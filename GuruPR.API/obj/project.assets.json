@@ -107,6 +107,42 @@
         "frameworkReferences": [
           "Microsoft.AspNetCore.App"
         ]
+      },
+      "GuruPR.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "dependencies": {
+          "GuruPR.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/GuruPR.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/GuruPR.Application.dll": {}
+        }
+      },
+      "GuruPR.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "compile": {
+          "bin/placeholder/GuruPR.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/GuruPR.Domain.dll": {}
+        }
+      },
+      "GuruPR.Persistence/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "dependencies": {
+          "GuruPR.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/GuruPR.Persistence.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/GuruPR.Persistence.dll": {}
+        }
       }
     }
   },
@@ -460,10 +496,27 @@
         "swashbuckle.aspnetcore.swaggerui.6.5.0.nupkg.sha512",
         "swashbuckle.aspnetcore.swaggerui.nuspec"
       ]
+    },
+    "GuruPR.Application/1.0.0": {
+      "type": "project",
+      "path": "../GuruPR.Application/GuruPR.Application.csproj",
+      "msbuildProject": "../GuruPR.Application/GuruPR.Application.csproj"
+    },
+    "GuruPR.Domain/1.0.0": {
+      "type": "project",
+      "path": "../GuruPR.Domain/GuruPR.Domain.csproj",
+      "msbuildProject": "../GuruPR.Domain/GuruPR.Domain.csproj"
+    },
+    "GuruPR.Persistence/1.0.0": {
+      "type": "project",
+      "path": "../GuruPR.Persistence/GuruPR.Persistence.csproj",
+      "msbuildProject": "../GuruPR.Persistence/GuruPR.Persistence.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net7.0": [
+      "GuruPR.Application >= 1.0.0",
+      "GuruPR.Persistence >= 1.0.0",
       "Microsoft.AspNetCore.OpenApi >= 7.0.9",
       "Swashbuckle.AspNetCore >= 6.5.0"
     ]
@@ -493,7 +546,14 @@
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\abdel\\RiderProjects\\GuruPR\\GuruPR.Application\\GuruPR.Application.csproj": {
+              "projectPath": "C:\\Users\\abdel\\RiderProjects\\GuruPR\\GuruPR.Application\\GuruPR.Application.csproj"
+            },
+            "C:\\Users\\abdel\\RiderProjects\\GuruPR\\GuruPR.Persistence\\GuruPR.Persistence.csproj": {
+              "projectPath": "C:\\Users\\abdel\\RiderProjects\\GuruPR\\GuruPR.Persistence\\GuruPR.Persistence.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

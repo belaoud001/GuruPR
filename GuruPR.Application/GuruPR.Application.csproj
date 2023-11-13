@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\GuruPR.Domain\GuruPR.Domain.csproj" />
+    </ItemGroup>
+
 </Project>

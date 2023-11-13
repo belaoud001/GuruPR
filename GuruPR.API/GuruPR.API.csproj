@@ -12,5 +12,10 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\GuruPR.Application\GuruPR.Application.csproj" />
+      <ProjectReference Include="..\GuruPR.Persistence\GuruPR.Persistence.csproj" />
+    </ItemGroup>
+
 </Project>
     
