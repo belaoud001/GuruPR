@@ -2,7 +2,6 @@
 
 public static class ServiceExtensions
 {
-    
     public static void ConfigureCors(this IServiceCollection services)
     {
         services.AddCors(
@@ -13,5 +12,9 @@ public static class ServiceExtensions
                                   .AllowAnyHeader())
         );
     }
-    
+
+    public static void ConfigureLogging(this IServiceCollection services)
+    {
+        services.AddLogging();
+    }
 }

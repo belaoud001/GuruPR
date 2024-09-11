@@ -1,10 +1,10 @@
 ﻿using GuruPR.Configuration;
+using GuruPR.Middlewares;
 
 namespace GuruPR;
 
 public class Startup
 {
-    
     public IConfiguration Configuration { get; }
     
     public Startup(IConfiguration configuration)
@@ -18,6 +18,7 @@ public class Startup
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
+        services.AddLogging();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -28,7 +29,7 @@ public class Startup
             app.UseSwaggerUI();
         }
 
-        app.UseHttpsRedirection();
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
 
         app.UseRouting();
 
@@ -38,5 +39,4 @@ public class Startup
             endpoint => endpoint.MapControllers()
         );
     }
-    
 }
