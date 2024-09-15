@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuruPR.Persistence", "GuruP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuruPR.Application", "GuruPR.Application\GuruPR.Application.csproj", "{57F524D8-795C-4AC8-8611-5AB0CC37BB04}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuruPR.Infrastructure", "GuruPR.Infrastructure\GuruPR.Infrastructure.csproj", "{692A6031-F881-40B8-9B3C-D86F5C0FD7A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{57F524D8-795C-4AC8-8611-5AB0CC37BB04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57F524D8-795C-4AC8-8611-5AB0CC37BB04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57F524D8-795C-4AC8-8611-5AB0CC37BB04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{692A6031-F881-40B8-9B3C-D86F5C0FD7A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{692A6031-F881-40B8-9B3C-D86F5C0FD7A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{692A6031-F881-40B8-9B3C-D86F5C0FD7A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{692A6031-F881-40B8-9B3C-D86F5C0FD7A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

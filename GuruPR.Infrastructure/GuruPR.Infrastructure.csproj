@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GuruPR.Domain\GuruPR.Domain.csproj" />
+      <ProjectReference Include="..\GuruPR.Application\GuruPR.Application.csproj" />
     </ItemGroup>
-
+    
 </Project>

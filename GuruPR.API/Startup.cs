@@ -1,6 +1,7 @@
 ﻿using GuruPR.Configuration;
+using GuruPR.Hubs;
 using GuruPR.Middlewares;
-
+    
 namespace GuruPR;
 
 public class Startup
@@ -14,11 +15,14 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        services.ConfigureAuthentication();
+        services.ConfiureAuthorization();   
         services.ConfigureCors();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
-        services.AddLogging();
+        services.ConfigureLogging();
+        services.ConfigureSignalR();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -29,6 +33,8 @@ public class Startup
             app.UseSwaggerUI();
         }
 
+        app.UseHttpsRedirection();
+
         app.UseMiddleware<ExceptionHandlingMiddleware>();
 
         app.UseRouting();
@@ -36,7 +42,14 @@ public class Startup
         app.UseAuthorization();
 
         app.UseEndpoints(
-            endpoint => endpoint.MapControllers()
+                endpoint =>
+                {
+                    endpoint.MapControllers();
+                    endpoint.MapHub<ChatHub>("/hubs");
+                }
         );
+
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
     }
 }

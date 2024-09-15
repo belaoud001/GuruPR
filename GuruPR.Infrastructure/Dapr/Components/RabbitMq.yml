@@ -1,0 +1,16 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: handle
+spec:
+  type: bindings.rabbitmq
+  version: v1
+  metadata:
+    - name: queueName
+      value: "guru"
+    - name: host
+      value: "amqp://guest:guest@127.0.0.1:5672"
+    - name: contentType
+      value: "application/json"
+    - name: direction
+      value: "input"
