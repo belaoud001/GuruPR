@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace GuruPR.Controllers;
 
 [ApiController]
-public class Dapr : ControllerBase
+public class DaprController : ControllerBase
 {
     private readonly ILogger _logger;
 
-    public Dapr(ILogger<Dapr> logger)
+    public DaprController(ILogger<DaprController> logger)
     {
         _logger = logger;
     }
