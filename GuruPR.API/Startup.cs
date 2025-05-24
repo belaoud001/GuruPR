@@ -1,6 +1,6 @@
-﻿using GuruPR.Configuration;
-using GuruPR.Hubs;
+﻿using GuruPR.Hubs;
 using GuruPR.Middlewares;
+using GuruPR.Configuration;
     
 namespace GuruPR;
 
@@ -16,13 +16,14 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.ConfigureAuthentication();
-        services.ConfiureAuthorization();   
+        services.ConfigureAuthorization();   
         services.ConfigureCors();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.ConfigureLogging();
         services.ConfigureSignalR();
+        services.ConfigureInfrastructure(Configuration);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

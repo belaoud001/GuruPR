@@ -10,4 +10,8 @@
       <ProjectReference Include="..\GuruPR.Domain\GuruPR.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
+    </ItemGroup>
+
 </Project>

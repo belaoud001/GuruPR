@@ -1,4 +1,6 @@
-﻿namespace GuruPR.Configuration;
+﻿using GuruPR.Infrastructure.Configuration;
+
+namespace GuruPR.Configuration;
 
 public static class ServiceExtensions
 {
@@ -23,7 +25,7 @@ public static class ServiceExtensions
         services.AddAuthentication().AddJwtBearer();
     }
 
-    public static void ConfiureAuthorization(this IServiceCollection services)
+    public static void ConfigureAuthorization(this IServiceCollection services)
     {
         services.AddAuthorizationBuilder();
     }
@@ -31,5 +33,10 @@ public static class ServiceExtensions
     public static void ConfigureSignalR(this IServiceCollection services)
     {
         services.AddSignalR();
+    }
+
+    public static void ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)  
+    {
+        services.AddInfrastructureServices(configuration);
     }
 }
