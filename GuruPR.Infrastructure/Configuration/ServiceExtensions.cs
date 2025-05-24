@@ -32,8 +32,8 @@ public static class ServiceExtensions
                                                    .Get<HuggingFaceModelsConfig>();
         
         if (huggingFaceModelsConfig == null || 
-            huggingFaceModelsConfig!.HuggingFaceModels?.Count <= 0 || 
-            huggingFaceModelsConfig!.ApiKey == null)
+            huggingFaceModelsConfig.HuggingFaceModels?.Count <= 0 || 
+            huggingFaceModelsConfig.ApiKey == null)
         {
             throw new InvalidOperationException("HuggingFaceModelsConfig is missing or contains no models.");
         }
