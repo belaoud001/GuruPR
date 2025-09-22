@@ -52,7 +52,7 @@ public static class ServiceExtensions
 
     private static void AddAzureOpenAIModels(IConfiguration configuration, IKernelBuilder kernelBuilder)
     {
-        var azureOpenAIModelsConfig = configuration.GetSection("AzureOpenAIConfig")
+        var azureOpenAIModelsConfig = configuration.GetSection("AzureOpenAIModelsConfig")
                                                    .Get<AzureOpenAIModelsConfig>();
 
         if (azureOpenAIModelsConfig == null ||
@@ -66,6 +66,7 @@ public static class ServiceExtensions
         foreach (var azureOpenAIModel in azureOpenAIModels ?? [])
         {
             kernelBuilder.Services.AddAzureOpenAIChatCompletion(
+                serviceId: azureOpenAIModel.DeploymentName,
                 deploymentName: azureOpenAIModel.DeploymentName,
                 endpoint: azureOpenAIModel.Endpoint,
                 apiKey: azureOpenAIModelsConfig.ApiKey,
