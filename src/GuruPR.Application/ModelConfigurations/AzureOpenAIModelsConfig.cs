@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GuruPR.Application.ModelConfigurations;
+﻿namespace GuruPR.Application.ModelConfigurations;
 
 public class AzureOpenAIModelsConfig
 {
