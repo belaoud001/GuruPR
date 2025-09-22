@@ -20,9 +20,10 @@ public static class ServiceExtensions
         var kernelBuilder = Kernel.CreateBuilder();
 
         AddHuggingFaceModels(configuration, kernelBuilder);
-        
+        AddAzureOpenAIModels(configuration, kernelBuilder);
+
         var kernel = kernelBuilder.Build();
-        
+
         services.AddSingleton<Kernel>(kernel);
     }
 
@@ -30,14 +31,14 @@ public static class ServiceExtensions
     {
         var huggingFaceModelsConfig = configuration.GetSection("HuggingFaceModelsConfig")
                                                    .Get<HuggingFaceModelsConfig>();
-        
-        if (huggingFaceModelsConfig == null || 
-            huggingFaceModelsConfig.HuggingFaceModels?.Count <= 0 || 
+
+        if (huggingFaceModelsConfig == null ||
+            huggingFaceModelsConfig.HuggingFaceModels?.Count <= 0 ||
             huggingFaceModelsConfig.ApiKey == null)
         {
             throw new InvalidOperationException("HuggingFaceModelsConfig is missing or contains no models.");
         }
-        
+
         var huggingFaceModels = huggingFaceModelsConfig?.HuggingFaceModels;
         foreach (var huggingFaceModel in huggingFaceModels ?? [])
         {
@@ -47,7 +48,30 @@ public static class ServiceExtensions
                 endpoint: new Uri(huggingFaceModel.Endpoint)
             );
         }
+    }
 
+    private static void AddAzureOpenAIModels(IConfiguration configuration, IKernelBuilder kernelBuilder)
+    {
+        var azureOpenAIModelsConfig = configuration.GetSection("AzureOpenAIConfig")
+                                                   .Get<AzureOpenAIModelsConfig>();
+
+        if (azureOpenAIModelsConfig == null ||
+            azureOpenAIModelsConfig.AzureOpenAIModels?.Count <= 0 ||
+            string.IsNullOrEmpty(azureOpenAIModelsConfig.ApiKey))
+        {
+            throw new InvalidOperationException("AzureOpenAIConfig is missing or contains no models.");
+        }
+
+        var azureOpenAIModels = azureOpenAIModelsConfig?.AzureOpenAIModels;
+        foreach (var azureOpenAIModel in azureOpenAIModels ?? [])
+        {
+            kernelBuilder.Services.AddAzureOpenAIChatCompletion(
+                deploymentName: azureOpenAIModel.DeploymentName,
+                endpoint: azureOpenAIModel.Endpoint,
+                apiKey: azureOpenAIModelsConfig.ApiKey,
+                apiVersion: azureOpenAIModel.ApiVersion
+            );
+        }
     }
 }
 
