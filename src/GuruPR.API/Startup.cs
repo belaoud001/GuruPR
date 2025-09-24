@@ -23,7 +23,9 @@ public class Startup
         services.AddSwaggerGen();
         services.ConfigureLogging();
         services.ConfigureSignalR();
+        services.ConfigureApplicationServices();
         services.ConfigureInfrastructure(Configuration);
+        services.ConfigurePersistence(Configuration);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

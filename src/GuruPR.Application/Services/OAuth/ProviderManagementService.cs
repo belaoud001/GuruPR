@@ -31,4 +31,18 @@ public class ProviderManagementService
 
         return _mapper.Map<ProviderDto>(provider);
     }
+
+    public async Task<bool> TestDatabaseConnectionAsync()
+    {
+        try
+        {
+            return await _unitOfWork.TestAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+
+            return false;
+        }
+    }
 }

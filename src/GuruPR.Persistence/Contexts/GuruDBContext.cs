@@ -13,13 +13,22 @@ public class GuruDBContext : DbContext
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-    }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
+
+#if DEBUG
+        optionsBuilder.EnableDetailedErrors(true);
+        optionsBuilder.EnableSensitiveDataLogging(true);
+#endif
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Provider>().ToContainer("Providers")
+                                       .HasPartitionKey(e => e.Id)
+                                       .HasNoDiscriminator();
     }
 }

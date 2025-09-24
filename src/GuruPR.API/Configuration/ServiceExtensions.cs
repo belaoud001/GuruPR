@@ -1,4 +1,6 @@
-﻿using GuruPR.Infrastructure.Configuration;
+﻿using GuruPR.Application.Configuration.Extensions;
+using GuruPR.Application.Services.OAuth;
+using GuruPR.Infrastructure.Configuration;
 using GuruPR.Persistence.Configuration;
 using OpenAI.Chat;
 
@@ -37,6 +39,11 @@ public static class ServiceExtensions
         services.AddSignalR();
     }
 
+    public static void ConfigureApplicationServices(this IServiceCollection services)
+    {
+        services.AddApplicationServices();
+    }
+
     public static void ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)  
     {
         services.AddInfrastructureServices(configuration);
@@ -45,5 +52,6 @@ public static class ServiceExtensions
     public static void ConfigurePersistence(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddPersistenceServices(configuration);
+        services.AddScoped<ProviderManagementService>();
     }
 }
