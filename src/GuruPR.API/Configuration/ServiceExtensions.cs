@@ -1,4 +1,6 @@
 ﻿using GuruPR.Infrastructure.Configuration;
+using GuruPR.Persistence.Configuration;
+using OpenAI.Chat;
 
 namespace GuruPR.Configuration;
 
@@ -38,5 +40,10 @@ public static class ServiceExtensions
     public static void ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)  
     {
         services.AddInfrastructureServices(configuration);
+    }
+
+    public static void ConfigurePersistence(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddPersistenceServices(configuration);
     }
 }

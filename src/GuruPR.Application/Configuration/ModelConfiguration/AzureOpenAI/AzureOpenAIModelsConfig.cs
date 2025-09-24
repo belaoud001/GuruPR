@@ -1,4 +1,4 @@
-﻿namespace GuruPR.Application.ModelConfigurations;
+﻿namespace GuruPR.Application.Configuration.ModelConfiguration.AzureOpenAI;
 
 public class AzureOpenAIModelsConfig
 {

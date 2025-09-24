@@ -1,8 +1,8 @@
 ﻿using Microsoft.SemanticKernel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-using GuruPR.Application.ModelConfigurations;
+using GuruPR.Application.Configuration.ModelConfiguration.AzureOpenAI;
+using GuruPR.Application.Configuration.ModelConfiguration.HuggingFace;
 
 namespace GuruPR.Infrastructure.Configuration;
 
