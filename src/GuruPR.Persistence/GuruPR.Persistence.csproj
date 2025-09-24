@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -7,11 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GuruPR.Application\GuruPR.Application.csproj" />
       <ProjectReference Include="..\GuruPR.Domain\GuruPR.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+
 using GuruPR.Application.Dtos.OAuth;
 using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Domain.Entities.OAuth;
@@ -9,12 +10,12 @@ namespace GuruPR.Application.Services.OAuth;
 public class ProviderManagementService
 {
     private readonly IMapper _mapper;
-    private readonly IProviderRepository _providerRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ProviderManagementService(IProviderRepository providerRepository, IMapper mapper)
+    public ProviderManagementService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _mapper = mapper;
-        _providerRepository = providerRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<ProviderDto> CreateProviderAsync(CreateProviderRequest createProviderRequest)
@@ -25,7 +26,8 @@ public class ProviderManagementService
             throw new DomainException("Invalid provider configuration, please recheck provider configuration.");
         }
 
-        await _providerRepository.SaveAsync(provider);
+        await _unitOfWork.Providers.AddAsync(provider);
+        await _unitOfWork.SaveChangesAsync();
 
         return _mapper.Map<ProviderDto>(provider);
     }

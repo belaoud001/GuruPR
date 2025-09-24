@@ -2,7 +2,6 @@
 
 namespace GuruPR.Application.Interfaces.Persistence;
 
-public interface IProviderRepository
+public interface IProviderRepository : IGenericRepository<Provider>
 {
-    Task SaveAsync(Provider provider);
 }
