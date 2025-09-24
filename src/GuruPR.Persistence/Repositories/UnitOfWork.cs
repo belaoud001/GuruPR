@@ -9,17 +9,17 @@ namespace GuruPR.Persistence.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly GuruDBContext _guruDBContext;
-    private IDbContextTransaction _transaction;
+    private readonly GuruDBContext _guruDbContext;
+    private IDbContextTransaction? _transaction;
 
-    private IProviderRepository _providerRepository;
+    private IProviderRepository? _providerRepository;
 
-    public UnitOfWork(GuruDBContext guruDBContext)
+    public UnitOfWork(GuruDBContext guruDbContext)
     {
-        _guruDBContext = guruDBContext;
+        _guruDbContext = guruDbContext;
     }
 
-    public IProviderRepository Providers => _providerRepository ??= new ProviderRepository(_guruDBContext);
+    public IProviderRepository Providers => _providerRepository ??= new ProviderRepository(_guruDbContext);
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
@@ -28,7 +28,7 @@ public class UnitOfWork : IUnitOfWork
             throw new InvalidOperationException("A transaction is already in progress.");
         }
 
-        _transaction = await _guruDBContext.Database.BeginTransactionAsync(cancellationToken);
+        _transaction = await _guruDbContext.Database.BeginTransactionAsync(cancellationToken);
     }
 
     public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
@@ -78,7 +78,7 @@ public class UnitOfWork : IUnitOfWork
     {
         try
         {
-            return await _guruDBContext.SaveChangesAsync(cancellationToken);
+            return await _guruDbContext.SaveChangesAsync(cancellationToken);
         }
         catch (DbUpdateConcurrencyException ex)
         {
@@ -92,7 +92,7 @@ public class UnitOfWork : IUnitOfWork
 
     public void Dispose()
     {
-        _guruDBContext?.Dispose();
+        _guruDbContext?.Dispose();
         _transaction?.Dispose();
     }
 
@@ -110,7 +110,7 @@ public class UnitOfWork : IUnitOfWork
             TokenUrl = "https://token.com"
         });
 
-        await _guruDBContext.SaveChangesAsync();
-        return await _guruDBContext.Database.CanConnectAsync();
+        await _guruDbContext.SaveChangesAsync();
+        return await _guruDbContext.Database.CanConnectAsync();
     }
 }

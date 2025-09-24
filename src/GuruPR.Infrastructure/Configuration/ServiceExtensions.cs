@@ -21,7 +21,7 @@ public static class ServiceExtensions
         var kernelBuilder = Kernel.CreateBuilder();
 
         AddHuggingFaceModels(configuration, kernelBuilder);
-        AddAzureOpenAIModels(configuration, kernelBuilder);
+        AddAzureOpenAiModels(configuration, kernelBuilder);
 
         var kernel = kernelBuilder.Build();
 
@@ -51,27 +51,27 @@ public static class ServiceExtensions
         }
     }
 
-    private static void AddAzureOpenAIModels(IConfiguration configuration, IKernelBuilder kernelBuilder)
+    private static void AddAzureOpenAiModels(IConfiguration configuration, IKernelBuilder kernelBuilder)
     {
-        var azureOpenAIModelsConfig = configuration.GetSection("AzureOpenAIModelsConfig")
+        var azureOpenAiModelsConfig = configuration.GetSection("AzureOpenAIModelsConfig")
                                                    .Get<AzureOpenAIModelsConfig>();
 
-        if (azureOpenAIModelsConfig == null ||
-            azureOpenAIModelsConfig.AzureOpenAIModels?.Count <= 0 ||
-            string.IsNullOrEmpty(azureOpenAIModelsConfig.ApiKey))
+        if (azureOpenAiModelsConfig == null ||
+            azureOpenAiModelsConfig.AzureOpenAIModels?.Count <= 0 ||
+            string.IsNullOrEmpty(azureOpenAiModelsConfig.ApiKey))
         {
             throw new InvalidOperationException("AzureOpenAIConfig is missing or contains no models.");
         }
 
-        var azureOpenAIModels = azureOpenAIModelsConfig?.AzureOpenAIModels;
-        foreach (var azureOpenAIModel in azureOpenAIModels ?? [])
+        var azureOpenAiModels = azureOpenAiModelsConfig?.AzureOpenAIModels;
+        foreach (var azureOpenAiModel in azureOpenAiModels ?? [])
         {
             kernelBuilder.Services.AddAzureOpenAIChatCompletion(
-                serviceId: azureOpenAIModel.DeploymentName,
-                deploymentName: azureOpenAIModel.DeploymentName,
-                endpoint: azureOpenAIModel.Endpoint,
-                apiKey: azureOpenAIModelsConfig.ApiKey,
-                apiVersion: azureOpenAIModel.ApiVersion
+                serviceId: azureOpenAiModel.DeploymentName,
+                deploymentName: azureOpenAiModel.DeploymentName,
+                endpoint: azureOpenAiModel.Endpoint,
+                apiKey: azureOpenAiModelsConfig!.ApiKey,
+                apiVersion: azureOpenAiModel.ApiVersion
             );
         }
     }

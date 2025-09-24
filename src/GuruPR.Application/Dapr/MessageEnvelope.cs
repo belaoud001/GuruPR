@@ -8,5 +8,5 @@ public class MessageEnvelope
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public OperationType OperationType { get; set; }
     
-    public Dictionary<string, object> Metadatas { get; set; }
+    public Dictionary<string, object>? Metadata { get; set; }
 }
