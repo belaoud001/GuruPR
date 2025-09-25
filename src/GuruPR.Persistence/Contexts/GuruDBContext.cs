@@ -27,7 +27,7 @@ public class GuruDBContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Provider>().ToContainer("Providers")
+        modelBuilder.Entity<Provider>().ToContainer("providers")
                                        .HasPartitionKey(e => e.Id)
                                        .HasNoDiscriminator();
     }

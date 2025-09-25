@@ -23,7 +23,14 @@ public static class ServiceExtensions
 
         services.AddDbContext<GuruDBContext>(optionsBuilder => optionsBuilder.UseCosmos(accountEndpoint: cosmosDBConfig.AccountEndpoint,
                                                                                         accountKey: cosmosDBConfig.AccountKey,
-                                                                                        databaseName: cosmosDBConfig.DatabaseName));
+                                                                                        databaseName: cosmosDBConfig.DatabaseName,
+                                                                                        cosmosOptionsAction: cosmosOptions =>
+                                                                                        {
+#if DEBUG
+                                                                                            cosmosOptions.ConnectionMode(Microsoft.Azure.Cosmos.ConnectionMode.Direct);
+#endif
+                                                                                        }
+                                                                                        ));
         services.AddRepositories();
     }
 
