@@ -8,7 +8,6 @@ public class GuruDBContext : DbContext
 {
     public DbSet<Provider> Providers { get; set; }
 
-
     public GuruDBContext(DbContextOptions<GuruDBContext> options) : base(options)
     {
     }
@@ -28,7 +27,7 @@ public class GuruDBContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Provider>().ToContainer("providers")
-                                       .HasPartitionKey(e => e.Id)
+                                       .HasPartitionKey(provider => provider.Id)
                                        .HasNoDiscriminator();
     }
 }
