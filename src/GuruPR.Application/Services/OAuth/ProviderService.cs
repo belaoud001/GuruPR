@@ -127,7 +127,7 @@ public class ProviderService : IProviderService
         var provider = await _unitOfWork.Providers.GetByIdAsync(providerId);
         if (provider == null)
         {
-            throw new NotFoundException($"Provider with id {providerId} not found.");
+            throw new NotFoundException($"Provider with ID {providerId} not found.");
         }
         return provider;
     }

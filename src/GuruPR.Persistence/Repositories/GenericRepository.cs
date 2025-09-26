@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using GuruPR.Application.Interfaces.Persistence;
+using System.Linq.Expressions;
 
 namespace GuruPR.Persistence.Repositories;
 

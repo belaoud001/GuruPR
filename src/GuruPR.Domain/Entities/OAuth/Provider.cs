@@ -64,4 +64,30 @@ public class Provider
 
         return true;
     }
+
+    public void AddProviderConnection(ProviderConnection providerConnection)
+    {
+        if (providerConnection == null)
+        {
+            throw new ArgumentNullException(nameof(providerConnection));
+        }
+
+        ProviderConnections.Add(providerConnection);
+    }
+
+    public bool RemoveProviderConnection(string providerConnectionId)
+    {
+        if (string.IsNullOrWhiteSpace(providerConnectionId))
+        {
+            throw new ArgumentException("Provider connection ID cannot be null or empty.", nameof(providerConnectionId));
+        }
+
+        var providerConnection = ProviderConnections.FirstOrDefault(providerConnection => providerConnection.Id == providerConnectionId);
+        if (providerConnection != null)
+        {
+            return ProviderConnections.Remove(providerConnection);
+        }
+
+        return false;
+    }
 }
