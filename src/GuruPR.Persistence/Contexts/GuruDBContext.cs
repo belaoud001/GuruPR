@@ -6,7 +6,7 @@ namespace GuruPR.Persistence.Contexts;
 
 public class GuruDBContext : DbContext
 {
-    public DbSet<Provider> Providers { get; set; }
+    public DbSet<Provider> Providers { get; set; } = null!;
 
     public GuruDBContext(DbContextOptions<GuruDBContext> options) : base(options)
     {
