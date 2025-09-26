@@ -13,8 +13,7 @@ public class ProviderConnectionProfile : Profile
         CreateMap<ProviderConnectionDto, ProviderConnection>();
 
         CreateMap<ProviderConnection, CreateProviderConnectionRequest>();
-        CreateMap<CreateProviderConnectionRequest, ProviderConnection>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid().ToString()));
+        CreateMap<CreateProviderConnectionRequest, ProviderConnection>();
 
         CreateMap<ProviderConnection, UpdateProviderConnectionRequest>();
         CreateMap<UpdateProviderConnectionRequest, ProviderConnection>();

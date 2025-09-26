@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+
 using GuruPR.Application.Dtos.OAuth.Provider;
 using GuruPR.Domain.Entities.OAuth;
 
@@ -12,7 +13,9 @@ public class ProviderProfile : Profile
         CreateMap<ProviderDto, Provider>();
 
         CreateMap<Provider, CreateProviderRequest>();
-        CreateMap<CreateProviderRequest, Provider>();
+        CreateMap<CreateProviderRequest, Provider>()
+            .ForMember(dest => dest.ProviderConnections, opt => opt.MapFrom(src => src.ProviderConnections));
+
 
         CreateMap<Provider, UpdateProviderRequest>();
         CreateMap<UpdateProviderRequest, Provider>();

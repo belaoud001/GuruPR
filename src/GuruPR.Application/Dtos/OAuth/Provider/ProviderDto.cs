@@ -1,4 +1,6 @@
-﻿namespace GuruPR.Application.Dtos.OAuth.Provider;
+﻿using GuruPR.Application.Dtos.OAuth.ProviderConnection;
+
+namespace GuruPR.Application.Dtos.OAuth.Provider;
 
 public class ProviderDto
 {
@@ -15,4 +17,6 @@ public class ProviderDto
     public List<string> DefaultScopes { get; set; } = new();
 
     public DateTime CreatedAt { get; set; }
+
+    public List<ProviderConnectionDto> ProviderConnections { get; set; } = [];
 }

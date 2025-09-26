@@ -10,5 +10,5 @@ public class CreateProviderConnectionRequest
 
     public required DateTime AccessExpiresAt { get; set; }
 
-    public required DateTime CreatedAt { get; set; }
+    public required DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

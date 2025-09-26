@@ -11,6 +11,7 @@ public static class ServiceExtensions
     {
         services.AddAutoMapper(config => {
             config.AddProfile<ProviderProfile>();
+            config.AddProfile<ProviderConnectionProfile>();
         });
         services.AddScoped<IProviderService, ProviderService>();
     }
