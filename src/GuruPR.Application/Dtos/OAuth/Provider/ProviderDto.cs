@@ -1,8 +1,8 @@
-﻿namespace GuruPR.Application.Dtos.OAuth;
+﻿namespace GuruPR.Application.Dtos.OAuth.Provider;
 
 public class ProviderDto
 {
-    public int Id { get; set; }
+    public string Id { get; set; } = default!;
 
     public string Name { get; set; } = default!;
 

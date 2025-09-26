@@ -28,6 +28,8 @@ public class GuruDBContext : DbContext
 
         modelBuilder.Entity<Provider>().ToContainer("providers")
                                        .HasPartitionKey(provider => provider.Id)
-                                       .HasNoDiscriminator();
+                                       .HasNoDiscriminator()
+                                       .Property(provider => provider.Id)
+                                       .IsRequired();
     }
 }

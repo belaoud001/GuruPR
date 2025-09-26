@@ -52,6 +52,5 @@ public static class ServiceExtensions
     public static void ConfigurePersistence(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddPersistenceServices(configuration);
-        services.AddScoped<ProviderManagementService>();
     }
 }

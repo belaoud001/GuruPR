@@ -18,7 +18,7 @@ public static class ServiceExtensions
 
         if (cosmosDBConfig is null)
         {
-            throw new ArgumentNullException(nameof(cosmosDBConfig), "CosmosDBConfig section is missing in configuration.");
+            throw new ArgumentNullException(nameof(Configuration), "CosmosDBConfig section is missing in configuration.");
         }
 
         services.AddDbContext<GuruDBContext>(optionsBuilder => optionsBuilder.UseCosmos(accountEndpoint: cosmosDBConfig.AccountEndpoint,

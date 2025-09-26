@@ -20,7 +20,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         return await _dbSet.ToListAsync();
     }
 
-    public async Task<T> GetByIdAsync(int id)
+    public async Task<T> GetByIdAsync(string id)
     {
         return await _dbSet.FindAsync(id) ?? throw new KeyNotFoundException();
     }
@@ -34,8 +34,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
     public void Update(T entity)
     {
-        throw new NotImplementedException();
+        _dbSet.Update(entity);
     }
+
     public void Delete(T entity)
     {
         _dbSet.Remove(entity);

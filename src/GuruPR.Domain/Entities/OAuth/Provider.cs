@@ -6,9 +6,9 @@
 public class Provider
 {
     /// <summary>
-    /// Unique identifier of the provider.
+    /// Unique identifier (GUID) of the provider.
     /// </summary>
-    public int Id { get; set; }
+    public string Id { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>
     /// Name of the provider.
@@ -44,6 +44,11 @@ public class Provider
     /// Date and time when the provider was created.
     /// </summary>
     public required DateTime CreatedAt { get; set; }
+
+    /// <summary>
+    /// List of connections associated with this provider.
+    /// </summary>
+    public List<ProviderConnection> ProviderConnections { get; set; } = [];
 
     /// <summary>
     /// Validates the provider configuration.

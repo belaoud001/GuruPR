@@ -1,0 +1,22 @@
+﻿using AutoMapper;
+
+using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Application.Dtos.OAuth.ProviderConnection;
+
+namespace GuruPR.Application.Profiles.OAuth;
+
+public class ProviderConnectionProfile : Profile
+{
+    public ProviderConnectionProfile()
+    {
+        CreateMap<ProviderConnection, ProviderConnectionDto>();
+        CreateMap<ProviderConnectionDto, ProviderConnection>();
+
+        CreateMap<ProviderConnection, CreateProviderConnectionRequest>();
+        CreateMap<CreateProviderConnectionRequest, ProviderConnection>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid().ToString()));
+
+        CreateMap<ProviderConnection, UpdateProviderConnectionRequest>();
+        CreateMap<UpdateProviderConnectionRequest, ProviderConnection>();
+    }
+}

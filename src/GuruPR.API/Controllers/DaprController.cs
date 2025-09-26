@@ -9,12 +9,11 @@ namespace GuruPR.Controllers;
 public class DaprController : ControllerBase
 {
     private readonly ILogger _logger;
-    private readonly ProviderManagementService providerManagementService;
 
-    public DaprController(ILogger<DaprController> logger, ProviderManagementService providerManagementService)
+
+    public DaprController(ILogger<DaprController> logger)
     {
         _logger = logger;
-        this.providerManagementService = providerManagementService;
     }
     
     [HttpPost("/handle")]
@@ -23,13 +22,5 @@ public class DaprController : ControllerBase
         // Treat incoming messages here ( Redirect based on operation-type ) ...
         
         return Ok();
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<string>> TestAsync()
-    {
-        var result = await providerManagementService.TestDatabaseConnectionAsync();
-
-        return Ok(result.ToString());
     }
 }

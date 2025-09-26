@@ -1,15 +1,7 @@
-﻿namespace GuruPR.Domain.Entities.OAuth;
+﻿namespace GuruPR.Application.Dtos.OAuth.ProviderConnection;
 
-/// <summary>
-/// Represents a connection to an OAuth provider, including tokens, scopes, and expiration details.
-/// </summary>
-public class ProviderConnection
+public class UpdateProviderConnectionRequest
 {
-    /// <summary>
-    /// Unique identifier of the provider connection.
-    /// </summary>
-    public string Id { get; set; } = null!;
-
     /// <summary>
     /// Access token used for authentication.
     /// </summary>
@@ -34,11 +26,4 @@ public class ProviderConnection
     /// Creation date and time of the provider connection.
     /// </summary>
     public required DateTime CreatedAt { get; set; }
-
-
-    public bool IsTokenExpired() => DateTime.UtcNow >= AccessExpiresAt;
-
-    public bool HasScope(string scope) => Scopes.Contains(scope);
-
-    public bool ShouldRefreshToken() => IsTokenExpired() && !string.IsNullOrEmpty(RefreshToken);
 }

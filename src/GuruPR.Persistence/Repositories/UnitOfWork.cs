@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore.Storage;
 
 using GuruPR.Persistence.Contexts;
-using GuruPR.Domain.Entities.OAuth;
 using GuruPR.Application.Interfaces.Persistence;
 
 namespace GuruPR.Persistence.Repositories;
@@ -94,23 +93,7 @@ public class UnitOfWork : IUnitOfWork
     {
         _guruDbContext?.Dispose();
         _transaction?.Dispose();
-    }
 
-    public async Task<bool> TestAsync(CancellationToken cancellationToken = default)
-    {
-        await Providers.AddAsync(new Provider()
-        {
-            ClientId = "t",
-            AuthorizationUrl = "https://test.com",
-            ClientSecret = "s",
-            Name = "Test",
-            CreatedAt = DateTime.UtcNow,
-            DefaultScopes = ["scope"],
-            Id = 1,
-            TokenUrl = "https://token.com"
-        });
-
-        await _guruDbContext.SaveChangesAsync();
-        return await _guruDbContext.Database.CanConnectAsync();
+        GC.SuppressFinalize(this);
     }
 }

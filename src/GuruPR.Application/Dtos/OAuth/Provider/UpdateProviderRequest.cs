@@ -1,6 +1,8 @@
-﻿namespace GuruPR.Application.Dtos.OAuth;
+﻿using GuruPR.Domain.Entities.OAuth;
 
-public class CreateProviderRequest
+namespace GuruPR.Application.Dtos.OAuth.Provider;
+
+public class UpdateProviderRequest
 {
     public required string Name { get; set; }
 

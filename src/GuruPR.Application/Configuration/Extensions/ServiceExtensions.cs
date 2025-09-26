@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-
-using GuruPR.Application.Profiles;
 using GuruPR.Application.Services.OAuth;
+using GuruPR.Application.Interfaces.Application;
+using GuruPR.Application.Profiles.OAuth;
 
 namespace GuruPR.Application.Configuration.Extensions;
 
@@ -12,6 +12,6 @@ public static class ServiceExtensions
         services.AddAutoMapper(config => {
             config.AddProfile<ProviderProfile>();
         });
-        services.AddScoped<ProviderManagementService>();
+        services.AddScoped<IProviderService, ProviderService>();
     }
 }
