@@ -1,6 +1,6 @@
 ﻿using GuruPR.Persistence.Configuration;
 using GuruPR.Infrastructure.Configuration;
-using GuruPR.Application.Configuration.Extensions;
+using GuruPR.Application.Settings.Extensions;
 
 namespace GuruPR.Configuration;
 

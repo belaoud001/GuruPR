@@ -5,8 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using GuruPR.Infrastructure.Services.Security;
 using GuruPR.Application.Configuration.Security;
 using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Application.Configuration.ModelConfiguration.AzureOpenAI;
-using GuruPR.Application.Configuration.ModelConfiguration.HuggingFace;
+using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
+using GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
 
 namespace GuruPR.Infrastructure.Configuration;
 
@@ -34,17 +34,17 @@ public static class ServiceExtensions
 
     private static void AddHuggingFaceModels(IConfiguration configuration, IKernelBuilder kernelBuilder)
     {
-        var huggingFaceModelsConfig = configuration.GetSection("HuggingFaceModelsConfig")
-                                                   .Get<HuggingFaceModelsConfig>();
+        var huggingFaceModelsConfig = configuration.GetSection(HuggingFaceModels.SectionName)
+                                                   .Get<HuggingFaceModels>();
 
         if (huggingFaceModelsConfig == null ||
-            huggingFaceModelsConfig.HuggingFaceModels?.Count <= 0 ||
+            huggingFaceModelsConfig.HuggingFaceModelCollection?.Count <= 0 ||
             huggingFaceModelsConfig.ApiKey == null)
         {
             throw new InvalidOperationException("HuggingFaceModelsConfig is missing or contains no models.");
         }
 
-        var huggingFaceModels = huggingFaceModelsConfig?.HuggingFaceModels;
+        var huggingFaceModels = huggingFaceModelsConfig?.HuggingFaceModelCollection;
         foreach (var huggingFaceModel in huggingFaceModels ?? [])
         {
             kernelBuilder.Services.AddHuggingFaceChatCompletion(
@@ -57,17 +57,17 @@ public static class ServiceExtensions
 
     private static void AddAzureOpenAiModels(IConfiguration configuration, IKernelBuilder kernelBuilder)
     {
-        var azureOpenAiModelsConfig = configuration.GetSection("AzureOpenAIModelsConfig")
-                                                   .Get<AzureOpenAIModelsConfig>();
+        var azureOpenAiModelsConfig = configuration.GetSection(AzureOpenAIModels.SectionName)
+                                                   .Get<AzureOpenAIModels>();
 
         if (azureOpenAiModelsConfig == null ||
-            azureOpenAiModelsConfig.AzureOpenAIModels?.Count <= 0 ||
+            azureOpenAiModelsConfig.AzureOpenAIModelCollection?.Count <= 0 ||
             string.IsNullOrEmpty(azureOpenAiModelsConfig.ApiKey))
         {
             throw new InvalidOperationException("AzureOpenAIConfig is missing or contains no models.");
         }
 
-        var azureOpenAiModels = azureOpenAiModelsConfig?.AzureOpenAIModels;
+        var azureOpenAiModels = azureOpenAiModelsConfig?.AzureOpenAIModelCollection;
         foreach (var azureOpenAiModel in azureOpenAiModels ?? [])
         {
             kernelBuilder.Services.AddAzureOpenAIChatCompletion(
@@ -82,8 +82,8 @@ public static class ServiceExtensions
 
     private static void AddSecurity(this IServiceCollection services, IConfiguration configuration)
     {
-        var tokenEncryptionConfig = configuration.GetSection("TokenEncryptionConfig")
-                                                 .Get<TokenEncryptionConfig>() 
+        var tokenEncryptionConfig = configuration.GetSection(TokenEncryption.SectionName)
+                                                 .Get<TokenEncryption>() 
                                                  ?? throw new InvalidOperationException("TokenEncryptionConfig section is missing in configuration.");
 
         if (string.IsNullOrEmpty(tokenEncryptionConfig.Key))

@@ -4,7 +4,7 @@ using GuruPR.Application.Services.OAuth;
 using GuruPR.Application.Profiles.OAuth;
 using GuruPR.Application.Interfaces.Application;
 
-namespace GuruPR.Application.Configuration.Extensions;
+namespace GuruPR.Application.Settings.Extensions;
 
 public static class ServiceExtensions
 {
