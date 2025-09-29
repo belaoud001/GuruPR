@@ -13,12 +13,29 @@ public class ProviderConnectionService : IProviderConnectionService
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
 
-    #region Public Methods
-
     public ProviderConnectionService(IMapper mapper, IUnitOfWork unitOfWork)
     {
         _mapper = mapper;
         _unitOfWork = unitOfWork;
+    }
+
+    #region Public Methods
+
+    public async Task<IEnumerable<ProviderConnectionDto>> GetConnectionsByProviderAsync(string providerId)
+    {
+        var provider = await GetProviderByIdOrThrowExceptionAsync(providerId);
+
+        return _mapper.Map<IEnumerable<ProviderConnectionDto>>(provider.ProviderConnections);
+    }
+
+    public async Task<ProviderConnectionDto> GetProviderConnectionByIdAsync(string providerId, string providerConnectionId)
+    {
+        var provider = await GetProviderByIdOrThrowExceptionAsync(providerId);
+        var providerConnection = provider.ProviderConnections.FirstOrDefault(providerConnection => providerConnection.Id == providerConnectionId);
+
+        var providerConnectionDto = _mapper.Map<ProviderConnectionDto>(providerConnection);
+
+        return providerConnectionDto;
     }
 
     public async Task<ProviderConnectionDto> AddProviderConnectionToProviderAsync(string providerId, CreateProviderConnectionRequest createProviderConnectionRequest)
@@ -46,13 +63,6 @@ public class ProviderConnectionService : IProviderConnectionService
         await _unitOfWork.SaveChangesAsync();
         
         return true;
-    }
-
-    public async Task<IEnumerable<ProviderConnectionDto>> GetConnectionsByProviderAsync(string providerId)
-    {
-        var provider = await GetProviderByIdOrThrowExceptionAsync(providerId);
-
-        return _mapper.Map<IEnumerable<ProviderConnectionDto>>(provider.ProviderConnections);
     }
 
     #endregion

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
 using GuruPR.Application.Services.OAuth;
-using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Profiles.OAuth;
+using GuruPR.Application.Interfaces.Application;
 
 namespace GuruPR.Application.Configuration.Extensions;
 
@@ -17,5 +17,6 @@ public static class ServiceExtensions
             config.AddProfile<ProviderConnectionProfile>();
         });
         services.AddScoped<IProviderService, ProviderService>();
+        services.AddScoped<IProviderConnectionService, ProviderConnectionService>();
     }
 }
