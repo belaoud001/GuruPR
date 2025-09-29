@@ -1,15 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Application.Interfaces.Infrastructure;
+using GuruPR.Persistence.Configuration;
 
 namespace GuruPR.Persistence.Contexts;
 
 public class GuruDBContext : DbContext
 {
+    private readonly ITokenEncryptionService _tokenEncryptionService;
+
     public DbSet<Provider> Providers { get; set; } = null!;
 
-    public GuruDBContext(DbContextOptions<GuruDBContext> options) : base(options)
+    public GuruDBContext(DbContextOptions<GuruDBContext> options, ITokenEncryptionService tokenEncryptionService) : base(options)
     {
+        _tokenEncryptionService = tokenEncryptionService;
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -26,10 +31,6 @@ public class GuruDBContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Provider>().ToContainer("providers")
-                                       .HasPartitionKey(provider => provider.Id)
-                                       .HasNoDiscriminator()
-                                       .Property(provider => provider.Id)
-                                       .IsRequired();
+        modelBuilder.ApplyConfiguration(new ProviderConfiguration(_tokenEncryptionService));
     }
 }

@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using GuruPR.Infrastructure.Services;
+using GuruPR.Application.Configuration.Security;
+using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Configuration.ModelConfiguration.AzureOpenAI;
 using GuruPR.Application.Configuration.ModelConfiguration.HuggingFace;
 
@@ -14,6 +17,7 @@ public static class ServiceExtensions
     public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSemanticKernel(configuration);
+        services.AddSecurity(configuration);
     }
 
     private static void AddSemanticKernel(this IServiceCollection services, IConfiguration configuration)
@@ -74,6 +78,20 @@ public static class ServiceExtensions
                 apiVersion: azureOpenAiModel.ApiVersion
             );
         }
+    }
+
+    private static void AddSecurity(this IServiceCollection services, IConfiguration configuration)
+    {
+        var tokenEncryptionConfig = configuration.GetSection("TokenEncryptionConfig")
+                                                 .Get<TokenEncryptionConfig>() 
+                                                 ?? throw new InvalidOperationException("TokenEncryptionConfig section is missing in configuration.");
+
+        if (string.IsNullOrEmpty(tokenEncryptionConfig.Key))
+        {
+            throw new InvalidOperationException("TokenEncryptionConfig or its Key is missing in configuration.");
+        }
+
+        services.AddSingleton<ITokenEncryptionService>(_ => new TokenEncryptionService(tokenEncryptionConfig.Key));
     }
 }
 
