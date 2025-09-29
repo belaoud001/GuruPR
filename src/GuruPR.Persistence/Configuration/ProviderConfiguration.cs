@@ -1,0 +1,40 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Application.Interfaces.Infrastructure;
+
+namespace GuruPR.Persistence.Configuration;
+
+public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
+{
+    private readonly ITokenEncryptionService _tokenEncryptionService;
+
+    public ProviderConfiguration(ITokenEncryptionService tokenEncryptionService)
+    {
+        _tokenEncryptionService = tokenEncryptionService;
+    }
+
+    public void Configure(EntityTypeBuilder<Provider> builder)
+    {
+        builder.ToContainer("providers")
+               .HasPartitionKey(provider => provider.Id)
+               .HasNoDiscriminator();
+
+        builder.Property(provider => provider.Id)
+               .IsRequired();
+
+        builder.OwnsMany(provider => provider.ProviderConnections, navigationBuilder =>
+        {
+            navigationBuilder.Property(providerConnection => providerConnection.AccessToken)
+                .HasConversion(
+                    plainText  => _tokenEncryptionService.Encrypt(plainText),
+                    cipherText => _tokenEncryptionService.Decrypt(cipherText));
+
+            navigationBuilder.Property(providerConnection => providerConnection.RefreshToken)
+                .HasConversion(
+                    plainText  => _tokenEncryptionService.Encrypt(plainText),
+                    cipherText => _tokenEncryptionService.Decrypt(cipherText));
+        });
+    }
+}

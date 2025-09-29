@@ -2,7 +2,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using GuruPR.Application.ModelConfigurations;
+using GuruPR.Infrastructure.Services.Security;
+using GuruPR.Application.Configuration.Security;
+using GuruPR.Application.Interfaces.Infrastructure;
+using GuruPR.Application.Configuration.ModelConfiguration.AzureOpenAI;
+using GuruPR.Application.Configuration.ModelConfiguration.HuggingFace;
 
 namespace GuruPR.Infrastructure.Configuration;
 
@@ -13,6 +17,7 @@ public static class ServiceExtensions
     public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSemanticKernel(configuration);
+        services.AddSecurity(configuration);
     }
 
     private static void AddSemanticKernel(this IServiceCollection services, IConfiguration configuration)
@@ -20,7 +25,7 @@ public static class ServiceExtensions
         var kernelBuilder = Kernel.CreateBuilder();
 
         AddHuggingFaceModels(configuration, kernelBuilder);
-        AddAzureOpenAIModels(configuration, kernelBuilder);
+        AddAzureOpenAiModels(configuration, kernelBuilder);
 
         var kernel = kernelBuilder.Build();
 
@@ -50,29 +55,43 @@ public static class ServiceExtensions
         }
     }
 
-    private static void AddAzureOpenAIModels(IConfiguration configuration, IKernelBuilder kernelBuilder)
+    private static void AddAzureOpenAiModels(IConfiguration configuration, IKernelBuilder kernelBuilder)
     {
-        var azureOpenAIModelsConfig = configuration.GetSection("AzureOpenAIModelsConfig")
+        var azureOpenAiModelsConfig = configuration.GetSection("AzureOpenAIModelsConfig")
                                                    .Get<AzureOpenAIModelsConfig>();
 
-        if (azureOpenAIModelsConfig == null ||
-            azureOpenAIModelsConfig.AzureOpenAIModels?.Count <= 0 ||
-            string.IsNullOrEmpty(azureOpenAIModelsConfig.ApiKey))
+        if (azureOpenAiModelsConfig == null ||
+            azureOpenAiModelsConfig.AzureOpenAIModels?.Count <= 0 ||
+            string.IsNullOrEmpty(azureOpenAiModelsConfig.ApiKey))
         {
             throw new InvalidOperationException("AzureOpenAIConfig is missing or contains no models.");
         }
 
-        var azureOpenAIModels = azureOpenAIModelsConfig?.AzureOpenAIModels;
-        foreach (var azureOpenAIModel in azureOpenAIModels ?? [])
+        var azureOpenAiModels = azureOpenAiModelsConfig?.AzureOpenAIModels;
+        foreach (var azureOpenAiModel in azureOpenAiModels ?? [])
         {
             kernelBuilder.Services.AddAzureOpenAIChatCompletion(
-                serviceId: azureOpenAIModel.DeploymentName,
-                deploymentName: azureOpenAIModel.DeploymentName,
-                endpoint: azureOpenAIModel.Endpoint,
-                apiKey: azureOpenAIModelsConfig.ApiKey,
-                apiVersion: azureOpenAIModel.ApiVersion
+                serviceId: azureOpenAiModel.DeploymentName,
+                deploymentName: azureOpenAiModel.DeploymentName,
+                endpoint: azureOpenAiModel.Endpoint,
+                apiKey: azureOpenAiModelsConfig!.ApiKey,
+                apiVersion: azureOpenAiModel.ApiVersion
             );
         }
+    }
+
+    private static void AddSecurity(this IServiceCollection services, IConfiguration configuration)
+    {
+        var tokenEncryptionConfig = configuration.GetSection("TokenEncryptionConfig")
+                                                 .Get<TokenEncryptionConfig>() 
+                                                 ?? throw new InvalidOperationException("TokenEncryptionConfig section is missing in configuration.");
+
+        if (string.IsNullOrEmpty(tokenEncryptionConfig.Key))
+        {
+            throw new InvalidOperationException("TokenEncryptionConfig or its Key is missing in configuration.");
+        }
+
+        services.AddSingleton<ITokenEncryptionService>(_ => new TokenEncryptionService(tokenEncryptionConfig.Key));
     }
 }
 

@@ -1,4 +1,6 @@
-﻿using GuruPR.Infrastructure.Configuration;
+﻿using GuruPR.Persistence.Configuration;
+using GuruPR.Infrastructure.Configuration;
+using GuruPR.Application.Configuration.Extensions;
 
 namespace GuruPR.Configuration;
 
@@ -35,8 +37,18 @@ public static class ServiceExtensions
         services.AddSignalR();
     }
 
+    public static void ConfigureApplicationServices(this IServiceCollection services)
+    {
+        services.AddApplicationServices();
+    }
+
     public static void ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)  
     {
         services.AddInfrastructureServices(configuration);
+    }
+
+    public static void ConfigurePersistence(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddPersistenceServices(configuration);
     }
 }

@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="SemanticKernel\HuggingFace\TextCompletion\" />
+      <Folder Include="SemanticKernel\Plugins\" />
     </ItemGroup>
     
 </Project>

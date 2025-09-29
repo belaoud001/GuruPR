@@ -1,9 +1,11 @@
 ﻿using GuruPR.Application.Dapr;
+using GuruPR.Application.Services.OAuth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Controllers;
 
 [ApiController]
+[Route("/Dapr")]
 public class DaprController : ControllerBase
 {
     private readonly ILogger _logger;
