@@ -10,7 +10,6 @@ public class DaprController : ControllerBase
 {
     private readonly ILogger _logger;
 
-
     public DaprController(ILogger<DaprController> logger)
     {
         _logger = logger;

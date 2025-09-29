@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using GuruPR.Infrastructure.Services;
+using GuruPR.Infrastructure.Services.Security;
 using GuruPR.Application.Configuration.Security;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Configuration.ModelConfiguration.AzureOpenAI;

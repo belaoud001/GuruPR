@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 
 using GuruPR.Application.Interfaces.Infrastructure;
 
-namespace GuruPR.Infrastructure.Services;
+namespace GuruPR.Infrastructure.Services.Security;
 
 public class TokenEncryptionService : ITokenEncryptionService
 {
@@ -24,7 +24,7 @@ public class TokenEncryptionService : ITokenEncryptionService
     public string Encrypt(string plainText)
     {
         if (string.IsNullOrEmpty(plainText))
-        { 
+        {
             return plainText;
         }
 

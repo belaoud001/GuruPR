@@ -19,6 +19,5 @@ public class ProviderConnectionProfile : Profile
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         CreateMap<UpdateProviderConnectionRequest, ProviderConnection>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-
     }
 }

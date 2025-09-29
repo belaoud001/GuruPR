@@ -3,9 +3,9 @@
 using GuruPR.Domain.Exceptions;
 using GuruPR.Domain.Entities.OAuth;
 using GuruPR.Application.Exceptions;
+using GuruPR.Application.Dtos.OAuth.Provider;
 using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Application.Interfaces.Application;
-using GuruPR.Application.Dtos.OAuth.Provider;
 
 namespace GuruPR.Application.Services.OAuth;
 

@@ -1,8 +1,6 @@
-﻿using GuruPR.Application.Configuration.Extensions;
-using GuruPR.Application.Services.OAuth;
+﻿using GuruPR.Persistence.Configuration;
 using GuruPR.Infrastructure.Configuration;
-using GuruPR.Persistence.Configuration;
-using OpenAI.Chat;
+using GuruPR.Application.Configuration.Extensions;
 
 namespace GuruPR.Configuration;
 
