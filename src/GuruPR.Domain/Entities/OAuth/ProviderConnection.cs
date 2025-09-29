@@ -8,7 +8,7 @@ public class ProviderConnection
     /// <summary>
     /// Unique identifier of the provider connection.
     /// </summary>
-    public string Id { get; set; } = null!;
+    public string Id { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>
     /// Access token used for authentication.

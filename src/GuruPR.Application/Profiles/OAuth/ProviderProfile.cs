@@ -16,8 +16,9 @@ public class ProviderProfile : Profile
         CreateMap<CreateProviderRequest, Provider>()
             .ForMember(dest => dest.ProviderConnections, opt => opt.MapFrom(src => src.ProviderConnections));
 
-
-        CreateMap<Provider, UpdateProviderRequest>();
-        CreateMap<UpdateProviderRequest, Provider>();
+        CreateMap<Provider, UpdateProviderRequest>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+        CreateMap<UpdateProviderRequest, Provider>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
     }
 }

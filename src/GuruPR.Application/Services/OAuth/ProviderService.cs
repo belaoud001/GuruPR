@@ -41,8 +41,6 @@ public class ProviderService : IProviderService
             throw new DomainException("Invalid provider configuration, please recheck provider configuration.");
         }
 
-        provider.ProviderConnections = null; // ignore nested collection for now
-
         await _unitOfWork.Providers.AddAsync(provider);
         await _unitOfWork.SaveChangesAsync();
 
