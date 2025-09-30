@@ -25,7 +25,7 @@ public class ProviderController : ControllerBase
         return Ok(providers);
     }
 
-    [HttpGet("{providerId}")]
+    [HttpGet("{providerId}", Name = "GetProviderById")]
     public async Task<IActionResult> GetProviderByIdAsync(string providerId)
     {
         var provider = await _providerService.GetProviderByIdAsync(providerId);
@@ -38,7 +38,7 @@ public class ProviderController : ControllerBase
     {
         var provider = await _providerService.CreateProviderAsync(createProviderRequest);
 
-        return CreatedAtAction(nameof(GetProviderByIdAsync), new { providerId = provider.Id }, provider);
+        return CreatedAtRoute("GetProviderById", new { providerId = provider.Id }, provider);
     }
 
     [HttpPut("{providerId}")]
