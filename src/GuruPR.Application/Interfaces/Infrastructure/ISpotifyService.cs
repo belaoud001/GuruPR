@@ -2,5 +2,7 @@
 
 public interface ISpotifyService
 {
-    Task<string> GetLikedSongsAsync();
+    Task<string> GetSpotifyAccessTokenAsync(string userId, string scope);
+
+    Task<string> GetLikedTracksAsync(string token, int numberOfTracks);
 }

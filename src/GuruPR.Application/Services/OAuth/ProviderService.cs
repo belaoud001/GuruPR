@@ -71,6 +71,19 @@ public class ProviderService : IProviderService
         return _mapper.Map<ProviderDto>(provider);
     }
 
+
+    public async Task<ProviderDto> GetProviderByNameAsync(string providerName)
+    {
+        var provider = await _unitOfWork.Providers.GetProviderByNameAsync(providerName);
+
+        if (provider == null)
+        {
+            throw new NotFoundException($"Provider with name {providerName} not found.");
+        }
+
+        return _mapper.Map<ProviderDto>(provider);
+    }
+
     /// <summary>
     /// Updates an existing OAuth provider.
     /// </summary>

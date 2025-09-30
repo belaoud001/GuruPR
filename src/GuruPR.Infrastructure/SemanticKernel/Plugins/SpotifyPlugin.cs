@@ -18,17 +18,16 @@ public class SpotifyPlugin
     [Description("Get token to perform authenticated calls")]
     public async Task<string> GetTokenForAuthCallsAsync()
     {
-        Console.WriteLine("Getting token for authenticated calls...");
         return await Task.FromResult("123456789");
     }
 
-
     [KernelFunction("GetUserLikedTracks")]
     [Description("Retrieves the current user's liked tracks from Spotify")]
-    public async Task<string> GetUserLikedTracksAsync(string token)
+    public async Task<string> GetUserLikedTracksAsync([Description("Number of tracks must be between 0 and 50")] int numberOfTracks)
     {
-        Console.WriteLine("Retrieving user's liked tracks from Spotify...");
-        Console.WriteLine($"Using token: {token}");
-        return await _spotifyService.GetLikedSongsAsync();
+        var token = await _spotifyService.GetSpotifyAccessTokenAsync("userId", "user-library-read");
+        var likedTracks = await _spotifyService.GetLikedTracksAsync(token, numberOfTracks);
+
+        return likedTracks;
     }
 }

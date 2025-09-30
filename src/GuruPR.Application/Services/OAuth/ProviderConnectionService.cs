@@ -21,7 +21,7 @@ public class ProviderConnectionService : IProviderConnectionService
 
     #region Public Methods
 
-    public async Task<IEnumerable<ProviderConnectionDto>> GetConnectionsByProviderAsync(string providerId)
+    public async Task<IEnumerable<ProviderConnectionDto>> GetConnectionsByProviderIdAsync(string providerId)
     {
         var provider = await GetProviderByIdOrThrowExceptionAsync(providerId);
 
@@ -36,6 +36,25 @@ public class ProviderConnectionService : IProviderConnectionService
         var providerConnectionDto = _mapper.Map<ProviderConnectionDto>(providerConnection);
 
         return providerConnectionDto;
+    }
+
+    public async Task<ProviderConnectionDto> GetProviderConnectionByScopeAndProviderNameAsync(string providerName, string scope)
+    {
+        var provider = await _unitOfWork.Providers.GetProviderByNameAsync(providerName);
+
+        if (provider is null)
+        {
+            throw new NotFoundException($"Provider with name '{providerName}' not found.");
+        }
+
+        var providerConnection = provider?.ProviderConnections.FirstOrDefault(pc => pc.HasScope(scope));
+
+        if (providerConnection is null)
+        {
+            throw new NotFoundException($"Provider connection with scope '{scope}' for provider '{providerName}' not found.");
+        }
+
+        return _mapper.Map<ProviderConnectionDto>(providerConnection);
     }
 
     public async Task<ProviderConnectionDto> AddProviderConnectionToProviderAsync(string providerId, CreateProviderConnectionRequest createProviderConnectionRequest)

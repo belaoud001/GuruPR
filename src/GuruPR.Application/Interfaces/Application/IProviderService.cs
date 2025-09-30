@@ -10,6 +10,8 @@ public interface IProviderService
 
     Task<ProviderDto> GetProviderByIdAsync(string providerId);
 
+    Task<ProviderDto> GetProviderByNameAsync(string providerName);
+
     Task<ProviderDto> UpdateProviderAsync(string providerId, UpdateProviderRequest updateProviderRequest);
 
     Task<bool> DeleteProviderAsync(string providerId);

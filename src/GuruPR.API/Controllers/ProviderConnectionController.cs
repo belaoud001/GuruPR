@@ -22,7 +22,7 @@ public class ProviderConnectionController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetConnectionsByProviderAsync(string providerId)
     {
-        var connections = await _providerConnectionService.GetConnectionsByProviderAsync(providerId);
+        var connections = await _providerConnectionService.GetConnectionsByProviderIdAsync(providerId);
 
         return Ok(connections);
     }

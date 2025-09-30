@@ -5,10 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using GuruPR.Infrastructure.Services.Security;
 using GuruPR.Application.Configuration.Security;
 using GuruPR.Infrastructure.Services.ThirdParties;
+using GuruPR.Infrastructure.SemanticKernel.Plugins;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
 using GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
-using GuruPR.Infrastructure.SemanticKernel.Plugins;
+using GuruPR.Infrastructure.HttpClients;
 
 namespace GuruPR.Infrastructure.Configuration;
 
@@ -21,6 +22,12 @@ public static class ServiceExtensions
         services.AddSemanticKernel(configuration);
         services.AddSecurity(configuration);
         services.AddScoped<ISpotifyService, SpotifyService>();
+        services.AddHttpClient<SpotifyClient>(httpClient =>
+        {
+            httpClient.BaseAddress = new Uri("https://api.spotify.com/");
+            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            httpClient.Timeout = TimeSpan.FromSeconds(30);
+        });
     }
 
     private static void AddSemanticKernel(this IServiceCollection services, IConfiguration configuration)
@@ -31,11 +38,17 @@ public static class ServiceExtensions
         AddAzureOpenAiModels(configuration, kernelBuilder);
 
         var kernel = kernelBuilder.Build();
-        
-        var spotifyPlugin = new SpotifyPlugin(new SpotifyService());
-        kernel.Plugins.AddFromObject(spotifyPlugin, "SpotifyPlugin");
 
-        services.AddSingleton<Kernel>(kernel);
+        services.AddSingleton(provider =>
+        {
+            var spotifyService = provider.GetRequiredService<ISpotifyService>();
+            var spotifyPlugin = new SpotifyPlugin(spotifyService);
+            
+            kernel.Plugins.AddFromObject(spotifyPlugin, "SpotifyPlugin");
+            
+            return kernel;
+        });
+
     }
 
     private static void AddHuggingFaceModels(IConfiguration configuration, IKernelBuilder kernelBuilder)
