@@ -26,7 +26,7 @@ public class SpotifyService : ISpotifyService
 
     public async Task<string> GetSpotifyAccessTokenAsync(string userId, string scope)
     {
-        // TODO: Integrate userId in the query to fetch the correct connection
+        //TODO: Integrate userId in the query to fetch the correct connection
         var connection = await _providerConnectionService.GetProviderConnectionByScopeAndProviderNameAsync("Spotify", scope);
 
         if (connection == null)
@@ -46,12 +46,12 @@ public class SpotifyService : ISpotifyService
     {
         if (string.IsNullOrWhiteSpace(token))
         {
-            throw new ArgumentException();
+            throw new ArgumentException("Token cannot be null or empty.", nameof(token));
         }
 
-        if (numberOfTracks <= 0 || numberOfTracks > 50)
+        if (numberOfTracks is <= 0 or > 50)
         {
-            throw new ArgumentOutOfRangeException();
+            throw new ArgumentOutOfRangeException(nameof(numberOfTracks));
         }
 
         string json = await _spotifyClient.GetUserTracksAsync(token, numberOfTracks);
