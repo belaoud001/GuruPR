@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using GuruPR.Persistence.Contexts;
+using GuruPR.Domain.Entities.Enums;
 using GuruPR.Domain.Entities.OAuth;
 using GuruPR.Application.Interfaces.Persistence;
 
@@ -17,8 +18,17 @@ public class ProviderRepository : GenericRepository<Provider>, IProviderReposito
         _dbSet = _guruDBContext.Set<Provider>();
     }
 
-    public async Task<Provider> GetProviderByNameAsync(string providerName)
+    public async Task<Provider?> GetProviderByNameAsync(string providerName)
     {
-        return await _dbSet.FirstOrDefaultAsync(provider => provider.Name == providerName);
+        var provider = await _dbSet.FirstOrDefaultAsync(provider => provider.DisplayName == providerName);
+
+        return provider;
+    }
+
+    public async Task<Provider?> GetProviderByTypeAsync(OAuthProviderType OAuthProviderType)
+    {
+        var provider = await _dbSet.FirstOrDefaultAsync(provider => provider.ProviderType == OAuthProviderType);
+
+        return provider;
     }
 }

@@ -9,6 +9,9 @@ public class ProviderProfile : Profile
 {
     public ProviderProfile()
     {
+        CreateMap<Provider, Provider>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
         CreateMap<Provider, ProviderDto>();
         CreateMap<ProviderDto, Provider>();
 

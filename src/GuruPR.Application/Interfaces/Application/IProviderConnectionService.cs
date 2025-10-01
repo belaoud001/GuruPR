@@ -1,16 +1,22 @@
-﻿using GuruPR.Application.Dtos.OAuth.ProviderConnection;
+﻿using GuruPR.Domain.Entities.Enums;
+using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Application.Dtos.OAuth.ProviderConnection;
 
 namespace GuruPR.Application.Interfaces.Application;
 
 public interface IProviderConnectionService
 {
-    Task<IEnumerable<ProviderConnectionDto>> GetConnectionsByProviderIdAsync(string providerId);
+    Task<IEnumerable<ProviderConnection>> GetConnectionsByProviderIdAsync(string providerId);
 
-    Task<ProviderConnectionDto> GetProviderConnectionByIdAsync(string providerId, string providerConnectionId);
+    Task<ProviderConnection> GetProviderConnectionByIdAsync(string providerId, string providerConnectionId);
 
-    Task<ProviderConnectionDto> GetProviderConnectionByScopeAndProviderNameAsync(string providerName, string scope);
+    Task<ProviderConnection> GetProviderConnectionByScopeAndProviderNameAsync(string providerName, string scope);
 
-    Task<ProviderConnectionDto> AddProviderConnectionToProviderAsync(string providerId, CreateProviderConnectionRequest createProviderConnectionRequest);
+    Task<ProviderConnection> GetProviderConnectionByProviderTypeAndScopeAsync(OAuthProviderType OAuthProviderType, string scope);
+
+    Task<ProviderConnection> AddProviderConnectionToProviderAsync(string providerId, CreateProviderConnectionRequest createProviderConnectionRequest);
+
+    Task<ProviderConnection> UpdateProviderConnectionByProviderTypeAsync(OAuthProviderType OAuthProviderType, string providerConnectionId, UpdateProviderConnectionRequest updateProviderConnectionRequest);
 
     Task<bool> DeleteProviderConnectionAsync(string providerId, string providerConnectionId);
 }

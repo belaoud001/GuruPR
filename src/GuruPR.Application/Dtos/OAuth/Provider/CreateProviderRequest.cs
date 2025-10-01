@@ -1,10 +1,13 @@
-﻿using GuruPR.Application.Dtos.OAuth.ProviderConnection;
+﻿using GuruPR.Domain.Entities.Enums;
+using GuruPR.Application.Dtos.OAuth.ProviderConnection;
 
 namespace GuruPR.Application.Dtos.OAuth.Provider;
 
 public class CreateProviderRequest
 {
-    public required string Name { get; set; }
+    public required string DisplayName { get; set; }
+
+    public OAuthProviderType ProviderType { get; set; }
 
     public required string ClientId { get; set; }
 

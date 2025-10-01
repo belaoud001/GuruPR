@@ -1,18 +1,22 @@
-﻿using GuruPR.Application.Dtos.OAuth.Provider;
+﻿using GuruPR.Domain.Entities.Enums;
+using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Application.Dtos.OAuth.Provider;
 
 namespace GuruPR.Application.Interfaces.Application;
 
 public interface IProviderService
 {
-    Task<ProviderDto> CreateProviderAsync(CreateProviderRequest createProviderRequest);
+    Task<Provider> CreateProviderAsync(CreateProviderRequest createProviderRequest);
 
-    Task<IEnumerable<ProviderDto>> GetAllProvidersAsync();
+    Task<IEnumerable<Provider>> GetAllProvidersAsync();
 
-    Task<ProviderDto> GetProviderByIdAsync(string providerId);
+    Task<Provider> GetProviderByIdAsync(string providerId);
 
-    Task<ProviderDto> GetProviderByNameAsync(string providerName);
+    Task<Provider> GetProviderByNameAsync(string providerName);
 
-    Task<ProviderDto> UpdateProviderAsync(string providerId, UpdateProviderRequest updateProviderRequest);
+    Task<Provider> GetProviderByTypeAsync(OAuthProviderType OAuthProviderType);
+
+    Task<Provider> UpdateProviderAsync(string providerId, UpdateProviderRequest updateProviderRequest);
 
     Task<bool> DeleteProviderAsync(string providerId);
 }

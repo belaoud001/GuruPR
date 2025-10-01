@@ -1,8 +1,12 @@
-﻿namespace GuruPR.Application.Dtos.OAuth.Provider;
+﻿using GuruPR.Domain.Entities.Enums;
+
+namespace GuruPR.Application.Dtos.OAuth.Provider;
 
 public class UpdateProviderRequest
 {
-    public string? Name { get; set; }
+    public string? DisplayName { get; set; }
+
+    public OAuthProviderType? ProviderType { get; set; }
 
     public string? ClientId { get; set; }
 

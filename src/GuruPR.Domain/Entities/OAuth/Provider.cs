@@ -1,4 +1,6 @@
-﻿namespace GuruPR.Domain.Entities.OAuth;
+﻿using GuruPR.Domain.Entities.Enums;
+
+namespace GuruPR.Domain.Entities.OAuth;
 
 /// <summary>
 /// Represents an OAuth provider with its configuration details.
@@ -11,9 +13,14 @@ public class Provider
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>
-    /// Name of the provider.
+    /// Display name of the provider.
     /// </summary>
-    public required string Name { get; set; }
+    public required string DisplayName { get; set; }
+
+    /// <summary>
+    /// Prefixed provider type (e.g., Google, Discord).
+    /// </summary>
+    public required OAuthProviderType ProviderType { get; set; }
 
     /// <summary>
     /// Client ID used for OAuth authentication.
@@ -55,7 +62,8 @@ public class Provider
     /// </summary>
     public bool IsValid()
     {
-        if (string.IsNullOrWhiteSpace(Name)) return false;
+        if (string.IsNullOrWhiteSpace(DisplayName)) return false;
+        if (!Enum.IsDefined<OAuthProviderType>(ProviderType)) return false;
         if (string.IsNullOrWhiteSpace(ClientId)) return false;
         if (string.IsNullOrWhiteSpace(ClientSecret)) return false;
         if (!Uri.IsWellFormedUriString(AuthorizationUrl, UriKind.Absolute)) return false;

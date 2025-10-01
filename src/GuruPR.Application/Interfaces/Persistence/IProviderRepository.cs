@@ -1,4 +1,5 @@
-﻿using GuruPR.Domain.Entities.OAuth;
+﻿using GuruPR.Domain.Entities.Enums;
+using GuruPR.Domain.Entities.OAuth;
 
 namespace GuruPR.Application.Interfaces.Persistence;
 
@@ -6,5 +7,7 @@ public interface IProviderRepository : IGenericRepository<Provider>
 {
     // TODO: Think of eager and lazy loading here.
 
-    Task<Provider> GetProviderByNameAsync(string providerName);
+    Task<Provider?> GetProviderByNameAsync(string providerName);
+
+    Task<Provider?> GetProviderByTypeAsync(OAuthProviderType oAuthProviderType);
 }

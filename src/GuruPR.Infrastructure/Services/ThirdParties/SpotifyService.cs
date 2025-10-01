@@ -1,11 +1,12 @@
 ﻿using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
-using GuruPR.Infrastructure.HttpClients;
+using GuruPR.Domain.Entities.Enums;
+using GuruPR.Infrastructure.HttpClients.Spotify;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
-
-using Microsoft.Extensions.Logging;
+using GuruPR.Application.Dtos.OAuth.ProviderConnection;
 
 namespace GuruPR.Infrastructure.Services.ThirdParties;
 
@@ -27,19 +28,34 @@ public class SpotifyService : ISpotifyService
     public async Task<string> GetSpotifyAccessTokenAsync(string userId, string scope)
     {
         //TODO: Integrate userId in the query to fetch the correct connection
-        var connection = await _providerConnectionService.GetProviderConnectionByScopeAndProviderNameAsync("Spotify", scope);
+        var providerConnection = await _providerConnectionService.GetProviderConnectionByProviderTypeAndScopeAsync(OAuthProviderType.Spotify, scope);
 
-        if (connection == null)
+        if (providerConnection == null)
         {
             throw new InvalidOperationException("No Spotify connection found for the user.");
         }
 
-        if (connection.Scopes == null || !connection.Scopes.Contains(scope))
+        if (providerConnection.Scopes == null || !providerConnection.Scopes.Contains(scope))
         {
             throw new InvalidOperationException($"The existing connection does not have the required scope: {scope}");
         }
 
-        return connection.AccessToken;
+        if (providerConnection.ShouldRefreshToken())
+        {
+            var tokenResponse = await _spotifyClient.RefreshTokenAsync(providerConnection);
+            var updatedConnection = new UpdateProviderConnectionRequest
+            {
+                AccessToken = tokenResponse.AccessToken,
+                RefreshToken = tokenResponse.RefreshToken ?? providerConnection.RefreshToken,
+                AccessExpiresAt = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn)
+            };
+
+            providerConnection = await _providerConnectionService.UpdateProviderConnectionByProviderTypeAsync(OAuthProviderType.Spotify, 
+                                                                                                              providerConnection.Id, 
+                                                                                                              updatedConnection);
+        }
+
+        return providerConnection.AccessToken;
     }
 
     public async Task<string> GetLikedTracksAsync(string token, int numberOfTracks)

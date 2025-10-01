@@ -4,12 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 using GuruPR.Infrastructure.Services.Security;
 using GuruPR.Application.Configuration.Security;
+using GuruPR.Infrastructure.HttpClients.Spotify;
 using GuruPR.Infrastructure.Services.ThirdParties;
 using GuruPR.Infrastructure.SemanticKernel.Plugins;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
 using GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
-using GuruPR.Infrastructure.HttpClients;
 
 namespace GuruPR.Infrastructure.Configuration;
 
@@ -17,18 +17,19 @@ namespace GuruPR.Infrastructure.Configuration;
 
 public static class ServiceExtensions
 {
+    #region Public Methods
+
     public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSemanticKernel(configuration);
         services.AddSecurity(configuration);
-        services.AddScoped<ISpotifyService, SpotifyService>();
-        services.AddHttpClient<SpotifyClient>(httpClient =>
-        {
-            httpClient.BaseAddress = new Uri("https://api.spotify.com/");
-            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-            httpClient.Timeout = TimeSpan.FromSeconds(30);
-        });
+        services.AddHttpClients();
+        services.AddThirdPartyServices();
     }
+
+    #endregion
+
+    #region Private Methods
 
     private static void AddSemanticKernel(this IServiceCollection services, IConfiguration configuration)
     {
@@ -112,6 +113,30 @@ public static class ServiceExtensions
 
         services.AddSingleton<ITokenEncryptionService>(_ => new TokenEncryptionService(tokenEncryptionConfig.Key));
     }
+
+    private static void AddHttpClients(this IServiceCollection services)
+    {
+        services.AddHttpClient<SpotifyOAuthClient>(httpClient =>
+        {
+            httpClient.BaseAddress = new Uri("https://accounts.spotify.com/");
+            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            httpClient.Timeout = TimeSpan.FromSeconds(30);
+        });
+
+        services.AddHttpClient<SpotifyClient>(httpClient =>
+        {
+            httpClient.BaseAddress = new Uri("https://api.spotify.com/");
+            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            httpClient.Timeout = TimeSpan.FromSeconds(30);
+        });
+    }
+
+    private static void AddThirdPartyServices(this IServiceCollection services)
+    {
+        services.AddScoped<ISpotifyService, SpotifyService>();
+    }
+
+    #endregion
 }
 
 #pragma warning restore SKEXP0070 // Suppress experimental feature warning
