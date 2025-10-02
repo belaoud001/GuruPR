@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using GuruPR.Application.Interfaces.Persistence;
-using System.Linq.Expressions;
 
 namespace GuruPR.Persistence.Repositories;
 
@@ -21,9 +20,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         return await _dbSet.ToListAsync();
     }
 
-    public async Task<T> GetByIdAsync(string id)
+    public async Task<T?> GetByIdAsync(string id)
     {
-        return await _dbSet.FindAsync(id) ?? throw new KeyNotFoundException();
+        return await _dbSet.FindAsync(id);
     }
 
     public async Task<T> AddAsync(T entity)

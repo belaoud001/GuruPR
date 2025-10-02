@@ -1,8 +1,8 @@
 ﻿using JetBrains.Annotations;
 
-namespace GuruPR.Application.Configuration.ModelConfiguration.AzureOpenAI;
+namespace GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
 
-public class AzureOpenAIModelConfig
+public class AzureOpenAIModel
 {
     public required string DeploymentName { get; [UsedImplicitly] init; }
 

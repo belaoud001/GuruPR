@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 
 using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Domain.Entities.Enums;
 using GuruPR.Application.Exceptions;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Persistence;
@@ -21,24 +22,60 @@ public class ProviderConnectionService : IProviderConnectionService
 
     #region Public Methods
 
-    public async Task<IEnumerable<ProviderConnectionDto>> GetConnectionsByProviderAsync(string providerId)
+    public async Task<IEnumerable<ProviderConnection>> GetConnectionsByProviderIdAsync(string providerId)
     {
         var provider = await GetProviderByIdOrThrowExceptionAsync(providerId);
 
-        return _mapper.Map<IEnumerable<ProviderConnectionDto>>(provider.ProviderConnections);
+        return provider.ProviderConnections ?? [];
     }
 
-    public async Task<ProviderConnectionDto> GetProviderConnectionByIdAsync(string providerId, string providerConnectionId)
+    public async Task<ProviderConnection> GetProviderConnectionByIdAsync(string providerId, string providerConnectionId)
     {
         var provider = await GetProviderByIdOrThrowExceptionAsync(providerId);
         var providerConnection = provider.ProviderConnections.FirstOrDefault(providerConnection => providerConnection.Id == providerConnectionId);
 
-        var providerConnectionDto = _mapper.Map<ProviderConnectionDto>(providerConnection);
+        if (providerConnection is null)
+        {
+            throw new NotFoundException($"Provider connection with ID '{providerConnectionId}' not found for provider with ID '{providerId}'.");
+        }
 
-        return providerConnectionDto;
+        return providerConnection;
     }
 
-    public async Task<ProviderConnectionDto> AddProviderConnectionToProviderAsync(string providerId, CreateProviderConnectionRequest createProviderConnectionRequest)
+    public async Task<ProviderConnection> GetProviderConnectionByScopeAndProviderNameAsync(string providerName, string scope)
+    {
+        var provider = await _unitOfWork.Providers.GetProviderByNameAsync(providerName);
+
+        if (provider is null)
+        {
+            throw new NotFoundException($"Provider with name '{providerName}' not found.");
+        }
+
+        var providerConnection = provider?.ProviderConnections.FirstOrDefault(pc => pc.HasScope(scope));
+
+        if (providerConnection is null)
+        {
+            throw new NotFoundException($"Provider connection with scope '{scope}' for provider '{providerName}' not found.");
+        }
+
+        return providerConnection;
+    }
+
+    public async Task<ProviderConnection> GetProviderConnectionByProviderTypeAndScopeAsync(OAuthProviderType OAuthProviderType, string scope)
+    {
+        var provider = await GetProviderByTypeOrThrowExceptionAsync(OAuthProviderType);
+        var providerConnection = provider?.ProviderConnections.FirstOrDefault(pc => pc.HasScope(scope));
+
+        if (providerConnection is null)
+        {
+            throw new NotFoundException($"Provider connection with scope '{scope}' for provider type '{OAuthProviderType}' not found.");
+        }
+
+        return providerConnection;
+    }
+
+
+    public async Task<ProviderConnection> AddProviderConnectionToProviderAsync(string providerId, CreateProviderConnectionRequest createProviderConnectionRequest)
     {
         var provider = await GetProviderByIdOrThrowExceptionAsync(providerId);
         var providerConnection = _mapper.Map<ProviderConnection>(createProviderConnectionRequest);
@@ -46,7 +83,20 @@ public class ProviderConnectionService : IProviderConnectionService
         provider.AddProviderConnection(providerConnection);
         await _unitOfWork.SaveChangesAsync();
 
-        return _mapper.Map<ProviderConnectionDto>(providerConnection);
+        return providerConnection;
+    }
+
+    public async Task<ProviderConnection> UpdateProviderConnectionByProviderTypeAsync(OAuthProviderType OAuthProviderType, 
+                                                                                      string providerConnectionId, 
+                                                                                      UpdateProviderConnectionRequest updateProviderConnectionRequest)
+    {
+        var provider = await GetProviderByTypeOrThrowExceptionAsync(OAuthProviderType);
+        var providerConnection = await GetProviderConnectionByIdAsync(provider.Id, providerConnectionId);
+
+        _mapper.Map(updateProviderConnectionRequest, providerConnection);
+        await _unitOfWork.SaveChangesAsync();
+
+        return providerConnection;
     }
 
     public async Task<bool> DeleteProviderConnectionAsync(string providerId, string providerConnectionId)
@@ -75,6 +125,18 @@ public class ProviderConnectionService : IProviderConnectionService
         if (provider is null)
         {
             throw new NotFoundException($"Provider with ID {providerId} not found.");
+        }
+
+        return provider;
+    }
+
+    private async Task<Provider> GetProviderByTypeOrThrowExceptionAsync(OAuthProviderType OAuthProviderType)
+    {
+        var provider = await _unitOfWork.Providers.GetProviderByTypeAsync(OAuthProviderType);
+
+        if (provider is null)
+        {
+            throw new NotFoundException($"Provider with type '{OAuthProviderType}' not found.");
         }
 
         return provider;

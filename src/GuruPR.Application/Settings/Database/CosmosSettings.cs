@@ -1,7 +1,8 @@
-﻿namespace GuruPR.Application.Configuration.Database;
+﻿namespace GuruPR.Application.Settings.Database;
 
-public class CosmosDBConfig
+public class CosmosSettings
 {
+    public const string SectionName = "Cosmos";
     public required string AccountEndpoint { get; set; }
 
     public required string AccountKey { get; set; }

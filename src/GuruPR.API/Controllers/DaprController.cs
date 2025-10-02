@@ -1,6 +1,6 @@
-﻿using GuruPR.Application.Dapr;
-using GuruPR.Application.Services.OAuth;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+
+using GuruPR.Application.Dapr;
 
 namespace GuruPR.Controllers;
 
@@ -14,12 +14,12 @@ public class DaprController : ControllerBase
     {
         _logger = logger;
     }
-    
+
     [HttpPost("/handle")]
     public async Task<ActionResult<string>> HandleInputBindingsAsync([FromBody] MessageEnvelope messageEnvelope)
     {
         // Treat incoming messages here ( Redirect based on operation-type ) ...
-        
+
         return Ok();
     }
 }

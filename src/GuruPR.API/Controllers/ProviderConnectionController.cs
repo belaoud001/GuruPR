@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Dtos.OAuth.ProviderConnection;
@@ -10,11 +11,15 @@ namespace GuruPR.Controllers;
 public class ProviderConnectionController : ControllerBase
 {
     private readonly ILogger<ProviderConnectionController> _logger;
+    private readonly IMapper _mapper;
     private readonly IProviderConnectionService _providerConnectionService;
 
-    public ProviderConnectionController(ILogger<ProviderConnectionController> logger, IProviderConnectionService providerConnectionService)
+    public ProviderConnectionController(ILogger<ProviderConnectionController> logger, 
+                                        IMapper mapper, 
+                                        IProviderConnectionService providerConnectionService)
     {
         _logger = logger;
+        _mapper = mapper;
         _providerConnectionService = providerConnectionService;
     }
 
@@ -22,26 +27,29 @@ public class ProviderConnectionController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetConnectionsByProviderAsync(string providerId)
     {
-        var connections = await _providerConnectionService.GetConnectionsByProviderAsync(providerId);
+        var providerConnections = await _providerConnectionService.GetConnectionsByProviderIdAsync(providerId);
+        var providerConnectionsDtos = _mapper.Map<IEnumerable<ProviderConnectionDto>>(providerConnections);
 
-        return Ok(connections);
+        return Ok(providerConnectionsDtos);
     }
 
     [HttpGet("{providerConnectionId}", Name = "GetProviderConnectionById")]
     public async Task<IActionResult> GetProviderConnectionByIdAsync(string providerId, string providerConnectionId)
     {
         var providerConnection = await _providerConnectionService.GetProviderConnectionByIdAsync(providerId, providerConnectionId);
+        var providerConnectionDto = _mapper.Map<ProviderConnectionDto>(providerConnection);
 
-        return Ok(providerConnection);
+        return Ok(providerConnectionDto);
     }
 
     [HttpPost]
     public async Task<IActionResult> AddProviderConnectionToProviderAsync(string providerId, [FromBody] CreateProviderConnectionRequest createProviderConnectionRequest)
     {
         var providerConnection = await _providerConnectionService.AddProviderConnectionToProviderAsync(providerId, createProviderConnectionRequest);
+        var providerConnectionDto = _mapper.Map<ProviderConnectionDto>(providerConnection);
 
         return CreatedAtRoute("GetProviderConnectionById", 
-                              new { providerId = providerId, providerConnectionId = providerConnection.Id }, 
+                              new { providerId = providerId, providerConnectionId = providerConnectionDto.Id }, 
                               providerConnection);
     }
 

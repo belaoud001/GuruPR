@@ -4,9 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 using GuruPR.Infrastructure.Services.Security;
 using GuruPR.Application.Configuration.Security;
+using GuruPR.Infrastructure.HttpClients.Spotify;
+using GuruPR.Infrastructure.Services.ThirdParties;
+using GuruPR.Infrastructure.SemanticKernel.Plugins;
 using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Application.Configuration.ModelConfiguration.AzureOpenAI;
-using GuruPR.Application.Configuration.ModelConfiguration.HuggingFace;
+using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
+using GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
 
 namespace GuruPR.Infrastructure.Configuration;
 
@@ -14,11 +17,19 @@ namespace GuruPR.Infrastructure.Configuration;
 
 public static class ServiceExtensions
 {
+    #region Public Methods
+
     public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSemanticKernel(configuration);
         services.AddSecurity(configuration);
+        services.AddHttpClients();
+        services.AddThirdPartyServices();
     }
+
+    #endregion
+
+    #region Private Methods
 
     private static void AddSemanticKernel(this IServiceCollection services, IConfiguration configuration)
     {
@@ -27,24 +38,40 @@ public static class ServiceExtensions
         AddHuggingFaceModels(configuration, kernelBuilder);
         AddAzureOpenAiModels(configuration, kernelBuilder);
 
-        var kernel = kernelBuilder.Build();
+        services.AddScoped<Kernel>(_ =>
+        {
+            kernelBuilder.CopyApplicationServices(services);
+            var kernel = kernelBuilder.Build();
 
-        services.AddSingleton<Kernel>(kernel);
+            // Plugins registration surely can be improved, but for now it works.
+            // For next iterations, consider using reflection to find all plugins automatically.
+            kernel.ImportPluginFromType<SpotifyPlugin>();
+
+            return kernel;
+        });
+    }
+
+    private static void CopyApplicationServices(this IKernelBuilder kernelBuilder, IServiceCollection services)
+    {
+        foreach (var serviceDescriptor in services)
+        {
+            kernelBuilder.Services.Add(serviceDescriptor);
+        }
     }
 
     private static void AddHuggingFaceModels(IConfiguration configuration, IKernelBuilder kernelBuilder)
     {
-        var huggingFaceModelsConfig = configuration.GetSection("HuggingFaceModelsConfig")
-                                                   .Get<HuggingFaceModelsConfig>();
+        var huggingFaceModelsConfig = configuration.GetSection(HuggingFaceModels.SectionName)
+                                                   .Get<HuggingFaceModels>();
 
         if (huggingFaceModelsConfig == null ||
-            huggingFaceModelsConfig.HuggingFaceModels?.Count <= 0 ||
+            huggingFaceModelsConfig.HuggingFaceModelCollection?.Count <= 0 ||
             huggingFaceModelsConfig.ApiKey == null)
         {
             throw new InvalidOperationException("HuggingFaceModelsConfig is missing or contains no models.");
         }
 
-        var huggingFaceModels = huggingFaceModelsConfig?.HuggingFaceModels;
+        var huggingFaceModels = huggingFaceModelsConfig?.HuggingFaceModelCollection;
         foreach (var huggingFaceModel in huggingFaceModels ?? [])
         {
             kernelBuilder.Services.AddHuggingFaceChatCompletion(
@@ -57,17 +84,17 @@ public static class ServiceExtensions
 
     private static void AddAzureOpenAiModels(IConfiguration configuration, IKernelBuilder kernelBuilder)
     {
-        var azureOpenAiModelsConfig = configuration.GetSection("AzureOpenAIModelsConfig")
-                                                   .Get<AzureOpenAIModelsConfig>();
+        var azureOpenAiModelsConfig = configuration.GetSection(AzureOpenAIModels.SectionName)
+                                                   .Get<AzureOpenAIModels>();
 
         if (azureOpenAiModelsConfig == null ||
-            azureOpenAiModelsConfig.AzureOpenAIModels?.Count <= 0 ||
+            azureOpenAiModelsConfig.AzureOpenAIModelCollection?.Count <= 0 ||
             string.IsNullOrEmpty(azureOpenAiModelsConfig.ApiKey))
         {
             throw new InvalidOperationException("AzureOpenAIConfig is missing or contains no models.");
         }
 
-        var azureOpenAiModels = azureOpenAiModelsConfig?.AzureOpenAIModels;
+        var azureOpenAiModels = azureOpenAiModelsConfig?.AzureOpenAIModelCollection;
         foreach (var azureOpenAiModel in azureOpenAiModels ?? [])
         {
             kernelBuilder.Services.AddAzureOpenAIChatCompletion(
@@ -82,8 +109,8 @@ public static class ServiceExtensions
 
     private static void AddSecurity(this IServiceCollection services, IConfiguration configuration)
     {
-        var tokenEncryptionConfig = configuration.GetSection("TokenEncryptionConfig")
-                                                 .Get<TokenEncryptionConfig>() 
+        var tokenEncryptionConfig = configuration.GetSection(TokenEncryption.SectionName)
+                                                 .Get<TokenEncryption>() 
                                                  ?? throw new InvalidOperationException("TokenEncryptionConfig section is missing in configuration.");
 
         if (string.IsNullOrEmpty(tokenEncryptionConfig.Key))
@@ -93,6 +120,30 @@ public static class ServiceExtensions
 
         services.AddSingleton<ITokenEncryptionService>(_ => new TokenEncryptionService(tokenEncryptionConfig.Key));
     }
+
+    private static void AddHttpClients(this IServiceCollection services)
+    {
+        services.AddHttpClient<SpotifyOAuthClient>(httpClient =>
+        {
+            httpClient.BaseAddress = new Uri("https://accounts.spotify.com/");
+            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            httpClient.Timeout = TimeSpan.FromSeconds(30);
+        });
+
+        services.AddHttpClient<SpotifyClient>(httpClient =>
+        {
+            httpClient.BaseAddress = new Uri("https://api.spotify.com/");
+            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            httpClient.Timeout = TimeSpan.FromSeconds(30);
+        });
+    }
+
+    private static void AddThirdPartyServices(this IServiceCollection services)
+    {
+        services.AddScoped<ISpotifyService, SpotifyService>();
+    }
+
+    #endregion
 }
 
 #pragma warning restore SKEXP0070 // Suppress experimental feature warning

@@ -36,9 +36,9 @@ public class ProviderConnection
     public required DateTime CreatedAt { get; set; }
 
 
-    public bool IsTokenExpired() => DateTime.UtcNow >= AccessExpiresAt;
+    public bool IsTokenExpired(int bufferSeconds) => DateTime.UtcNow >= AccessExpiresAt.AddSeconds(-bufferSeconds);
 
-    public bool HasScope(string scope) => Scopes.Contains(scope);
+    public bool HasScope(string scope) => Scopes.Any(selectedScope => string.Equals(selectedScope, scope, StringComparison.OrdinalIgnoreCase));
 
-    public bool ShouldRefreshToken() => IsTokenExpired() && !string.IsNullOrEmpty(RefreshToken);
+    public bool ShouldRefreshToken(int bufferSeconds = 60) => IsTokenExpired(bufferSeconds) && !string.IsNullOrEmpty(RefreshToken);
 }

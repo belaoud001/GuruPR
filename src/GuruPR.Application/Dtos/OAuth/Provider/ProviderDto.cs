@@ -1,4 +1,5 @@
 ﻿using GuruPR.Application.Dtos.OAuth.ProviderConnection;
+using GuruPR.Domain.Entities.Enums;
 
 namespace GuruPR.Application.Dtos.OAuth.Provider;
 
@@ -6,7 +7,9 @@ public class ProviderDto
 {
     public string Id { get; set; } = default!;
 
-    public string Name { get; set; } = default!;
+    public string DisplayName { get; set; } = default!;
+
+    public OAuthProviderType ProviderType { get; set; }
 
     public string ClientId { get; set; } = default!;
 

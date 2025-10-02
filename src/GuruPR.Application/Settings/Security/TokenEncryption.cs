@@ -1,6 +1,8 @@
 ﻿namespace GuruPR.Application.Configuration.Security;
 
-public class TokenEncryptionConfig
+public class TokenEncryption
 {
+    public const string SectionName = "TokenEncryption";
+
     public required string Key { get; set; }
 }
