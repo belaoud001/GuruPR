@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Dtos.OAuth.ProviderConnection;
-using AutoMapper;
 
 namespace GuruPR.Controllers;
 

@@ -8,7 +8,6 @@ public class SpotifyOAuthClient : OAuthClientBase
 {
     public SpotifyOAuthClient(HttpClient httpClient) : base(httpClient) 
     {
-
     }
 
     protected override string TokenEndpoint => "api/token";
