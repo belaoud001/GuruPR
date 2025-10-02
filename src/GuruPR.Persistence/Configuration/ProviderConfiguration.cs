@@ -26,6 +26,11 @@ public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
 
         builder.OwnsMany(provider => provider.ProviderConnections, navigationBuilder =>
         {
+            navigationBuilder.Property(providerConnection => providerConnection.ClientSecret)
+                .HasConversion(
+                    plainText => _tokenEncryptionService.Encrypt(plainText),
+                    cipherText => _tokenEncryptionService.Decrypt(cipherText));
+
             navigationBuilder.Property(providerConnection => providerConnection.AccessToken)
                 .HasConversion(
                     plainText  => _tokenEncryptionService.Encrypt(plainText),

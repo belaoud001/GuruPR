@@ -11,6 +11,17 @@ public class ProviderConnection
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>
+    /// Client ID used for OAuth authentication.
+    /// </summary>
+    public required string ClientId { get; set; }
+
+    /// <summary>
+    /// Client secret used for OAuth authentication.
+    /// </summary>
+    public required string ClientSecret { get; set; }
+
+
+    /// <summary>
     /// Access token used for authentication.
     /// </summary>
     public required string AccessToken { get; set; }

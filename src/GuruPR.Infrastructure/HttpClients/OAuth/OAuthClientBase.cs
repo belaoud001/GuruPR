@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Net.Http.Headers;
+using GuruPR.Domain.Entities.OAuth;
 
 namespace GuruPR.Infrastructure.HttpClients.OAuth;
 
@@ -21,19 +22,19 @@ public abstract class OAuthClientBase
         };
     }
 
-    public virtual async Task<TokenResponse> RefreshTokenAsync(string clientId, string clientSecret, string refreshToken)
+    public virtual async Task<TokenResponse> RefreshTokenAsync(string tokenUrl, ProviderConnection providerConnection)
     {
-        if (string.IsNullOrWhiteSpace(refreshToken))
+        if (string.IsNullOrWhiteSpace(providerConnection.RefreshToken))
         {
-            throw new ArgumentException("Refresh token cannot be null or empty.", nameof(refreshToken));
+            throw new ArgumentException("Refresh token cannot be null or empty.", nameof(providerConnection.RefreshToken));
         }
 
-        var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"));
-        var requestBody = GetRefreshTokenParams(refreshToken);
-        using var request = new HttpRequestMessage(HttpMethod.Post, TokenEndpoint)
+        var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{providerConnection.ClientId}:{providerConnection.ClientSecret}"));
+        var requestBody = GetRefreshTokenParams(providerConnection.RefreshToken);
+        using var request = new HttpRequestMessage(HttpMethod.Post, tokenUrl)
         {
             Content = new FormUrlEncodedContent(requestBody),
-            Headers =
+            Headers = 
             {
                 Authorization = new AuthenticationHeaderValue("basic", credentials)
             }

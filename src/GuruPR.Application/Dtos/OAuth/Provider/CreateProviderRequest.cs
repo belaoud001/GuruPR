@@ -9,10 +9,6 @@ public class CreateProviderRequest
 
     public OAuthProviderType ProviderType { get; set; }
 
-    public required string ClientId { get; set; }
-
-    public required string ClientSecret { get; set; }
-
     public required string AuthorizationUrl { get; set; }
 
     public required string TokenUrl { get; set; }

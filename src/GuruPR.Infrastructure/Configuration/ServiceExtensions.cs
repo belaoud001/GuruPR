@@ -125,7 +125,6 @@ public static class ServiceExtensions
     {
         services.AddHttpClient<SpotifyOAuthClient>(httpClient =>
         {
-            httpClient.BaseAddress = new Uri("https://accounts.spotify.com/");
             httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
             httpClient.Timeout = TimeSpan.FromSeconds(30);
         });

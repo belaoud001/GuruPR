@@ -2,6 +2,17 @@
 
 public class UpdateProviderConnectionRequest
 {
+
+    /// <summary>
+    /// Client ID used for OAuth authentication.
+    /// </summary>
+    public string? ClientId { get; set; }
+
+    /// <summary>
+    /// Client secret used for OAuth authentication.
+    /// </summary>
+    public string? ClientSecret { get; set; }
+
     /// <summary>
     /// Access token used for authentication.
     /// </summary>
