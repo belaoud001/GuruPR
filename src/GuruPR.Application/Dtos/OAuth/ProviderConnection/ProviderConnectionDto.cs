@@ -13,6 +13,11 @@ public class ProviderConnectionDto
     public required string AccessToken { get; set; }
 
     /// <summary>
+    /// Client ID used for OAuth authentication.
+    /// </summary>
+    public required string ClientId { get; set; }
+
+    /// <summary>
     /// Refresh token used to renew the access token.
     /// </summary>
     public required string RefreshToken { get; set; }

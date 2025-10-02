@@ -23,16 +23,6 @@ public class Provider
     public required OAuthProviderType ProviderType { get; set; }
 
     /// <summary>
-    /// Client ID used for OAuth authentication.
-    /// </summary>
-    public required string ClientId { get; set; }
-
-    /// <summary>
-    /// Client secret used for OAuth authentication.
-    /// </summary>
-    public required string ClientSecret { get; set; }
-
-    /// <summary>
     /// URL for the authorization endpoint.
     /// </summary>
     public required string AuthorizationUrl { get; set; }
@@ -64,8 +54,6 @@ public class Provider
     {
         if (string.IsNullOrWhiteSpace(DisplayName)) return false;
         if (!Enum.IsDefined<OAuthProviderType>(ProviderType)) return false;
-        if (string.IsNullOrWhiteSpace(ClientId)) return false;
-        if (string.IsNullOrWhiteSpace(ClientSecret)) return false;
         if (!Uri.IsWellFormedUriString(AuthorizationUrl, UriKind.Absolute)) return false;
         if (!Uri.IsWellFormedUriString(TokenUrl, UriKind.Absolute)) return false;
         if (DefaultScopes == null || DefaultScopes.Count == 0) return false;

@@ -51,7 +51,7 @@ public class SpotifyService : ISpotifyService
 
         if (providerConnection.ShouldRefreshToken())
         {
-            var tokenResponse = await _spotifyOAuthClient.RefreshTokenAsync(provider.ClientId, provider.ClientSecret, providerConnection.RefreshToken);
+            var tokenResponse = await _spotifyOAuthClient.RefreshTokenAsync(provider.TokenUrl, providerConnection);
             var updatedConnection = new UpdateProviderConnectionRequest
             {
                 AccessToken = tokenResponse.AccessToken,
