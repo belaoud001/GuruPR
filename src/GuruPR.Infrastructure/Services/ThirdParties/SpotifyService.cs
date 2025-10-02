@@ -14,12 +14,20 @@ public class SpotifyService : ISpotifyService
 {
     private readonly ILogger<SpotifyService> _logger;
     private readonly SpotifyClient _spotifyClient;
+    private readonly SpotifyOAuthClient _spotifyOAuthClient;
+    private readonly IProviderService _providerService;
     private readonly IProviderConnectionService _providerConnectionService;
 
-    public SpotifyService(ILogger<SpotifyService> logger, SpotifyClient spotifyClient, IProviderConnectionService providerConnectionService) 
+    public SpotifyService(ILogger<SpotifyService> logger, 
+                          SpotifyClient spotifyClient, 
+                          SpotifyOAuthClient spotifyOAuthClient, 
+                          IProviderService providerService, 
+                          IProviderConnectionService providerConnectionService) 
     {
         _logger = logger;
         _spotifyClient = spotifyClient;
+        _spotifyOAuthClient = spotifyOAuthClient;
+        _providerService = providerService;
         _providerConnectionService = providerConnectionService;
     }
 
@@ -28,6 +36,7 @@ public class SpotifyService : ISpotifyService
     public async Task<string> GetSpotifyAccessTokenAsync(string userId, string scope)
     {
         //TODO: Integrate userId in the query to fetch the correct connection
+        var provider = await _providerService.GetProviderByTypeAsync(OAuthProviderType.Spotify);
         var providerConnection = await _providerConnectionService.GetProviderConnectionByProviderTypeAndScopeAsync(OAuthProviderType.Spotify, scope);
 
         if (providerConnection == null)
@@ -42,7 +51,7 @@ public class SpotifyService : ISpotifyService
 
         if (providerConnection.ShouldRefreshToken())
         {
-            var tokenResponse = await _spotifyClient.RefreshTokenAsync(providerConnection);
+            var tokenResponse = await _spotifyOAuthClient.RefreshTokenAsync(provider.ClientId, provider.ClientSecret, providerConnection.RefreshToken);
             var updatedConnection = new UpdateProviderConnectionRequest
             {
                 AccessToken = tokenResponse.AccessToken,

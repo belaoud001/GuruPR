@@ -38,18 +38,25 @@ public static class ServiceExtensions
         AddHuggingFaceModels(configuration, kernelBuilder);
         AddAzureOpenAiModels(configuration, kernelBuilder);
 
-        var kernel = kernelBuilder.Build();
-
-        services.AddSingleton(provider =>
+        services.AddScoped<Kernel>(_ =>
         {
-            var spotifyService = provider.GetRequiredService<ISpotifyService>();
-            var spotifyPlugin = new SpotifyPlugin(spotifyService);
-            
-            kernel.Plugins.AddFromObject(spotifyPlugin, "SpotifyPlugin");
-            
+            kernelBuilder.CopyApplicationServices(services);
+            var kernel = kernelBuilder.Build();
+
+            // Plugins registration surely can be improved, but for now it works.
+            // For next iterations, consider using reflection to find all plugins automatically.
+            kernel.ImportPluginFromType<SpotifyPlugin>();
+
             return kernel;
         });
+    }
 
+    private static void CopyApplicationServices(this IKernelBuilder kernelBuilder, IServiceCollection services)
+    {
+        foreach (var serviceDescriptor in services)
+        {
+            kernelBuilder.Services.Add(serviceDescriptor);
+        }
     }
 
     private static void AddHuggingFaceModels(IConfiguration configuration, IKernelBuilder kernelBuilder)
