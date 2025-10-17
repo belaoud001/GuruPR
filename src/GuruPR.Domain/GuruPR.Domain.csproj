@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.9" />
     </ItemGroup>
 
 </Project>

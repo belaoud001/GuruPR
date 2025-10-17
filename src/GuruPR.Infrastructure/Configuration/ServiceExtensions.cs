@@ -1,10 +1,16 @@
 ﻿using Microsoft.SemanticKernel;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
+using GuruPR.Application.Services.Account;
+using GuruPR.Infrastructure.Services.Auth;
+using GuruPR.Application.Settings.Security;
 using GuruPR.Infrastructure.Services.Security;
 using GuruPR.Application.Configuration.Security;
 using GuruPR.Infrastructure.HttpClients.Spotify;
+using GuruPR.Application.Interfaces.Application;
 using GuruPR.Infrastructure.Services.ThirdParties;
 using GuruPR.Infrastructure.SemanticKernel.Plugins;
 using GuruPR.Application.Interfaces.Infrastructure;
@@ -21,6 +27,7 @@ public static class ServiceExtensions
 
     public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddCustomAuthentication(configuration);
         services.AddSemanticKernel(configuration);
         services.AddSecurity(configuration);
         services.AddHttpClients();
@@ -30,6 +37,63 @@ public static class ServiceExtensions
     #endregion
 
     #region Private Methods
+
+    private static void AddCustomAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddAuthentication(
+                    options =>
+                    {
+                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultSignInScheme       = JwtBearerDefaults.AuthenticationScheme;
+                    }
+                )
+                .AddJwtBearer(
+                    options =>
+                    {
+                        var jwtSettings = configuration.GetSection(JwtSettings.SectionName)
+                                                       .Get<JwtSettings>();
+
+                        if (jwtSettings == null)
+                        {
+                            throw new InvalidOperationException("JWT settings are not configured properly.");
+                        }
+
+                        options.TokenValidationParameters = new TokenValidationParameters
+                                                            {
+                                                                ValidateIssuer = true,
+                                                                ValidateAudience = true,
+                                                                ValidateLifetime = true,
+                                                                ValidateIssuerSigningKey = true,
+                                                                ClockSkew = TimeSpan.Zero,
+                                                                ValidIssuer = jwtSettings.Issuer,
+                                                                ValidAudience = jwtSettings.Audience,
+                                                                IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+                                                            };
+
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnMessageReceived = context =>
+                            {
+                                var authorizationHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+
+                                if (string.IsNullOrEmpty(authorizationHeader) || !authorizationHeader.StartsWith("Bearer "))
+                                {
+                                    if (context.Request.Cookies.TryGetValue("AccessToken", out var cookieToken))
+                                    {
+                                        context.Token = cookieToken;
+                                    }
+                                }
+
+                                return Task.CompletedTask;
+                            }
+                        };
+                    }
+                );
+
+        services.AddScoped<ITokenService, JwtTokenService>();
+        services.AddScoped<IAccountService, AccountService>();
+    }
 
     private static void AddSemanticKernel(this IServiceCollection services, IConfiguration configuration)
     {

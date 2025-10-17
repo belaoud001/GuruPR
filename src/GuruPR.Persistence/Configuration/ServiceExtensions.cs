@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using GuruPR.Domain.Entities;
 using GuruPR.Persistence.Contexts;
 using GuruPR.Persistence.Repositories;
 using GuruPR.Application.Settings.Database;
@@ -21,7 +23,7 @@ public static class ServiceExtensions
             throw new ArgumentNullException(nameof(Configuration), "CosmosDBConfig section is missing in configuration.");
         }
 
-        services.AddDbContext<GuruDBContext>(optionsBuilder => optionsBuilder.UseCosmos(accountEndpoint: cosmosDBConfig.AccountEndpoint,
+        services.AddDbContext<GuruDbContext>(optionsBuilder => optionsBuilder.UseCosmos(accountEndpoint: cosmosDBConfig.AccountEndpoint,
                                                                                         accountKey: cosmosDBConfig.AccountKey,
                                                                                         databaseName: cosmosDBConfig.DatabaseName,
                                                                                         cosmosOptionsAction: cosmosOptions =>
@@ -31,7 +33,38 @@ public static class ServiceExtensions
 #endif
                                                                                         }
                                                                                         ));
+
+        var postgresConfig = Configuration.GetSection(PostgresSettings.SectionName)
+                                          .Get<PostgresSettings>();
+
+        if (postgresConfig is null)
+        {
+            throw new ArgumentNullException(nameof(Configuration), "PostgresConfig section is missing in configuration.");
+        }
+        
+        services.AddDbContext<UserManagementDbContext>(optionBuilder => optionBuilder.UseNpgsql(connectionString: postgresConfig.ConnectionString));
+        services.AddIdentity();
         services.AddRepositories();
+    }
+
+    private static void AddIdentity(this IServiceCollection services)
+    {
+        services.AddIdentity<User, IdentityRole<Guid>>(
+            identityOptions =>
+            {
+                identityOptions.Password.RequiredLength = 8;
+                identityOptions.Password.RequireDigit = true;
+                identityOptions.Password.RequireLowercase = true;
+                identityOptions.Password.RequireUppercase = true;
+                identityOptions.Password.RequireNonAlphanumeric = true;
+
+                identityOptions.User.RequireUniqueEmail = true;
+
+                identityOptions.SignIn.RequireConfirmedEmail = true;
+
+                identityOptions.Lockout.MaxFailedAccessAttempts = 5;
+            }
+        ).AddEntityFrameworkStores<UserManagementDbContext>();
     }
 
     private static void AddRepositories(this IServiceCollection services)

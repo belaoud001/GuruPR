@@ -1,5 +1,6 @@
 ﻿using GuruPR.Persistence.Configuration;
 using GuruPR.Infrastructure.Configuration;
+using GuruPR.Application.Settings.Security;
 using GuruPR.Application.Settings.Extensions;
 
 namespace GuruPR.Configuration;
@@ -17,19 +18,14 @@ public static class ServiceExtensions
         );
     }
 
+    public static void ConfigureSettings(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSettings<JwtSettings>(configuration);
+    }
+
     public static void ConfigureLogging(this IServiceCollection services)
     {
         services.AddLogging();
-    }
-
-    public static void ConfigureAuthentication(this IServiceCollection services)
-    {
-        services.AddAuthentication().AddJwtBearer();
-    }
-
-    public static void ConfigureAuthorization(this IServiceCollection services)
-    {
-        services.AddAuthorizationBuilder();
     }
 
     public static void ConfigureSignalR(this IServiceCollection services)

@@ -1,0 +1,22 @@
+﻿using GuruPR.Domain.Entities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace GuruPR.Persistence.Configuration.ContextConfiguration;
+
+public class UserManagementDbContextConfiguration : IEntityTypeConfiguration<User>
+{
+    public UserManagementDbContextConfiguration()
+    {
+    }
+
+    public void Configure(EntityTypeBuilder<User> builder)
+    {
+        builder.Property(user => user.FirstName)
+               .HasMaxLength(256);
+
+        builder.Property(user => user.LastName)
+               .HasMaxLength(256);
+    }
+}

@@ -8,12 +8,12 @@ namespace GuruPR.Persistence.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly GuruDBContext _guruDbContext;
+    private readonly GuruDbContext _guruDbContext;
     private IDbContextTransaction? _transaction;
 
     private IProviderRepository? _providerRepository;
 
-    public UnitOfWork(GuruDBContext guruDbContext)
+    public UnitOfWork(GuruDbContext guruDbContext)
     {
         _guruDbContext = guruDbContext;
     }

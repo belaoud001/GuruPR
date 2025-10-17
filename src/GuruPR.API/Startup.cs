@@ -1,7 +1,9 @@
-﻿using GuruPR.Hubs;
+﻿using Scalar.AspNetCore;
+
+using GuruPR.Hubs;
 using GuruPR.Middlewares;
 using GuruPR.Configuration;
-    
+
 namespace GuruPR;
 
 public class Startup
@@ -15,14 +17,13 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.ConfigureAuthentication();
-        services.ConfigureAuthorization();   
         services.ConfigureCors();
+        services.AddOpenApi();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
         services.ConfigureLogging();
         services.ConfigureSignalR();
+        services.ConfigureSettings(Configuration);
         services.ConfigureApplicationServices();
         services.ConfigureInfrastructure(Configuration);
         services.ConfigurePersistence(Configuration);
@@ -30,18 +31,13 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        if (env.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-
         app.UseHttpsRedirection();
 
         app.UseMiddleware<ExceptionHandlingMiddleware>();
 
         app.UseRouting();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.UseEndpoints(
@@ -49,10 +45,13 @@ public class Startup
                 {
                     endpoint.MapControllers();
                     endpoint.MapHub<ChatHub>("/hubs");
+
+                    if (env.IsDevelopment())
+                    {
+                        endpoint.MapOpenApi();
+                        endpoint.MapScalarApiReference();
+                    }
                 }
         );
-
-        app.UseDefaultFiles();
-        app.UseStaticFiles();
     }
 }
