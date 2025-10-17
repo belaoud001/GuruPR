@@ -22,10 +22,7 @@ public class AccountService : IAccountService
 
     public async Task RegisterAsync(RegisterRequest registerRequest)
     {
-        if (registerRequest == null)
-        {
-            throw new ArgumentNullException(nameof(registerRequest));
-        }
+        ArgumentNullException.ThrowIfNull(registerRequest, nameof(registerRequest));
 
         await EnsureUserDoesNotExistAsync(registerRequest.Email);
 
@@ -48,10 +45,7 @@ public class AccountService : IAccountService
 
     public async Task LoginAsync(LoginRequest loginRequest)
     {
-        if (loginRequest == null)
-        {
-            throw new ArgumentNullException(nameof(loginRequest));
-        }
+        ArgumentNullException.ThrowIfNull(loginRequest, nameof(loginRequest));
 
         var user = await FindUserByEmailAsync(loginRequest.Email);
 
@@ -96,24 +90,14 @@ public class AccountService : IAccountService
     {
         var user = await _userManager.FindByEmailAsync(email);
 
-        if (user == null)
-        {
-            throw new AccountException("Invalid email or password.");
-        }
-
-        return user;
+        return user ?? throw new AccountException("Invalid email or password.");
     }
 
     private User FindUserByRefreshToken(string refreshToken)
     {
         var user = _userManager.Users.SingleOrDefault(u => u.RefreshToken == refreshToken);
 
-        if (user == null)
-        {
-            throw new AccountException("Invalid refresh token.");
-        }
-
-        return user;
+        return user ?? throw new AccountException("Invalid refresh token.");
     }
 
     private async Task SetAuthenticationTokensAsync(User user)
