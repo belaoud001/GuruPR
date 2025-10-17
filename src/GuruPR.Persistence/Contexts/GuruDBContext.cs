@@ -31,6 +31,6 @@ public class GuruDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfiguration(new GuruDbContextConfiguration(_tokenEncryptionService));
+        modelBuilder.ApplyConfiguration(new ProviderConfiguration(_tokenEncryptionService));
     }
 }

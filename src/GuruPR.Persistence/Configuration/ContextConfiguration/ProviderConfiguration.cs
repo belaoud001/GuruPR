@@ -6,11 +6,11 @@ using GuruPR.Application.Interfaces.Infrastructure;
 
 namespace GuruPR.Persistence.Configuration.ContextConfiguration;
 
-public class GuruDbContextConfiguration : IEntityTypeConfiguration<Provider>
+public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
 {
     private readonly ITokenEncryptionService _tokenEncryptionService;
 
-    public GuruDbContextConfiguration(ITokenEncryptionService tokenEncryptionService)
+    public ProviderConfiguration(ITokenEncryptionService tokenEncryptionService)
     {
         _tokenEncryptionService = tokenEncryptionService;
     }

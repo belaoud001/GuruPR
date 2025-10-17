@@ -9,8 +9,6 @@ namespace GuruPR.Persistence.Contexts;
 
 public class UserManagementDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
-    public DbSet<User> Users { get; set; }
-
     public UserManagementDbContext(DbContextOptions<UserManagementDbContext> options) : base(options)
     {
     }
@@ -19,6 +17,6 @@ public class UserManagementDbContext : IdentityDbContext<User, IdentityRole<Guid
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfiguration(new UserManagementDbContextConfiguration());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
     }
 }

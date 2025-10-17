@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GuruPR.Persistence.Configuration.ContextConfiguration;
 
-public class UserManagementDbContextConfiguration : IEntityTypeConfiguration<User>
+public class UserConfiguration : IEntityTypeConfiguration<User>
 {
-    public UserManagementDbContextConfiguration()
+    public UserConfiguration()
     {
     }
 
