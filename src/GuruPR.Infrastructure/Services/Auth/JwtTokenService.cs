@@ -38,19 +38,19 @@ public class JwtTokenService : ITokenService
         };
         var expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationTimeInMinutes);
         var token = new JwtSecurityToken(
-            issuer: _jwtSettings.Issuer,
-            audience: _jwtSettings.Audience,
-            claims: claims,
-            notBefore: DateTime.UtcNow,
-            expires: expires,
-            signingCredentials: signingCredentials
-        );
+                        issuer: _jwtSettings.Issuer,
+                        audience: _jwtSettings.Audience,
+                        claims: claims,
+                        notBefore: DateTime.UtcNow,
+                        expires: expires,
+                        signingCredentials: signingCredentials
+                    );
         var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
         var jwtTokenResult = new JwtTokenResult
-        {
-            Token = jwtToken,
-            ExpiresAtUtc = expires
-        };
+                             {
+                                 Token = jwtToken,
+                                 ExpiresAtUtc = expires
+                             };
 
         return jwtTokenResult;
     }
@@ -75,13 +75,13 @@ public class JwtTokenService : ITokenService
         }
 
         var cookieOptions = new CookieOptions
-        {
-            Secure = true,
-            HttpOnly = true,
-            Expires = expiration,
-            IsEssential = true,
-            SameSite = SameSiteMode.Strict
-        };
+                            {
+                                Secure = true,
+                                HttpOnly = true,
+                                Expires = expiration,
+                                IsEssential = true,
+                                SameSite = SameSiteMode.Strict
+                            };
         httpContext.Response.Cookies.Append(cookieName, token, cookieOptions);
     }
 }
