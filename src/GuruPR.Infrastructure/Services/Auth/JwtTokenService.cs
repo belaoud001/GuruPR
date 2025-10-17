@@ -1,27 +1,27 @@
 ﻿using System.Text;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.IdentityModel.Tokens.Jwt;
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 using GuruPR.Domain.Entities;
 using GuruPR.Application.Dtos.Jwt;
 using GuruPR.Application.Settings.Security;
 using GuruPR.Application.Interfaces.Infrastructure;
-using System.Security.Cryptography;
-using Microsoft.Extensions.Options;
 
 namespace GuruPR.Infrastructure.Services.Auth;
 
 public class JwtTokenService : ITokenService
 {
-    private readonly IHttpContextAccessor _httpsContextAccessor;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly JwtSettings _jwtSettings;
 
     public JwtTokenService(IHttpContextAccessor httpContextAccessor, IOptions<JwtSettings> jwtSettings)
     {
-        _httpsContextAccessor = httpContextAccessor;
+        _httpContextAccessor = httpContextAccessor;
         _jwtSettings = jwtSettings.Value;
     }
 
@@ -67,6 +67,13 @@ public class JwtTokenService : ITokenService
 
     public void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token, DateTime expiration)
     {
+        var httpContext = _httpContextAccessor.HttpContext;
+
+        if (httpContext == null)
+        {
+            throw new InvalidOperationException("HttpContext is not available. This method must be called within an HTTP request context.");
+        }
+
         var cookieOptions = new CookieOptions
         {
             Secure = true,
@@ -75,6 +82,6 @@ public class JwtTokenService : ITokenService
             IsEssential = true,
             SameSite = SameSiteMode.Strict
         };
-        _httpsContextAccessor.HttpContext.Response.Cookies.Append(cookieName, token, cookieOptions);
+        httpContext.Response.Cookies.Append(cookieName, token, cookieOptions);
     }
 }
