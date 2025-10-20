@@ -35,6 +35,8 @@ public class JwtTokenService : ITokenService
             new Claim(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
             new Claim(ClaimTypes.NameIdentifier,     user.ToString()),
+
+            new Claim(ClaimTypes.Role, "Admin")
         };
         var expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationTimeInMinutes);
         var token = new JwtSecurityToken(
@@ -76,11 +78,11 @@ public class JwtTokenService : ITokenService
 
         var cookieOptions = new CookieOptions
                             {
-                                Secure = true,
-                                HttpOnly = true,
+                                //Secure = true,
+                                //HttpOnly = true,
                                 Expires = expiration,
                                 IsEssential = true,
-                                SameSite = SameSiteMode.Strict
+                                SameSite = SameSiteMode.None
                             };
         httpContext.Response.Cookies.Append(cookieName, token, cookieOptions);
     }

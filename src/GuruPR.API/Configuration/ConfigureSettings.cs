@@ -1,5 +1,4 @@
 ﻿using GuruPR.Application.Settings;
-using GuruPR.Application.Settings.Security;
 
 namespace GuruPR.Configuration;
 

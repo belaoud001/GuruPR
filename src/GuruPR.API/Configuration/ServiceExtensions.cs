@@ -21,6 +21,7 @@ public static class ServiceExtensions
     public static void ConfigureSettings(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSettings<JwtSettings>(configuration);
+        services.AddSettings<EmailValidationSettings>(configuration);
     }
 
     public static void ConfigureLogging(this IServiceCollection services)

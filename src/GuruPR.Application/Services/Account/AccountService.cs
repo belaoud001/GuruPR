@@ -2,8 +2,9 @@
 
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Requests;
-using GuruPR.Application.Exceptions;
+using GuruPR.Application.Exceptions.Account;
 using GuruPR.Application.Interfaces.Application;
+using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Application.Interfaces.Infrastructure;
 
 namespace GuruPR.Application.Services.Account;
@@ -11,14 +12,19 @@ namespace GuruPR.Application.Services.Account;
 public class AccountService : IAccountService
 {
     private readonly ITokenService _tokenService;
+    private readonly IUserRepository _userRepository;
     private readonly UserManager<User> _userManager;
+
     private const int RefreshTokenExpirationDays = 7;
 
-    public AccountService(ITokenService tokenService, UserManager<User> userManager)
+    public AccountService(ITokenService tokenService, IUserRepository userRepository, UserManager<User> userManager)
     {
         _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
+        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
     }
+
+    #region Public Methods
 
     public async Task RegisterAsync(RegisterRequest registerRequest)
     {
@@ -36,10 +42,9 @@ public class AccountService : IAccountService
 
         var result = await _userManager.CreateAsync(user, registerRequest.Password);
 
-
-        if (!result.Succeeded) 
-        { 
-            throw new AccountException($"Failed to create a new user with email '{registerRequest.Email}'.");
+        if (!result.Succeeded)
+        {
+            ThrowRegistrationException(result.Errors);
         }
     }
 
@@ -51,7 +56,7 @@ public class AccountService : IAccountService
 
         if (!await _userManager.CheckPasswordAsync(user, loginRequest.Password))
         {
-            throw new AccountException("Invalid email or password.");
+            throw new LoginFailedException("Login failed. Invalid email or password.");
         }
 
         await SetAuthenticationTokensAsync(user);
@@ -61,17 +66,58 @@ public class AccountService : IAccountService
     {
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
-            throw new AccountException("Refresh token is missing.");
+            throw new RefreshTokenException("Refresh token is missing.");
         }
 
-        var user = FindUserByRefreshToken(refreshToken);
+        var user = await FindUserByRefreshTokenAsync(refreshToken);
 
         if (user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {
-            throw new AccountException("Refresh token has expired.");
+            throw new RefreshTokenException("Refresh token has expired.");
         }
 
         await SetAuthenticationTokensAsync(user);
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private static void ThrowRegistrationException(IEnumerable<IdentityError> errors)
+    {
+        var errorGroups = errors.GroupBy(error => GetErrorCategory(error.Code))
+                                .ToDictionary(
+                                    group => group.Key,
+                                    group => group.Select(error => error.Description)
+                                                  .ToList()
+                                );
+
+        throw new RegistrationFailedException($"Registration failed.", errorGroups);
+    }
+
+    private static string GetErrorCategory(string errorCode)
+    {
+        if (errorCode.StartsWith("Password", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Password";
+        }
+
+        if (errorCode.Contains("Email", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Email";
+        }
+
+        if (errorCode.StartsWith("FirstName", StringComparison.OrdinalIgnoreCase))
+        {
+            return "FirstName";
+        }
+
+        if (errorCode.StartsWith("LastName", StringComparison.OrdinalIgnoreCase))
+        {
+            return "LastName";
+        }
+
+        return "Other";
     }
 
     private async Task<User?> EnsureUserDoesNotExistAsync(string email)
@@ -80,7 +126,7 @@ public class AccountService : IAccountService
 
         if (user != null)
         {
-            throw new AccountException($"User with email '{email}' already exists.");
+            throw new UserAlreadyExistsException($"User with email '{email}' already exists.");
         }
 
         return user;
@@ -90,14 +136,14 @@ public class AccountService : IAccountService
     {
         var user = await _userManager.FindByEmailAsync(email);
 
-        return user ?? throw new AccountException("Invalid email or password.");
+        return user ?? throw new LoginFailedException("Invalid email or password.");
     }
 
-    private User FindUserByRefreshToken(string refreshToken)
+    private async Task<User> FindUserByRefreshTokenAsync(string refreshToken)
     {
-        var user = _userManager.Users.SingleOrDefault(u => u.RefreshToken == refreshToken);
+        var user = await _userRepository.GetUserByRefreshTokenAsync(refreshToken);
 
-        return user ?? throw new AccountException("Invalid refresh token.");
+        return user ?? throw new RefreshTokenException("Unable to retrieve user for refresh token.");
     }
 
     private async Task SetAuthenticationTokensAsync(User user)
@@ -119,4 +165,6 @@ public class AccountService : IAccountService
         _tokenService.WriteAuthTokenAsHttpOnlyCookie("AccessToken", jwtTokenResult.Token, jwtTokenResult.ExpiresAtUtc);
         _tokenService.WriteAuthTokenAsHttpOnlyCookie("RefreshToken", newRefreshToken, refreshTokenExpiry);
     }
+
+    #endregion
 }

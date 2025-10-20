@@ -1,4 +1,4 @@
-﻿namespace GuruPR.Application.Exceptions;
+﻿namespace GuruPR.Application.Exceptions.Account;
 
 public class AccountException : Exception
 {

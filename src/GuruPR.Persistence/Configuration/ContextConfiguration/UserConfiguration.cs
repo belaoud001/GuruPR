@@ -1,7 +1,7 @@
-﻿using GuruPR.Domain.Entities;
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using GuruPR.Domain.Entities;
 
 namespace GuruPR.Persistence.Configuration.ContextConfiguration;
 

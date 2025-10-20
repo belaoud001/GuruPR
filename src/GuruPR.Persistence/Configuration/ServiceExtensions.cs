@@ -8,6 +8,7 @@ using GuruPR.Persistence.Contexts;
 using GuruPR.Persistence.Repositories;
 using GuruPR.Application.Settings.Database;
 using GuruPR.Application.Interfaces.Persistence;
+using GuruPR.Application.Services.Account.IdentityValidators;
 
 namespace GuruPR.Persistence.Configuration;
 
@@ -43,6 +44,7 @@ public static class ServiceExtensions
         }
         
         services.AddDbContext<UserManagementDbContext>(optionBuilder => optionBuilder.UseNpgsql(connectionString: postgresConfig.ConnectionString));
+
         services.AddIdentity();
         services.AddRepositories();
     }
@@ -50,26 +52,32 @@ public static class ServiceExtensions
     private static void AddIdentity(this IServiceCollection services)
     {
         services.AddIdentity<User, IdentityRole<Guid>>(
-            identityOptions =>
-            {
-                identityOptions.Password.RequiredLength = 8;
-                identityOptions.Password.RequireDigit = true;
-                identityOptions.Password.RequireLowercase = true;
-                identityOptions.Password.RequireUppercase = true;
-                identityOptions.Password.RequireNonAlphanumeric = true;
+                    identityOptions =>
+                    {
+                        // Password settings
+                        identityOptions.Password.RequiredLength = 8;
+                        identityOptions.Password.RequireDigit = true;
+                        identityOptions.Password.RequireLowercase = true;
+                        identityOptions.Password.RequireUppercase = true;
+                        identityOptions.Password.RequireNonAlphanumeric = true;
 
-                identityOptions.User.RequireUniqueEmail = true;
+                        // Email settings
+                        identityOptions.User.RequireUniqueEmail = true;
+                        identityOptions.SignIn.RequireConfirmedEmail = true;
 
-                identityOptions.SignIn.RequireConfirmedEmail = true;
-
-                identityOptions.Lockout.MaxFailedAccessAttempts = 5;
-            }
-        ).AddEntityFrameworkStores<UserManagementDbContext>();
+                        // Lockout settings
+                        identityOptions.Lockout.MaxFailedAccessAttempts = 5;
+                    }
+                )
+                .AddUserValidator<StrictEmailDomainValidator>()
+                .AddUserValidator<UserProfileValidator>()
+                .AddEntityFrameworkStores<UserManagementDbContext>();
     }
 
     private static void AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IProviderRepository, ProviderRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
     }
 }

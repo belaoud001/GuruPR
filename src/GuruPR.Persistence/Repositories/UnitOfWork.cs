@@ -12,6 +12,7 @@ public class UnitOfWork : IUnitOfWork
     private IDbContextTransaction? _transaction;
 
     private IProviderRepository? _providerRepository;
+    private IUserRepository? _userRepository;
 
     public UnitOfWork(GuruDbContext guruDbContext)
     {

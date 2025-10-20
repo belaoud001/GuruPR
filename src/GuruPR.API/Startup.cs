@@ -3,6 +3,8 @@
 using GuruPR.Hubs;
 using GuruPR.Middlewares;
 using GuruPR.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GuruPR;
 
@@ -25,8 +27,8 @@ public class Startup
         services.ConfigureSignalR();
         services.ConfigureSettings(Configuration);
         services.ConfigureApplicationServices();
-        services.ConfigureInfrastructure(Configuration);
         services.ConfigurePersistence(Configuration);
+        services.ConfigureInfrastructure(Configuration);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
