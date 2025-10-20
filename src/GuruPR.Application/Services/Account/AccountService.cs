@@ -6,6 +6,11 @@ using GuruPR.Application.Exceptions.Account;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Application.Interfaces.Infrastructure;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Azure.Core;
+using System;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Http;
 
 namespace GuruPR.Application.Services.Account;
 
@@ -13,14 +18,25 @@ public class AccountService : IAccountService
 {
     private readonly ITokenService _tokenService;
     private readonly IUserRepository _userRepository;
+    private readonly IEmailSender _emailSender;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly LinkGenerator _linkGenerator;
     private readonly UserManager<User> _userManager;
 
     private const int RefreshTokenExpirationDays = 7;
 
-    public AccountService(ITokenService tokenService, IUserRepository userRepository, UserManager<User> userManager)
+    public AccountService(ITokenService tokenService, 
+                          IUserRepository userRepository, 
+                          IEmailSender emailSender,
+                          IHttpContextAccessor httpContextAccessor,
+                          LinkGenerator linkGenerator,
+                          UserManager<User> userManager)
     {
         _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+        _emailSender = emailSender ?? throw new ArgumentNullException(nameof(emailSender));
+        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+        _linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
     }
 
@@ -45,6 +61,21 @@ public class AccountService : IAccountService
         if (!result.Succeeded)
         {
             ThrowRegistrationException(result.Errors);
+        } 
+        else
+        {
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var encodedToken = System.Web.HttpUtility.UrlEncode(token);
+
+            var confirmationLink = _linkGenerator.GetUriByAction(
+                _httpContextAccessor.HttpContext,
+                action: "ConfirmEmail",
+                controller: "Account",
+                values: new { userId = user.Id, token = encodedToken }
+            );
+
+            await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
+                $"Please confirm your account by clicking <a href='{confirmationLink}'>here</a>.");
         }
     }
 

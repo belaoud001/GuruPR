@@ -16,6 +16,8 @@ using GuruPR.Infrastructure.SemanticKernel.Plugins;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
 using GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using GuruPR.Infrastructure.Services.Email;
 
 namespace GuruPR.Infrastructure.Configuration;
 
@@ -32,6 +34,7 @@ public static class ServiceExtensions
         services.AddSecurity(configuration);
         services.AddHttpClients();
         services.AddThirdPartyServices();
+        services.AddTransient<IEmailSender, EmailSender>();
     }
 
     #endregion

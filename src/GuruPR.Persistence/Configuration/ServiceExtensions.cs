@@ -71,7 +71,8 @@ public static class ServiceExtensions
                 )
                 .AddUserValidator<StrictEmailDomainValidator>()
                 .AddUserValidator<UserProfileValidator>()
-                .AddEntityFrameworkStores<UserManagementDbContext>();
+                .AddEntityFrameworkStores<UserManagementDbContext>()
+                .AddDefaultTokenProviders();
     }
 
     private static void AddRepositories(this IServiceCollection services)

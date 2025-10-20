@@ -15,6 +15,8 @@ public class StrictEmailDomainValidator : IUserValidator<User>
         _allowedDomains = emailValidationSettings.Value.AllowedDomains;
     }
 
+    #region Public Methods
+
     public Task<IdentityResult> ValidateAsync(UserManager<User> userManager, User user)
     {
         var errors = new List<IdentityError>();
@@ -63,4 +65,5 @@ public class StrictEmailDomainValidator : IUserValidator<User>
                                             : IdentityResult.Success);
     }
 
+    #endregion
 }
