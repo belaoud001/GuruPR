@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GuruPR.Application.Dapr;
 
-using GuruPR.Application.Dapr;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Controllers;
 

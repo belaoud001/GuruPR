@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
+﻿using GuruPR.Application.Interfaces.Persistence;
+using GuruPR.Application.Services.Account.IdentityValidators;
+using GuruPR.Application.Settings.Database;
 using GuruPR.Domain.Entities;
 using GuruPR.Persistence.Contexts;
 using GuruPR.Persistence.Repositories;
-using GuruPR.Application.Settings.Database;
-using GuruPR.Application.Interfaces.Persistence;
-using GuruPR.Application.Services.Account.IdentityValidators;
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GuruPR.Persistence.Configuration;
 

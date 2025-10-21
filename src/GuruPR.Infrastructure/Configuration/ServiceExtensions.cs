@@ -1,23 +1,23 @@
-﻿using Microsoft.SemanticKernel;
-using Microsoft.IdentityModel.Tokens;
+﻿using GuruPR.Application.Configuration.Security;
+using GuruPR.Application.Interfaces.Application;
+using GuruPR.Application.Interfaces.Infrastructure;
+using GuruPR.Application.Services.Account;
+using GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
+using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
+using GuruPR.Application.Settings.Security;
+using GuruPR.Infrastructure.HttpClients.Spotify;
+using GuruPR.Infrastructure.SemanticKernel.Plugins;
+using GuruPR.Infrastructure.Services.Auth;
+using GuruPR.Infrastructure.Services.Email;
+using GuruPR.Infrastructure.Services.Security;
+using GuruPR.Infrastructure.Services.ThirdParties;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-
-using GuruPR.Application.Services.Account;
-using GuruPR.Infrastructure.Services.Auth;
-using GuruPR.Application.Settings.Security;
-using GuruPR.Infrastructure.Services.Security;
-using GuruPR.Application.Configuration.Security;
-using GuruPR.Infrastructure.HttpClients.Spotify;
-using GuruPR.Application.Interfaces.Application;
-using GuruPR.Infrastructure.Services.ThirdParties;
-using GuruPR.Infrastructure.SemanticKernel.Plugins;
-using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
-using GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using GuruPR.Infrastructure.Services.Email;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.SemanticKernel;
 
 namespace GuruPR.Infrastructure.Configuration;
 
@@ -34,7 +34,7 @@ public static class ServiceExtensions
         services.AddSecurity(configuration);
         services.AddHttpClients();
         services.AddThirdPartyServices();
-        services.AddTransient<IEmailSender, EmailSender>();
+        services.AddTransient<IEmailSender, GmailSender>();
     }
 
     #endregion

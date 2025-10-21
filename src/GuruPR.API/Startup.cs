@@ -1,10 +1,8 @@
-﻿using Scalar.AspNetCore;
-
+﻿using GuruPR.Configuration;
 using GuruPR.Hubs;
 using GuruPR.Middlewares;
-using GuruPR.Configuration;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
+
+using Scalar.AspNetCore;
 
 namespace GuruPR;
 

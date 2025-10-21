@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GuruPR.Application.Exceptions.Account;
 
-using GuruPR.Application.Exceptions.Account;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Middlewares;
 

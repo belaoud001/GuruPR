@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-using GuruPR.Persistence.Contexts;
+﻿using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Domain.Entities.Enums;
 using GuruPR.Domain.Entities.OAuth;
-using GuruPR.Application.Interfaces.Persistence;
+using GuruPR.Persistence.Contexts;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace GuruPR.Persistence.Repositories;
 

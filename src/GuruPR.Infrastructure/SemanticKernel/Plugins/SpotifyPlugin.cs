@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel;
-using Microsoft.SemanticKernel;
 
 using GuruPR.Application.Interfaces.Infrastructure;
+
+using Microsoft.SemanticKernel;
 
 namespace GuruPR.Infrastructure.SemanticKernel.Plugins;
 

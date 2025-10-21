@@ -1,5 +1,5 @@
-﻿using GuruPR.Domain.Entities;
-using GuruPR.Application.Dtos.Jwt;
+﻿using GuruPR.Application.Dtos.Jwt;
+using GuruPR.Domain.Entities;
 
 namespace GuruPR.Application.Interfaces.Infrastructure;
 

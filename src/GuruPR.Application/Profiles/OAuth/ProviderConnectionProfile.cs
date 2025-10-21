@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 
-using GuruPR.Domain.Entities.OAuth;
 using GuruPR.Application.Dtos.OAuth.ProviderConnection;
+using GuruPR.Domain.Entities.OAuth;
 
 namespace GuruPR.Application.Profiles.OAuth;
 

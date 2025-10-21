@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-
+﻿using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Persistence.Contexts;
-using GuruPR.Application.Interfaces.Persistence;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace GuruPR.Persistence.Repositories;
 

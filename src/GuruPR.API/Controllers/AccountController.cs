@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using GuruPR.Application.Interfaces.Application;
 using GuruPR.Domain.Requests;
-using GuruPR.Application.Interfaces.Application;
+
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Controllers;
 

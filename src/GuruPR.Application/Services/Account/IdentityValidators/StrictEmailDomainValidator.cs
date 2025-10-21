@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Identity;
-
+﻿using GuruPR.Application.Settings.Security;
 using GuruPR.Domain.Entities;
-using GuruPR.Application.Settings.Security;
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 namespace GuruPR.Application.Services.Account.IdentityValidators;
 

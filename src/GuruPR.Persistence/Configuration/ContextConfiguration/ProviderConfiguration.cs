@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
+﻿using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Domain.Entities.OAuth;
-using GuruPR.Application.Interfaces.Infrastructure;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GuruPR.Persistence.Configuration.ContextConfiguration;
 

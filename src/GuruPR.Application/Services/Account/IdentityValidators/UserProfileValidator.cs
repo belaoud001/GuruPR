@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 
-using Microsoft.AspNetCore.Identity;
-
 using GuruPR.Domain.Entities;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace GuruPR.Application.Services.Account.IdentityValidators;

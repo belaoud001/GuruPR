@@ -1,7 +1,8 @@
-﻿using GuruPR.Persistence.Configuration;
-using GuruPR.Infrastructure.Configuration;
-using GuruPR.Application.Settings.Security;
+﻿using GuruPR.Application.Settings.Email;
 using GuruPR.Application.Settings.Extensions;
+using GuruPR.Application.Settings.Security;
+using GuruPR.Infrastructure.Configuration;
+using GuruPR.Persistence.Configuration;
 
 namespace GuruPR.Configuration;
 
@@ -22,6 +23,7 @@ public static class ServiceExtensions
     {
         services.AddSettings<JwtSettings>(configuration);
         services.AddSettings<EmailValidationSettings>(configuration);
+        services.AddSettings<GmailingAppSettings>(configuration);
     }
 
     public static void ConfigureLogging(this IServiceCollection services)

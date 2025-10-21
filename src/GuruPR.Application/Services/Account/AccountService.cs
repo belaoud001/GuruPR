@@ -1,16 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
-
+﻿using GuruPR.Application.Exceptions.Account;
+using GuruPR.Application.Interfaces.Application;
+using GuruPR.Application.Interfaces.Infrastructure;
+using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Requests;
-using GuruPR.Application.Exceptions.Account;
-using GuruPR.Application.Interfaces.Application;
-using GuruPR.Application.Interfaces.Persistence;
-using GuruPR.Application.Interfaces.Infrastructure;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Azure.Core;
-using System;
-using Microsoft.AspNetCore.Routing;
+
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Routing;
 
 namespace GuruPR.Application.Services.Account;
 
