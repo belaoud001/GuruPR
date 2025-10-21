@@ -1,7 +1,9 @@
 ﻿using GuruPR.Application.Interfaces.Application;
+using GuruPR.Domain.Entities;
 using GuruPR.Domain.Requests;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Controllers;
@@ -12,6 +14,7 @@ public class AccountController : ControllerBase
 {
     private readonly ILogger<AccountController> _logger;
     private readonly IAccountService _accountService;
+    private readonly UserManager<User> _userManager;
 
     public AccountController(ILogger<AccountController> logger, IAccountService accountService)
     {
@@ -42,6 +45,14 @@ public class AccountController : ControllerBase
         await _accountService.RefreshTokenAsync(refrehToken);
 
         return Ok("Token refresh has succeeded.");
+    }
+
+    [HttpGet("ConfirmEmail")]
+    public async Task<IActionResult> ConfirmEmail(string userId, string token)
+    {
+        await _accountService.ConfirmEmailAsync(userId, token);
+
+        return Ok("Email confirmation has succeeded.");
     }
 
     [HttpPost("logout")]

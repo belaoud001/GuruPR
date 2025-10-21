@@ -1,4 +1,5 @@
-﻿using GuruPR.Application.Exceptions.Account;
+﻿using GuruPR.Application.Exceptions;
+using GuruPR.Application.Exceptions.Account;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +45,7 @@ public class ExceptionHandlingMiddleware
             RegistrationFailedException => (StatusCodes.Status400BadRequest,   "User registration failed"),
             RefreshTokenException       => (StatusCodes.Status401Unauthorized, "Invalid Refresh Token"),
             LoginFailedException        => (StatusCodes.Status401Unauthorized, "Login Failed"),
+            NotFoundException           => (StatusCodes.Status404NotFound,     "Resource Not Found"),
             UserAlreadyExistsException  => (StatusCodes.Status409Conflict,     "User Already Exists"),
 
             // Server Errors

@@ -1,4 +1,5 @@
-﻿using GuruPR.Application.Exceptions.Account;
+﻿using GuruPR.Application.Exceptions;
+using GuruPR.Application.Exceptions.Account;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Interfaces.Persistence;
@@ -63,17 +64,16 @@ public class AccountService : IAccountService
         else
         {
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var encodedToken = System.Web.HttpUtility.UrlEncode(token);
+            var httpContext = _httpContextAccessor.HttpContext ?? throw new OperationFailedException("Email confirmation failed.");
 
-            var confirmationLink = _linkGenerator.GetUriByAction(
-                _httpContextAccessor.HttpContext,
-                action: "ConfirmEmail",
-                controller: "Account",
-                values: new { userId = user.Id, token = encodedToken }
-            );
+            var confirmationLink = _linkGenerator.GetUriByAction(httpContext,
+                                                                 action: "ConfirmEmail",
+                                                                 controller: "Account",
+                                                                 values: new { userId = user.Id, token = token });
 
-            await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
-                $"Please confirm your account by clicking <a href='{confirmationLink}'>here</a>.");
+            await _emailSender.SendEmailAsync(user.Email, 
+                                              "Confirm your email",
+                                              $"Please confirm your account by clicking <a href='{confirmationLink}'>here</a>.");
         }
     }
 
@@ -99,13 +99,27 @@ public class AccountService : IAccountService
         }
 
         var user = await FindUserByRefreshTokenAsync(refreshToken);
-
         if (user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {
             throw new RefreshTokenException("Refresh token has expired.");
         }
 
         await SetAuthenticationTokensAsync(user);
+    }
+
+    public async Task ConfirmEmailAsync(string userId, string token)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            throw new UserNotFoundException($"User with the specified ID {userId} was not found.");
+        }
+
+        var result = await _userManager.ConfirmEmailAsync(user, token);
+        if (!result.Succeeded)
+        {
+            throw new EmailConfirmationException("Email confirmation failed.");
+        }
     }
 
     #endregion
