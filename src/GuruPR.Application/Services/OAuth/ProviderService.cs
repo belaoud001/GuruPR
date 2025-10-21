@@ -42,7 +42,7 @@ public class ProviderService : IProviderService
         }
 
         await _unitOfWork.Providers.AddAsync(provider);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveGuruChangesAsync();
 
         return provider;
     }
@@ -127,7 +127,7 @@ public class ProviderService : IProviderService
         }
 
         _unitOfWork.Providers.Update(provider);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveGuruChangesAsync();
 
         return provider;
     }
@@ -144,7 +144,7 @@ public class ProviderService : IProviderService
 
         _unitOfWork.Providers.Delete(provider);
 
-        var result = await _unitOfWork.SaveChangesAsync();
+        var result = await _unitOfWork.SaveGuruChangesAsync();
         return result > 0;
     }
 

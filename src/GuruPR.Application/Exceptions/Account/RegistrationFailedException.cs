@@ -1,4 +1,6 @@
-﻿namespace GuruPR.Application.Exceptions.Account;
+﻿using GuruPR.Application.Exceptions.Interfaces;
+
+namespace GuruPR.Application.Exceptions.Account;
 
 public class RegistrationFailedException : AccountException, IValidationException
 {

@@ -1,4 +1,4 @@
-﻿namespace GuruPR.Application.Exceptions.Account;
+﻿namespace GuruPR.Application.Exceptions.Interfaces;
 
 public interface IValidationException
 {

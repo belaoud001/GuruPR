@@ -1,5 +1,6 @@
 ﻿using GuruPR.Application.Exceptions;
 using GuruPR.Application.Exceptions.Account;
+using GuruPR.Application.Exceptions.Interfaces;
 
 using Microsoft.AspNetCore.Mvc;
 

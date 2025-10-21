@@ -1,25 +1,29 @@
 ﻿using GuruPR.Application.Interfaces.Application;
+using GuruPR.Application.Settings.FrontEnd;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Requests;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace GuruPR.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/v1/accounts")]
 public class AccountController : ControllerBase
 {
     private readonly ILogger<AccountController> _logger;
     private readonly IAccountService _accountService;
-    private readonly UserManager<User> _userManager;
+    private readonly FrontEndSettings _frontEndSettings;
 
-    public AccountController(ILogger<AccountController> logger, IAccountService accountService)
+    public AccountController(ILogger<AccountController> logger, IAccountService accountService, IOptions<FrontEndSettings> frontEndSettings)
     {
         _logger = logger;
         _accountService = accountService;
+        _frontEndSettings = frontEndSettings.Value;
     }
 
     [HttpPost("register")]
@@ -47,12 +51,23 @@ public class AccountController : ControllerBase
         return Ok("Token refresh has succeeded.");
     }
 
-    [HttpGet("ConfirmEmail")]
+    [HttpGet("confirm-email")]
+    [AllowAnonymous]
     public async Task<IActionResult> ConfirmEmail(string userId, string token)
     {
-        await _accountService.ConfirmEmailAsync(userId, token);
+        try
+        {
+            await _accountService.ConfirmEmailAsync(userId, token);
 
-        return Ok("Email confirmation has succeeded.");
+            // Redirect to login page
+            return Redirect(_frontEndSettings.BaseUrl + _frontEndSettings.EmailConfirmationPath);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Email confirmation failed for userId: {UserId}", userId);
+
+            return Redirect(_frontEndSettings.BaseUrl + _frontEndSettings.EmailConfirmationFailedPath);
+        }
     }
 
     [HttpPost("logout")]
