@@ -78,8 +78,8 @@ public class JwtTokenService : ITokenService
 
         var cookieOptions = new CookieOptions
                             {
-                                //Secure = true,
-                                //HttpOnly = true,
+                                Secure = true,
+                                HttpOnly = true,
                                 Expires = expiration,
                                 IsEssential = true,
                                 SameSite = SameSiteMode.None
