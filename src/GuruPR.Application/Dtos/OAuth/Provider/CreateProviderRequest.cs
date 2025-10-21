@@ -1,5 +1,5 @@
-﻿using GuruPR.Domain.Entities.Enums;
-using GuruPR.Application.Dtos.OAuth.ProviderConnection;
+﻿using GuruPR.Application.Dtos.OAuth.ProviderConnection;
+using GuruPR.Domain.Entities.Enums;
 
 namespace GuruPR.Application.Dtos.OAuth.Provider;
 

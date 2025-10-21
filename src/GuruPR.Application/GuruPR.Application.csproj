@@ -13,6 +13,7 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="15.0.1" />
       <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.10" />
       <PackageReference Include="Microsoft.SemanticKernel" Version="1.52.0" />
     </ItemGroup>
 

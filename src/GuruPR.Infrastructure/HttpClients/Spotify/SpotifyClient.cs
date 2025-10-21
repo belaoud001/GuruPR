@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+
 using Microsoft.Extensions.Logging;
 
 namespace GuruPR.Infrastructure.HttpClients.Spotify;

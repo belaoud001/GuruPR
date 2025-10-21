@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 
-using GuruPR.Domain.Entities.OAuth;
-using GuruPR.Domain.Entities.Enums;
+using GuruPR.Application.Dtos.OAuth.ProviderConnection;
 using GuruPR.Application.Exceptions;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Persistence;
-using GuruPR.Application.Dtos.OAuth.ProviderConnection;
+using GuruPR.Domain.Entities.Enums;
+using GuruPR.Domain.Entities.OAuth;
 
 namespace GuruPR.Application.Services.OAuth;
 
@@ -81,7 +81,7 @@ public class ProviderConnectionService : IProviderConnectionService
         var providerConnection = _mapper.Map<ProviderConnection>(createProviderConnectionRequest);
 
         provider.AddProviderConnection(providerConnection);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveGuruChangesAsync();
 
         return providerConnection;
     }
@@ -94,7 +94,7 @@ public class ProviderConnectionService : IProviderConnectionService
         var providerConnection = await GetProviderConnectionByIdAsync(provider.Id, providerConnectionId);
 
         _mapper.Map(updateProviderConnectionRequest, providerConnection);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveGuruChangesAsync();
 
         return providerConnection;
     }
@@ -110,7 +110,7 @@ public class ProviderConnectionService : IProviderConnectionService
             return false;
         }
 
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveGuruChangesAsync();
         
         return true;
     }

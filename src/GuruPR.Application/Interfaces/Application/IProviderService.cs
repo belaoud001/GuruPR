@@ -1,6 +1,6 @@
-﻿using GuruPR.Domain.Entities.Enums;
+﻿using GuruPR.Application.Dtos.OAuth.Provider;
+using GuruPR.Domain.Entities.Enums;
 using GuruPR.Domain.Entities.OAuth;
-using GuruPR.Application.Dtos.OAuth.Provider;
 
 namespace GuruPR.Application.Interfaces.Application;
 

@@ -1,79 +1,195 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using System.Transactions;
 
-using GuruPR.Persistence.Contexts;
 using GuruPR.Application.Interfaces.Persistence;
+using GuruPR.Persistence.Contexts;
+
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace GuruPR.Persistence.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly GuruDBContext _guruDbContext;
-    private IDbContextTransaction? _transaction;
+    private readonly GuruDbContext _guruDbContext;
+    private readonly UserManagementDbContext _userManagementDbContext;
+
+    private IDbContextTransaction? _guruTransaction;
+    private IDbContextTransaction? _userManagementTransaction;
+    private TransactionScope? _transactionScope;
 
     private IProviderRepository? _providerRepository;
+    private IUserRepository? _userRepository;
 
-    public UnitOfWork(GuruDBContext guruDbContext)
+    public UnitOfWork(GuruDbContext guruDbContext, UserManagementDbContext userManagementDbContext)
     {
         _guruDbContext = guruDbContext;
+        _userManagementDbContext = userManagementDbContext;
     }
 
     public IProviderRepository Providers => _providerRepository ??= new ProviderRepository(_guruDbContext);
+    public IUserRepository Users => _userRepository ??= new UserRepository(_userManagementDbContext);
 
-    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+    public Task BeginDistributedTransactionAsync(CancellationToken cancellationToken = default)
     {
-        if (_transaction != null)
+        if (_transactionScope != null)
         {
             throw new InvalidOperationException("A transaction is already in progress.");
         }
 
-        _transaction = await _guruDbContext.Database.BeginTransactionAsync(cancellationToken);
+        _transactionScope = new TransactionScope(TransactionScopeOption.Required,
+                                                 new TransactionOptions
+                                                 {
+                                                     IsolationLevel = IsolationLevel.ReadCommitted,
+                                                     Timeout = TransactionManager.DefaultTimeout
+                                                 },
+                                                 TransactionScopeAsyncFlowOption.Enabled);
+
+        return Task.CompletedTask;
     }
 
-    public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+    public async Task CommitDistributedTransactionAsync(CancellationToken cancellationToken = default)
     {
-        if (_transaction == null)
+        if (_transactionScope == null)
         {
-            throw new InvalidOperationException("No transaction in progress.");
+            throw new InvalidOperationException("No distributed transaction in progress.");
         }
 
         try
         {
-            await _transaction.CommitAsync(cancellationToken);
+            await _guruDbContext.SaveChangesAsync(cancellationToken);
+            await _userManagementDbContext.SaveChangesAsync(cancellationToken);
+
+            _transactionScope.Complete();
+        }
+        finally
+        {
+            _transactionScope.Dispose();
+            _transactionScope = null;
+        }
+    }
+
+    public Task RollbackDistributedTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (_transactionScope == null)
+        {
+            throw new InvalidOperationException("No transaction in progress.");
+        }
+
+        // TransactionScope doesn't have RollbackAsync - just dispose it
+        // Not calling Complete() before disposing automatically rolls back
+        _transactionScope.Dispose();
+        _transactionScope = null;
+
+        return Task.CompletedTask;
+    }
+
+    // Guru context-specific transaction
+    public async Task BeginGuruTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (_guruTransaction != null)
+        {
+            throw new InvalidOperationException("Guru transaction is already in progress.");
+        }
+
+        _guruTransaction = await _guruDbContext.Database.BeginTransactionAsync(cancellationToken);
+    }
+
+    public async Task CommitGuruTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (_guruTransaction == null)
+        {
+            throw new InvalidOperationException("No Guru transaction in progress.");
+        }
+
+        try
+        {
+            await _guruDbContext.SaveChangesAsync(cancellationToken);
+            await _guruTransaction.CommitAsync(cancellationToken);
         }
         catch
         {
-            await RollbackTransactionAsync(cancellationToken);
-            
+            await _guruTransaction.RollbackAsync(cancellationToken);
             throw;
         }
         finally
         {
-            await _transaction.DisposeAsync();
-            
-            _transaction = null;
+            await _guruTransaction.DisposeAsync();
+            _guruTransaction = null;
         }
     }
 
-    public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+    public async Task RollbackGuruTransactionAsync(CancellationToken cancellationToken = default)
     {
-        if (_transaction == null)
+        if (_guruTransaction == null)
         {
-            throw new InvalidOperationException("No transaction in progress.");
+            return;
         }
 
         try
         {
-            await _transaction.RollbackAsync(cancellationToken);
+            await _guruTransaction.RollbackAsync(cancellationToken);
         }
         finally
         {
-            await _transaction.DisposeAsync();
-            _transaction = null;
+            await _guruTransaction.DisposeAsync();
+            _guruTransaction = null;
         }
     }
 
-    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    // Identity (User Management) context-specific transaction
+    public async Task BeginUserManagementTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (_userManagementTransaction != null)
+        {
+            throw new InvalidOperationException("Identity transaction is already in progress.");
+        }
+        _userManagementTransaction = await _userManagementDbContext.Database.BeginTransactionAsync(cancellationToken);
+    }
+
+    public async Task CommitUserManagementTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (_userManagementTransaction == null)
+        {
+            throw new InvalidOperationException("No Identity transaction in progress.");
+        }
+
+        try
+        {
+            await _userManagementDbContext.SaveChangesAsync(cancellationToken);
+            await _userManagementTransaction.CommitAsync(cancellationToken);
+        }
+        catch
+        {
+            await _userManagementTransaction.RollbackAsync(cancellationToken);
+            throw;
+        }
+        finally
+        {
+            await _userManagementTransaction.DisposeAsync();
+            _userManagementTransaction = null;
+        }
+    }
+
+    public async Task RollbackUserManagementTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (_userManagementTransaction == null)
+        {
+            return;
+        }
+
+        try
+        {
+            await _userManagementTransaction.RollbackAsync(cancellationToken);
+        }
+        finally
+        {
+            await _userManagementTransaction.DisposeAsync();
+            _userManagementTransaction = null;
+        }
+    }
+
+    public async Task<int> SaveGuruChangesAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -89,10 +205,31 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
+    public async Task<int> SaveUserManagementChangesAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await _userManagementDbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            throw new InvalidOperationException("Concurrency conflict occurred.", ex);
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new InvalidOperationException("Database update failed.", ex);
+        }
+    }
+
     public void Dispose()
     {
+        _transactionScope?.Dispose();
+
+        _guruTransaction?.Dispose();
+        _userManagementTransaction?.Dispose();
+
         _guruDbContext?.Dispose();
-        _transaction?.Dispose();
+        _userManagementDbContext?.Dispose();
 
         GC.SuppressFinalize(this);
     }

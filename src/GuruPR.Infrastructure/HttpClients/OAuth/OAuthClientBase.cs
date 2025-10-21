@@ -1,5 +1,6 @@
-﻿using System.Text;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
+using System.Text;
+
 using GuruPR.Domain.Entities.OAuth;
 
 namespace GuruPR.Infrastructure.HttpClients.OAuth;

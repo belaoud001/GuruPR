@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using GuruPR.Application.Interfaces.Infrastructure;
+using GuruPR.Domain.Entities.OAuth;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using GuruPR.Domain.Entities.OAuth;
-using GuruPR.Application.Interfaces.Infrastructure;
-
-namespace GuruPR.Persistence.Configuration;
+namespace GuruPR.Persistence.Configuration.ContextConfiguration;
 
 public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
 {
@@ -28,7 +28,7 @@ public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
         {
             navigationBuilder.Property(providerConnection => providerConnection.ClientSecret)
                 .HasConversion(
-                    plainText => _tokenEncryptionService.Encrypt(plainText),
+                    plainText  => _tokenEncryptionService.Encrypt(plainText),
                     cipherText => _tokenEncryptionService.Decrypt(cipherText));
 
             navigationBuilder.Property(providerConnection => providerConnection.AccessToken)

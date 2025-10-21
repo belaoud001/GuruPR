@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 
-using GuruPR.Domain.Exceptions;
-using GuruPR.Domain.Entities.Enums;
-using GuruPR.Domain.Entities.OAuth;
-using GuruPR.Application.Exceptions;
 using GuruPR.Application.Dtos.OAuth.Provider;
+using GuruPR.Application.Exceptions;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Persistence;
+using GuruPR.Domain.Entities.Enums;
+using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Domain.Exceptions;
 
 namespace GuruPR.Application.Services.OAuth;
 
@@ -42,7 +42,7 @@ public class ProviderService : IProviderService
         }
 
         await _unitOfWork.Providers.AddAsync(provider);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveGuruChangesAsync();
 
         return provider;
     }
@@ -127,7 +127,7 @@ public class ProviderService : IProviderService
         }
 
         _unitOfWork.Providers.Update(provider);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveGuruChangesAsync();
 
         return provider;
     }
@@ -144,7 +144,7 @@ public class ProviderService : IProviderService
 
         _unitOfWork.Providers.Delete(provider);
 
-        var result = await _unitOfWork.SaveChangesAsync();
+        var result = await _unitOfWork.SaveGuruChangesAsync();
         return result > 0;
     }
 

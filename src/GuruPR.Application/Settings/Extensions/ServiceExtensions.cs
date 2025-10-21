@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-using GuruPR.Application.Services.OAuth;
+﻿using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Profiles.OAuth;
-using GuruPR.Application.Interfaces.Application;
+using GuruPR.Application.Services.OAuth;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GuruPR.Application.Settings.Extensions;
 

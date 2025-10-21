@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+
 using GuruPR.Application.Dapr.Enums;
 
 namespace GuruPR.Application.Dapr;
