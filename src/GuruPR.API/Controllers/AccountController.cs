@@ -1,10 +1,8 @@
 ﻿using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Settings.FrontEnd;
-using GuruPR.Domain.Entities;
 using GuruPR.Domain.Requests;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -28,7 +26,7 @@ public class AccountController : ControllerBase
 
     [HttpPost("register")]
     [AllowAnonymous]
-    public async Task<IActionResult> RegisterAsync(RegisterRequest registerRequest)
+    public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequest registerRequest)
     {
         await _accountService.RegisterAsync(registerRequest);
 
@@ -36,7 +34,8 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync(LoginRequest loginRequest)
+    [AllowAnonymous]
+    public async Task<IActionResult> LoginAsync([FromBody] LoginRequest loginRequest)
     {
         await _accountService.LoginAsync(loginRequest);
 
@@ -71,8 +70,10 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("logout")]
-    public async Task<IActionResult> LogoutAsync()
+    public async Task<IActionResult> LogoutAsync([FromBody] LogoutRequest logoutRequest)
     {
-        return Ok("Logout endpoint is under construction.");
+        await _accountService.LogoutAsync(logoutRequest.UserId, logoutRequest.RefreshToken);
+
+        return Ok("Logout has succeeded.");
     }
 }

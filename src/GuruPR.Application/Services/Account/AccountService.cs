@@ -111,6 +111,28 @@ public class AccountService : IAccountService
         }
     }
 
+    public async Task LogoutAsync(string userId, string refreshToken)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user == null || user.RefreshToken != refreshToken)
+        {
+            throw new RefreshTokenException("Invalid refresh token or user ID.");
+        }
+
+        user.RefreshToken = null;
+
+        var updateResult = await _userManager.UpdateAsync(user);
+
+        if (!updateResult.Succeeded)
+        {
+            throw new LogoutException($"Failed to logout user with email {user.Email}");
+        }
+
+        _httpContextAccessor.HttpContext?.Response.Cookies.Delete("AccessToken");
+        _httpContextAccessor.HttpContext?.Response.Cookies.Delete("RefreshToken");
+    }
+
     #endregion
 
     #region Private Methods

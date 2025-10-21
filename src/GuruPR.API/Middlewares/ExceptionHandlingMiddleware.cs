@@ -43,6 +43,7 @@ public class ExceptionHandlingMiddleware
         var (statusCode, title) = exception switch
         {
             // Client Errors
+            ArgumentNullException       => (StatusCodes.Status400BadRequest,   "A required argument was null"),
             RegistrationFailedException => (StatusCodes.Status400BadRequest,   "User registration failed"),
             RefreshTokenException       => (StatusCodes.Status401Unauthorized, "Invalid Refresh Token"),
             LoginFailedException        => (StatusCodes.Status401Unauthorized, "Login Failed"),
@@ -50,7 +51,8 @@ public class ExceptionHandlingMiddleware
             UserAlreadyExistsException  => (StatusCodes.Status409Conflict,     "User Already Exists"),
 
             // Server Errors
-            _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
+            LogoutException => (StatusCodes.Status500InternalServerError, "Logout Failed"),
+            _               => (StatusCodes.Status500InternalServerError, "Internal Server Error")
         };
 
         var isServerError = statusCode >= 500;

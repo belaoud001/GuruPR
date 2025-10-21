@@ -11,4 +11,7 @@ public interface IAccountService
     Task RefreshTokenAsync(string refreshToken);
 
     Task ConfirmEmailAsync(string userId, string token);
+
+    Task LogoutAsync(string userId, string refreshToken);
+
 }
