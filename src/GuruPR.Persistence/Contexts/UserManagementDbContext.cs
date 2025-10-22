@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-
+﻿using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Domain.Entities;
 using GuruPR.Persistence.Configuration.ContextConfiguration;
-using GuruPR.Application.Interfaces.Infrastructure;
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace GuruPR.Persistence.Contexts;
 

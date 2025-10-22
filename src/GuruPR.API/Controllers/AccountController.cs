@@ -43,7 +43,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> RefreshTokenAsync(string refrehToken)
+    public async Task<IActionResult> RefreshTokenAsync([FromBody] string refrehToken)
     {
         await _accountService.RefreshTokenAsync(refrehToken);
 

@@ -86,8 +86,8 @@ public class ProviderConnectionService : IProviderConnectionService
         return providerConnection;
     }
 
-    public async Task<ProviderConnection> UpdateProviderConnectionByProviderTypeAsync(OAuthProviderType OAuthProviderType, 
-                                                                                      string providerConnectionId, 
+    public async Task<ProviderConnection> UpdateProviderConnectionByProviderTypeAsync(OAuthProviderType OAuthProviderType,
+                                                                                      string providerConnectionId,
                                                                                       UpdateProviderConnectionRequest updateProviderConnectionRequest)
     {
         var provider = await GetProviderByTypeOrThrowExceptionAsync(OAuthProviderType);
@@ -111,7 +111,7 @@ public class ProviderConnectionService : IProviderConnectionService
         }
 
         await _unitOfWork.SaveGuruChangesAsync();
-        
+
         return true;
     }
 

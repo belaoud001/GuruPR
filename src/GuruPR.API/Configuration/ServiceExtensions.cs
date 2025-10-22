@@ -43,7 +43,7 @@ public static class ServiceExtensions
         services.AddApplicationServices();
     }
 
-    public static void ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)  
+    public static void ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddInfrastructureServices(configuration);
     }

@@ -55,7 +55,7 @@ public class UserProfileValidator : IUserValidator<User>
                 Description = "Last name is required."
             });
         }
-        else 
+        else
         {
             IsValidName(user.LastName, "LastName", errors);
         }

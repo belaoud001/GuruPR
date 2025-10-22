@@ -11,7 +11,7 @@ public class Program
         Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration(ConfigureConfiguration)
             .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
-    
+
     private static void ConfigureConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
     {
         var env = context.HostingEnvironment;

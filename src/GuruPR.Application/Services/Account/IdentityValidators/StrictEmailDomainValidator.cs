@@ -32,10 +32,10 @@ public class StrictEmailDomainValidator : IUserValidator<User>
         {
             // TODO: Add regional variant support
             errors.Add(new IdentityError
-                       {
-                           Code = "EmailInvalidFormat",
-                           Description = "Email format is invalid."
-                       }
+            {
+                Code = "EmailInvalidFormat",
+                Description = "Email format is invalid."
+            }
             );
         }
         else
@@ -44,19 +44,19 @@ public class StrictEmailDomainValidator : IUserValidator<User>
             if (string.IsNullOrWhiteSpace(domain))
             {
                 errors.Add(new IdentityError
-                           {
-                               Code = "EmailMissingDomain",
-                               Description = "Email domain is missing."
-                           }
+                {
+                    Code = "EmailMissingDomain",
+                    Description = "Email domain is missing."
+                }
                 );
             }
             else if (!_allowedDomains.Contains(domain))
             {
                 errors.Add(new IdentityError
-                           {
-                               Code = "EmailInvalidDomain",
-                               Description = $"Email domain '@{domain}' is not accepted. Please use a supported email provider."
-                           }
+                {
+                    Code = "EmailInvalidDomain",
+                    Description = $"Email domain '@{domain}' is not accepted. Please use a supported email provider."
+                }
                 );
             }
         }

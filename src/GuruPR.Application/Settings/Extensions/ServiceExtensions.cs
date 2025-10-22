@@ -10,9 +10,10 @@ public static class ServiceExtensions
 {
     public static void AddApplicationServices(this IServiceCollection services)
     {
-        services.AddAutoMapper(config => {
+        services.AddAutoMapper(config =>
+        {
             config.AllowNullCollections = true;
-            
+
             config.AddProfile<ProviderProfile>();
             config.AddProfile<ProviderConnectionProfile>();
         });

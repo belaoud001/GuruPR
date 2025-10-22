@@ -9,7 +9,7 @@ namespace GuruPR;
 public class Startup
 {
     public IConfiguration Configuration { get; }
-    
+
     public Startup(IConfiguration configuration)
     {
         Configuration = configuration;
@@ -29,7 +29,7 @@ public class Startup
         services.ConfigureInfrastructure(Configuration);
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public async void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         app.UseHttpsRedirection();
 
@@ -53,5 +53,7 @@ public class Startup
                     }
                 }
         );
+
+        await app.UseIdentityInitializationAsync();
     }
 }

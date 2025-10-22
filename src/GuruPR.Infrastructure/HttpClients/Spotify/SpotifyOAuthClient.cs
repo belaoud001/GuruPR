@@ -6,7 +6,7 @@ namespace GuruPR.Infrastructure.HttpClients.Spotify;
 
 public class SpotifyOAuthClient : OAuthClientBase
 {
-    public SpotifyOAuthClient(HttpClient httpClient) : base(httpClient) 
+    public SpotifyOAuthClient(HttpClient httpClient) : base(httpClient)
     {
     }
 

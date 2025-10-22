@@ -5,7 +5,7 @@ namespace GuruPR.Application.Interfaces.Infrastructure;
 
 public interface ITokenService
 {
-    JwtTokenResult GenerateToken(User user);
+    Task<JwtTokenResult> GenerateTokenAsync(User user);
 
     string GenerateRefreshToken();
 

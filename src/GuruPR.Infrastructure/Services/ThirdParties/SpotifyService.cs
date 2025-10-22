@@ -19,11 +19,11 @@ public class SpotifyService : ISpotifyService
     private readonly IProviderService _providerService;
     private readonly IProviderConnectionService _providerConnectionService;
 
-    public SpotifyService(ILogger<SpotifyService> logger, 
-                          SpotifyClient spotifyClient, 
-                          SpotifyOAuthClient spotifyOAuthClient, 
-                          IProviderService providerService, 
-                          IProviderConnectionService providerConnectionService) 
+    public SpotifyService(ILogger<SpotifyService> logger,
+                          SpotifyClient spotifyClient,
+                          SpotifyOAuthClient spotifyOAuthClient,
+                          IProviderService providerService,
+                          IProviderConnectionService providerConnectionService)
     {
         _logger = logger;
         _spotifyClient = spotifyClient;
@@ -60,8 +60,8 @@ public class SpotifyService : ISpotifyService
                 AccessExpiresAt = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn)
             };
 
-            providerConnection = await _providerConnectionService.UpdateProviderConnectionByProviderTypeAsync(OAuthProviderType.Spotify, 
-                                                                                                              providerConnection.Id, 
+            providerConnection = await _providerConnectionService.UpdateProviderConnectionByProviderTypeAsync(OAuthProviderType.Spotify,
+                                                                                                              providerConnection.Id,
                                                                                                               updatedConnection);
         }
 
