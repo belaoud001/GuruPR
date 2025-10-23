@@ -11,8 +11,11 @@ public static class WebApplicationExtensions
     public static WebApplication ConfigureMiddlewarePipeline(this WebApplication app, IWebHostEnvironment env)
     {
         app.UseHttpsRedirection();
+        
         app.UseMiddleware<ExceptionHandlingMiddleware>();
+        
         app.UseRouting();
+        
         app.UseAuthentication();
         app.UseAuthorization();
 
