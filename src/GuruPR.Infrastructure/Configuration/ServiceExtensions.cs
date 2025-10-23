@@ -4,6 +4,7 @@ using GuruPR.Application.Configuration.Security;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Services.Account;
+using GuruPR.Application.Settings.Authentication;
 using GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
 using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
 using GuruPR.Application.Settings.Security;
@@ -15,6 +16,7 @@ using GuruPR.Infrastructure.Services.Email;
 using GuruPR.Infrastructure.Services.Security;
 using GuruPR.Infrastructure.Services.ThirdParties;
 
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
@@ -53,10 +55,28 @@ public static class ServiceExtensions
         services.AddAuthentication(
                     options =>
                     {
-                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                        options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
                         options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    }
+                )
+                .AddCookie()
+                .AddGoogle(
+                    options =>
+                    {
+                        var externalAuthentication = configuration.GetSection(ExternalAuthentication.SectionName)
+                                                                  .Get<ExternalAuthentication>();
+                        if (externalAuthentication == null)
+                        {
+                            throw new InvalidOperationException("External authentication settings are not configured properly.");
+                        }
+
+                        var googleSettings = externalAuthentication.Google;
+
+                        options.ClientId = googleSettings.ClientId;
+                        options.ClientSecret = googleSettings.ClientSecret;
+                        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     }
                 )
                 .AddJwtBearer(

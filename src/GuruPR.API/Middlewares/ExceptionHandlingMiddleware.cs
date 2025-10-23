@@ -45,12 +45,18 @@ public class ExceptionHandlingMiddleware
             // Client Errors
             ArgumentNullException => (StatusCodes.Status400BadRequest, "A required argument was missing"),
             RegistrationFailedException => (StatusCodes.Status400BadRequest, "User Registration Failed"),
+            UntrustedReturnUrlException => (StatusCodes.Status400BadRequest, "Untrusted Return URL"),
+            InvalidReturnUrlException => (StatusCodes.Status400BadRequest, "Invalid Return URL"),
+
             RefreshTokenException => (StatusCodes.Status401Unauthorized, "Invalid Refresh Token"),
             LoginFailedException => (StatusCodes.Status401Unauthorized, "Login Failed"),
+
             NotFoundException => (StatusCodes.Status404NotFound, "Resource Not Found"),
+
             UserAlreadyExistsException => (StatusCodes.Status409Conflict, "User Already Exists"),
 
             // Server Errors
+            MissingAllowedOriginsException => (StatusCodes.Status500InternalServerError, "Missing Allowed Origins Configuration"),
             UserRoleOperationFailedException => (StatusCodes.Status500InternalServerError, "User Role Operation Failed"),
             OperationFailedException => (StatusCodes.Status500InternalServerError, "Operation Failed"),
             LogoutException => (StatusCodes.Status500InternalServerError, "Logout Failed"),

@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Security.Claims;
+using System.Text.Encodings.Web;
 
 using GuruPR.Application.Exceptions;
 using GuruPR.Application.Exceptions.Account;
@@ -7,6 +8,7 @@ using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Enums;
+using GuruPR.Domain.Extensions.Auth;
 using GuruPR.Domain.Extensions.User;
 using GuruPR.Domain.Requests;
 
@@ -14,11 +16,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace GuruPR.Application.Services.Account;
 
 public class AccountService : IAccountService
 {
+    private readonly ILogger<AccountService> _logger;
     private readonly ITokenService _tokenService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEmailSender _emailSender;
@@ -28,13 +32,15 @@ public class AccountService : IAccountService
 
     private const int RefreshTokenExpirationDays = 7;
 
-    public AccountService(ITokenService tokenService,
+    public AccountService(ILogger<AccountService> logger,
+                          ITokenService tokenService,
                           IUnitOfWork unitOfWork,
                           IEmailSender emailSender,
                           IHttpContextAccessor httpContextAccessor,
                           LinkGenerator linkGenerator,
                           UserManager<User> userManager)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _emailSender = emailSender ?? throw new ArgumentNullException(nameof(emailSender));
@@ -162,6 +168,37 @@ public class AccountService : IAccountService
         }
     }
 
+    public async Task LoginWithExternalProviderAsync(ClaimsPrincipal? claimsPrincipal, string provider)
+    {
+        if (claimsPrincipal == null)
+        {
+            throw new ExternalLoginProviderException(provider, "Claims principal is missing");
+        }
+
+        var email = ExtractEmailFromClaims(claimsPrincipal, provider);
+        var user = await _userManager.FindByEmailAsync(email);
+
+        await _unitOfWork.BeginUserManagementTransactionAsync();
+
+        try
+        {
+            if (user == null)
+            {
+                user = await CreateUserFromExternalProviderClaimsAsync(claimsPrincipal, provider, email);
+            }
+
+            await SetAuthenticationTokensAsync(user);
+
+            await _unitOfWork.CommitUserManagementTransactionAsync();
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackUserManagementTransactionAsync();
+
+            throw;
+        }
+    }
+
     #endregion
 
     #region Private Methods
@@ -253,7 +290,7 @@ public class AccountService : IAccountService
 
         if (!updateResult.Succeeded)
         {
-            throw new OperationFailedException($"Failed to update user with email {user.Email}.");
+            throw new OperationFailedException($"Failed to update tokens for user with email {user.Email}.");
         }
 
         _tokenService.WriteAuthTokenAsHttpOnlyCookie("AccessToken", jwtTokenResult.Token, jwtTokenResult.ExpiresAtUtc);
@@ -295,7 +332,7 @@ public class AccountService : IAccountService
         var httpContext = _httpContextAccessor.HttpContext ?? throw new OperationFailedException("Unable to generate confirmation link.");
 
         var confirmationLink = _linkGenerator.GetUriByAction(httpContext,
-                                                             action: "ConfirmEmail",
+                                                             action: "ConfirmEmailAsync",
                                                              controller: "Account",
                                                              values: new { userId = userId, token });
 
@@ -344,6 +381,63 @@ public class AccountService : IAccountService
                     </p>
                   </div>
                 </div>";
+    }
+
+    private static string ExtractEmailFromClaims(ClaimsPrincipal claimsPrincipal, string provider)
+    {
+        var email = claimsPrincipal.FindFirstValue(ClaimTypes.Email);
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            throw new ExternalLoginProviderException(provider, "Email claim is missing");
+        }
+
+        return email;
+    }
+
+    private async Task<User> CreateUserFromExternalProviderClaimsAsync(ClaimsPrincipal claimsPrincipal, string provider, string email)
+    {
+        var user = new User
+        {
+            Email = email,
+            UserName = email,
+            FirstName = claimsPrincipal.FindFirstValue(ClaimTypes.GivenName) ?? provider.Normalize(),
+            LastName = claimsPrincipal.FindFirstValue(ClaimTypes.Surname) ?? "User",
+            EmailConfirmed = true
+        };
+
+        var createResult = await _userManager.CreateAsync(user);
+        if (!createResult.Succeeded)
+        {
+            var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+
+            _logger.LogError("Error creating user from external provider {Provider}: {Errors}", provider, errors);
+
+            throw new RegistrationFailedException($"Failed to create a user account using the external provider {provider}.");
+        }
+
+        await AssignRoleAsync(user.Id.ToString(), UserRole.User);
+        await AddLoginInfoAsync(user, provider, claimsPrincipal);
+
+        return user;
+    }
+
+    private async Task AddLoginInfoAsync(User user, string provider, ClaimsPrincipal claimsPrincipal)
+    {
+        var userNameIdentifier = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrWhiteSpace(userNameIdentifier))
+        {
+            throw new ExternalLoginProviderException(provider, $"{provider} user ID claim is missing");
+        }
+
+        var loginInfo = new UserLoginInfo(provider, userNameIdentifier, provider);
+        var loginResult = await _userManager.AddLoginAsync(user, loginInfo);
+
+        if (!loginResult.Succeeded)
+        {
+            var errors = string.Join(", ", loginResult.Errors.Select(e => e.Description));
+            throw new ExternalLoginProviderException(provider, $"Unable to link {provider} login: {errors}");
+        }
     }
 
     #endregion
