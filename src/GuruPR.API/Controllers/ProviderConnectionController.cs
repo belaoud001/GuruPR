@@ -15,8 +15,8 @@ public class ProviderConnectionController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IProviderConnectionService _providerConnectionService;
 
-    public ProviderConnectionController(ILogger<ProviderConnectionController> logger, 
-                                        IMapper mapper, 
+    public ProviderConnectionController(ILogger<ProviderConnectionController> logger,
+                                        IMapper mapper,
                                         IProviderConnectionService providerConnectionService)
     {
         _logger = logger;
@@ -49,8 +49,8 @@ public class ProviderConnectionController : ControllerBase
         var providerConnection = await _providerConnectionService.AddProviderConnectionToProviderAsync(providerId, createProviderConnectionRequest);
         var providerConnectionDto = _mapper.Map<ProviderConnectionDto>(providerConnection);
 
-        return CreatedAtRoute("GetProviderConnectionById", 
-                              new { providerId = providerId, providerConnectionId = providerConnectionDto.Id }, 
+        return CreatedAtRoute("GetProviderConnectionById",
+                              new { providerId = providerId, providerConnectionId = providerConnectionDto.Id },
                               providerConnection);
     }
 

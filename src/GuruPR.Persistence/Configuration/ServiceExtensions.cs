@@ -42,7 +42,7 @@ public static class ServiceExtensions
         {
             throw new ArgumentNullException(nameof(Configuration), "PostgresConfig section is missing in configuration.");
         }
-        
+
         services.AddDbContext<UserManagementDbContext>(optionBuilder => optionBuilder.UseNpgsql(connectionString: postgresConfig.ConnectionString));
 
         services.AddIdentity();

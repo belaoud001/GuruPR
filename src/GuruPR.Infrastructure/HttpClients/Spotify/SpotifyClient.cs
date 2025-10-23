@@ -16,12 +16,12 @@ public class SpotifyClient
     public async Task<string> GetUserTracksAsync(string token, int limit)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"v1/me/tracks?limit={limit}")
-                      {
-                          Headers =
+        {
+            Headers =
                           {
                               Authorization = new AuthenticationHeaderValue("Bearer", token)
                           }
-                      };
+        };
 
         var response = await _httpClient.SendAsync(request);
 

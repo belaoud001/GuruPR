@@ -3,7 +3,6 @@
 using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Persistence.Contexts;
 
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 

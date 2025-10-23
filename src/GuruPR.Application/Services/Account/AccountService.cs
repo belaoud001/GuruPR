@@ -6,6 +6,8 @@ using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Domain.Entities;
+using GuruPR.Domain.Enums;
+using GuruPR.Domain.Extensions.User;
 using GuruPR.Domain.Requests;
 
 using Microsoft.AspNetCore.Http;
@@ -26,7 +28,7 @@ public class AccountService : IAccountService
 
     private const int RefreshTokenExpirationDays = 7;
 
-    public AccountService(ITokenService tokenService, 
+    public AccountService(ITokenService tokenService,
                           IUnitOfWork unitOfWork,
                           IEmailSender emailSender,
                           IHttpContextAccessor httpContextAccessor,
@@ -51,10 +53,13 @@ public class AccountService : IAccountService
 
         await _unitOfWork.BeginUserManagementTransactionAsync();
 
+        User? user = null;
+
         try
         {
-            var user = await CreateUserAsync(registerRequest);
-            await SendConfirmationEmailAsync(user);
+            user = await CreateUserAsync(registerRequest);
+
+            await AssignRoleAsync(user.Id.ToString(), UserRole.User);
 
             await _unitOfWork.CommitUserManagementTransactionAsync();
         }
@@ -64,6 +69,8 @@ public class AccountService : IAccountService
 
             throw;
         }
+
+        await SendConfirmationEmailAsync(user);
     }
 
     public async Task LoginAsync(LoginRequest loginRequest)
@@ -71,6 +78,11 @@ public class AccountService : IAccountService
         ArgumentNullException.ThrowIfNull(loginRequest, nameof(loginRequest));
 
         var user = await FindUserByEmailAsync(loginRequest.Email);
+
+        if (user == null)
+        {
+            throw new UserNotFoundException($"User with the specified email {loginRequest.Email} was not found.");
+        }
 
         if (!await _userManager.CheckPasswordAsync(user, loginRequest.Password))
         {
@@ -98,11 +110,7 @@ public class AccountService : IAccountService
 
     public async Task ConfirmEmailAsync(string userId, string token)
     {
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null)
-        {
-            throw new UserNotFoundException($"User with the specified ID {userId} was not found.");
-        }
+        var user = await GetUserByIdOrThrowException(userId);
 
         var result = await _userManager.ConfirmEmailAsync(user, token);
         if (!result.Succeeded)
@@ -113,9 +121,9 @@ public class AccountService : IAccountService
 
     public async Task LogoutAsync(string userId, string refreshToken)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await GetUserByIdOrThrowException(userId);
 
-        if (user == null || user.RefreshToken != refreshToken)
+        if (user.RefreshToken != refreshToken)
         {
             throw new RefreshTokenException("Invalid refresh token or user ID.");
         }
@@ -123,7 +131,6 @@ public class AccountService : IAccountService
         user.RefreshToken = null;
 
         var updateResult = await _userManager.UpdateAsync(user);
-
         if (!updateResult.Succeeded)
         {
             throw new LogoutException($"Failed to logout user with email {user.Email}");
@@ -133,11 +140,44 @@ public class AccountService : IAccountService
         _httpContextAccessor.HttpContext?.Response.Cookies.Delete("RefreshToken");
     }
 
+    public async Task AssignRoleAsync(string userId, UserRole userRole)
+    {
+        var user = await GetUserByIdOrThrowException(userId);
+
+        var result = await _userManager.AddToRoleAsync(user, userRole.ToName());
+        if (!result.Succeeded)
+        {
+            throw new UserRoleOperationFailedException($"Failed to add role {userRole.ToName()} to user with email {user.Email}");
+        }
+    }
+
+    public async Task RemoveRoleAsync(string userId, UserRole userRole)
+    {
+        var user = await GetUserByIdOrThrowException(userId);
+
+        var result = await _userManager.RemoveFromRoleAsync(user, userRole.ToName());
+        if (!result.Succeeded)
+        {
+            throw new UserRoleOperationFailedException($"Failed to remove role {userRole.ToName()} from user with email {user.Email}");
+        }
+    }
+
     #endregion
 
     #region Private Methods
 
-    private static void ThrowRegistrationException(IEnumerable<IdentityError> errors)
+    private async Task<User> GetUserByIdOrThrowException(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            throw new UserNotFoundException($"User with the specified ID {userId} was not found.");
+        }
+
+        return user;
+    }
+
+    private void ThrowRegistrationException(IEnumerable<IdentityError> errors)
     {
         var errorGroups = errors.GroupBy(error => GetErrorCategory(error.Code))
                                 .ToDictionary(
@@ -149,7 +189,7 @@ public class AccountService : IAccountService
         throw new RegistrationFailedException($"Registration failed.", errorGroups);
     }
 
-    private static string GetErrorCategory(string errorCode)
+    private string GetErrorCategory(string errorCode)
     {
         if (errorCode.StartsWith("Password", StringComparison.OrdinalIgnoreCase))
         {
@@ -202,7 +242,7 @@ public class AccountService : IAccountService
 
     private async Task SetAuthenticationTokensAsync(User user)
     {
-        var jwtTokenResult = _tokenService.GenerateToken(user);
+        var jwtTokenResult = await _tokenService.GenerateTokenAsync(user);
         var newRefreshToken = _tokenService.GenerateRefreshToken();
         var refreshTokenExpiry = DateTime.UtcNow.AddDays(RefreshTokenExpirationDays);
 
@@ -213,7 +253,7 @@ public class AccountService : IAccountService
 
         if (!updateResult.Succeeded)
         {
-            throw new AccountException($"Failed to update user with email {user.Email}");
+            throw new OperationFailedException($"Failed to update user with email {user.Email}.");
         }
 
         _tokenService.WriteAuthTokenAsHttpOnlyCookie("AccessToken", jwtTokenResult.Token, jwtTokenResult.ExpiresAtUtc);
@@ -223,12 +263,12 @@ public class AccountService : IAccountService
     private async Task<User> CreateUserAsync(RegisterRequest registerRequest)
     {
         var user = new User
-                   {
-                       FirstName = registerRequest.FirstName,
-                       LastName = registerRequest.LastName,
-                       Email = registerRequest.Email,
-                       UserName = registerRequest.Email
-                   };
+        {
+            FirstName = registerRequest.FirstName,
+            LastName = registerRequest.LastName,
+            Email = registerRequest.Email,
+            UserName = registerRequest.Email
+        };
 
         var result = await _userManager.CreateAsync(user, registerRequest.Password);
         if (!result.Succeeded)
@@ -262,7 +302,7 @@ public class AccountService : IAccountService
         return confirmationLink ?? throw new OperationFailedException("Failed to generate confirmation link.");
     }
 
-    private static string BuildConfirmationEmailBody(string firstName, string confirmationLink)
+    private string BuildConfirmationEmailBody(string firstName, string confirmationLink)
     {
         return $@"
                 <div style=""font-family:'Inter', 'Noto Sans JP', Arial, sans-serif; color:#111; background-color:#f7f7f7; padding:40px 0;"">

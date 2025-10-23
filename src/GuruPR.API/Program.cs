@@ -1,29 +1,28 @@
-using GuruPR;
+using GuruPR.Extensions;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
-        CreateHostBuilder(args).Build().Run();
-    }
-
-    private static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration(ConfigureConfiguration)
-            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
-    
-    private static void ConfigureConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
-    {
-        var env = context.HostingEnvironment;
-
-        configurationBuilder.SetBasePath(Directory.GetCurrentDirectory())
-                            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                            .AddEnvironmentVariables();
-
-        if (env.IsDevelopment())
+        try
         {
-            configurationBuilder.AddUserSecrets<Program>();
+            var builder = WebApplication.CreateBuilder(args);
+
+            builder.ConfigureAppConfiguration();
+            builder.Services.ConfigureAllApplicationServices(builder.Configuration);
+
+            var app = builder.Build();
+
+            app.ConfigureMiddlewarePipeline(builder.Environment);
+            app.ConfigureEndpoints(builder.Environment);
+
+            await app.InitializeApplicationAsync();
+
+            await app.RunAsync();
+        }
+        catch (Exception)
+        {
+            throw;
         }
     }
 }

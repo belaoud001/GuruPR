@@ -35,7 +35,7 @@ public abstract class OAuthClientBase
         using var request = new HttpRequestMessage(HttpMethod.Post, tokenUrl)
         {
             Content = new FormUrlEncodedContent(requestBody),
-            Headers = 
+            Headers =
             {
                 Authorization = new AuthenticationHeaderValue("basic", credentials)
             }

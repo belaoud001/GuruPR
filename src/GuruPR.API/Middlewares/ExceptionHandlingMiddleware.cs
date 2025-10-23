@@ -43,16 +43,18 @@ public class ExceptionHandlingMiddleware
         var (statusCode, title) = exception switch
         {
             // Client Errors
-            ArgumentNullException       => (StatusCodes.Status400BadRequest,   "A required argument was null"),
-            RegistrationFailedException => (StatusCodes.Status400BadRequest,   "User registration failed"),
-            RefreshTokenException       => (StatusCodes.Status401Unauthorized, "Invalid Refresh Token"),
-            LoginFailedException        => (StatusCodes.Status401Unauthorized, "Login Failed"),
-            NotFoundException           => (StatusCodes.Status404NotFound,     "Resource Not Found"),
-            UserAlreadyExistsException  => (StatusCodes.Status409Conflict,     "User Already Exists"),
+            ArgumentNullException => (StatusCodes.Status400BadRequest, "A required argument was missing"),
+            RegistrationFailedException => (StatusCodes.Status400BadRequest, "User Registration Failed"),
+            RefreshTokenException => (StatusCodes.Status401Unauthorized, "Invalid Refresh Token"),
+            LoginFailedException => (StatusCodes.Status401Unauthorized, "Login Failed"),
+            NotFoundException => (StatusCodes.Status404NotFound, "Resource Not Found"),
+            UserAlreadyExistsException => (StatusCodes.Status409Conflict, "User Already Exists"),
 
             // Server Errors
+            UserRoleOperationFailedException => (StatusCodes.Status500InternalServerError, "User Role Operation Failed"),
+            OperationFailedException => (StatusCodes.Status500InternalServerError, "Operation Failed"),
             LogoutException => (StatusCodes.Status500InternalServerError, "Logout Failed"),
-            _               => (StatusCodes.Status500InternalServerError, "Internal Server Error")
+            _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
         };
 
         var isServerError = statusCode >= 500;
@@ -60,9 +62,9 @@ public class ExceptionHandlingMiddleware
 
         var problem = new ProblemDetails
         {
-            Status   = statusCode,
-            Title    = title,
-            Detail   = showDetails ? exception.Message : "An unexpected error occurred.",
+            Status = statusCode,
+            Title = title,
+            Detail = showDetails ? exception.Message : "An unexpected error occurred.",
             Instance = context.Request.Path
         };
 
@@ -81,7 +83,7 @@ public class ExceptionHandlingMiddleware
                     statusCode);
 
         context.Response.Clear();
-        context.Response.StatusCode  = statusCode;
+        context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/problem+json";
 
         await context.Response.WriteAsJsonAsync(problem);

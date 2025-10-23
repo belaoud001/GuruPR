@@ -1,4 +1,6 @@
-﻿using GuruPR.Application.Configuration.Security;
+﻿using System.IdentityModel.Tokens.Jwt;
+
+using GuruPR.Application.Configuration.Security;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Services.Account;
@@ -6,6 +8,7 @@ using GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
 using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
 using GuruPR.Application.Settings.Security;
 using GuruPR.Infrastructure.HttpClients.Spotify;
+using GuruPR.Infrastructure.Identity.Constants;
 using GuruPR.Infrastructure.SemanticKernel.Plugins;
 using GuruPR.Infrastructure.Services.Auth;
 using GuruPR.Infrastructure.Services.Email;
@@ -18,6 +21,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.SemanticKernel;
+
+using static System.Text.Encoding;
 
 namespace GuruPR.Infrastructure.Configuration;
 
@@ -43,13 +48,15 @@ public static class ServiceExtensions
 
     private static void AddCustomAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
+        JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+
         services.AddAuthentication(
                     options =>
                     {
                         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                        options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
-                        options.DefaultSignInScheme       = JwtBearerDefaults.AuthenticationScheme;
-                        options.DefaultScheme             = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                     }
                 )
                 .AddJwtBearer(
@@ -64,16 +71,19 @@ public static class ServiceExtensions
                         }
 
                         options.TokenValidationParameters = new TokenValidationParameters
-                                                            {
-                                                                ValidateIssuer = true,
-                                                                ValidateAudience = true,
-                                                                ValidateLifetime = true,
-                                                                ValidateIssuerSigningKey = true,
-                                                                ClockSkew = TimeSpan.Zero,
-                                                                ValidIssuer = jwtSettings.Issuer,
-                                                                ValidAudience = jwtSettings.Audience,
-                                                                IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
-                                                            };
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            ClockSkew = TimeSpan.Zero,
+                            ValidIssuer = jwtSettings.Issuer,
+                            ValidAudience = jwtSettings.Audience,
+                            IssuerSigningKey = new SymmetricSecurityKey(UTF8.GetBytes(jwtSettings.SecretKey)),
+                            RoleClaimType = JwtClaimTypes.Role,
+                            NameClaimType = JwtClaimTypes.Name
+                        };
+
 
                         options.Events = new JwtBearerEvents
                         {
@@ -178,7 +188,7 @@ public static class ServiceExtensions
     private static void AddSecurity(this IServiceCollection services, IConfiguration configuration)
     {
         var tokenEncryptionConfig = configuration.GetSection(TokenEncryption.SectionName)
-                                                 .Get<TokenEncryption>() 
+                                                 .Get<TokenEncryption>()
                                                  ?? throw new InvalidOperationException("TokenEncryptionConfig section is missing in configuration.");
 
         if (string.IsNullOrEmpty(tokenEncryptionConfig.Key))

@@ -3,12 +3,14 @@
 using GuruPR.Application.Dtos.OAuth.Provider;
 using GuruPR.Application.Interfaces.Application;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Controllers;
 
 [ApiController]
 [Route("api/v1/providers")]
+[Authorize]
 public class ProviderController : ControllerBase
 {
     private readonly ILogger<ProviderController> _logger;
