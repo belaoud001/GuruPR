@@ -11,7 +11,7 @@ public interface IAccountService
 
     Task LoginAsync(LoginRequest loginRequest);
 
-    Task RefreshTokenAsync(string refreshToken);
+    Task RefreshTokenAsync(string userId, string refreshToken);
 
     Task ConfirmEmailAsync(string userId, string token);
 

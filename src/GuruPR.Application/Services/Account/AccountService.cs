@@ -23,6 +23,7 @@ public class AccountService : IAccountService
 {
     private readonly ILogger<AccountService> _logger;
     private readonly ITokenService _tokenService;
+    private readonly IHasher _hasher;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEmailSender _emailSender;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -35,6 +36,7 @@ public class AccountService : IAccountService
 
     public AccountService(ILogger<AccountService> logger,
                           ITokenService tokenService,
+                          IHasher hasher,
                           IUnitOfWork unitOfWork,
                           IEmailSender emailSender,
                           IEmailTemplateService emailTemplateService,
@@ -45,6 +47,7 @@ public class AccountService : IAccountService
     {
         _logger = logger;
         _tokenService = tokenService;
+        _hasher = hasher;
         _unitOfWork = unitOfWork;
         _emailSender = emailSender;
         _emailTemplateService = emailTemplateService;
@@ -103,15 +106,21 @@ public class AccountService : IAccountService
         await SetAuthenticationTokensAsync(user);
     }
 
-    public async Task RefreshTokenAsync(string refreshToken)
+    public async Task RefreshTokenAsync(string userId, string refreshToken)
     {
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
             throw new RefreshTokenException("Refresh token is missing.");
         }
 
-        var user = await FindUserByRefreshTokenAsync(refreshToken);
-        if (user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            throw new RefreshTokenException($"User with the specified ID {userId} was not found.");
+        }
+
+        var isValidRefreshTokenHash = _hasher.Verify(user.RefreshTokenHash, refreshToken);
+        if (!isValidRefreshTokenHash || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {
             throw new RefreshTokenException("Refresh token has expired.");
         }
@@ -133,13 +142,13 @@ public class AccountService : IAccountService
     public async Task LogoutAsync(string userId, string refreshToken)
     {
         var user = await GetUserByIdOrThrowException(userId);
-
-        if (user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime > DateTime.UtcNow)
+        var isValidRefreshToken = _hasher.Verify(user.RefreshTokenHash, refreshToken);
+        if (!isValidRefreshToken || user.RefreshTokenExpiryTime < DateTime.UtcNow)
         {
             throw new RefreshTokenException("Invalid refresh token or user ID.");
         }
 
-        user.RefreshToken = null;
+        user.RefreshTokenHash = null;
 
         var updateResult = await _userManager.UpdateAsync(user);
         if (!updateResult.Succeeded)
@@ -275,24 +284,17 @@ public class AccountService : IAccountService
         return user ?? throw new LoginFailedException("Invalid email or password.");
     }
 
-    private async Task<User> FindUserByRefreshTokenAsync(string refreshToken)
-    {
-        var user = await _unitOfWork.Users.GetUserByRefreshTokenAsync(refreshToken);
-
-        return user ?? throw new RefreshTokenException("Unable to retrieve user for refresh token.");
-    }
-
     private async Task SetAuthenticationTokensAsync(User user)
     {
         var jwtTokenResult = await _tokenService.GenerateTokenAsync(user);
         var newRefreshToken = _tokenService.GenerateRefreshToken();
+        var newRefreshTokenHash = _hasher.Hash(newRefreshToken);
         var refreshTokenExpiry = DateTime.UtcNow.AddDays(RefreshTokenExpirationDays);
-
-        user.RefreshToken = newRefreshToken;
+        
+        user.RefreshTokenHash = newRefreshTokenHash;
         user.RefreshTokenExpiryTime = refreshTokenExpiry;
 
         var updateResult = await _userManager.UpdateAsync(user);
-
         if (!updateResult.Succeeded)
         {
             throw new OperationFailedException($"Failed to update tokens for user with email {user.Email}.");

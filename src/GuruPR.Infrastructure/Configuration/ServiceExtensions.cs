@@ -207,8 +207,8 @@ public static class ServiceExtensions
 
     private static void AddSecurity(this IServiceCollection services, IConfiguration configuration)
     {
-        var tokenEncryptionConfig = configuration.GetSection(TokenEncryption.SectionName)
-                                                 .Get<TokenEncryption>()
+        var tokenEncryptionConfig = configuration.GetSection(TokenEncryptionSettings.SectionName)
+                                                 .Get<TokenEncryptionSettings>()
                                                  ?? throw new InvalidOperationException("TokenEncryptionConfig section is missing in configuration.");
 
         if (string.IsNullOrEmpty(tokenEncryptionConfig.Key))
@@ -216,7 +216,8 @@ public static class ServiceExtensions
             throw new InvalidOperationException("TokenEncryptionConfig or its Key is missing in configuration.");
         }
 
-        services.AddSingleton<ITokenEncryptionService>(_ => new TokenEncryptionService(tokenEncryptionConfig.Key));
+        services.AddSingleton<ITokenEncryptionService, TokenEncryptionService>();
+        services.AddSingleton<IHasher, HmacTokenHasher>();
     }
 
     private static void AddHttpClients(this IServiceCollection services)

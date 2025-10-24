@@ -1,9 +1,12 @@
-﻿using GuruPR.Application.Interfaces.Application;
+﻿using System.Security.Claims;
+
+using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Settings.FrontEnd;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Enums;
 using GuruPR.Domain.Extensions.Auth;
 using GuruPR.Domain.Requests;
+using GuruPR.Infrastructure.Identity.Constants;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -11,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GuruPR.Controllers;
 
@@ -60,9 +64,16 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> RefreshTokenAsync([FromBody] string refrehToken)
+    public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshRequest refreshRequest)
     {
-        await _accountService.RefreshTokenAsync(refrehToken);
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == JwtClaimTypes.Subject)?.Value;
+
+        if (userId == null)
+        {
+            return Unauthorized("Invalid token or missing subject claim.");
+        }
+
+        await _accountService.RefreshTokenAsync(userId, refreshRequest.RefreshToken);
 
         return Ok("Token refresh has succeeded.");
     }

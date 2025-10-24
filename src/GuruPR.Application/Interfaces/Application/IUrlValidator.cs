@@ -2,5 +2,5 @@
 
 public interface IUrlValidator
 {
-    void ValidateReturnUrl(string returnUrl);
+    void ValidateReturnUrl(string? returnUrl);
 }
