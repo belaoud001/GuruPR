@@ -67,7 +67,7 @@ public class AccountController : ControllerBase
         return Ok("Token refresh has succeeded.");
     }
 
-    [HttpGet("confirm-email")]
+    [HttpGet("confirm-email", Name = "ConfirmEmail")]
     [AllowAnonymous]
     public async Task<IActionResult> ConfirmEmailAsync(string userId, string token)
     {

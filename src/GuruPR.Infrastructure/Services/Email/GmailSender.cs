@@ -21,10 +21,10 @@ public class GmailSender : IEmailSender
     public async Task SendEmailAsync(string to, string subject, string htmlBody)
     {
         var message = new MimeMessage();
+       
         message.From.Add(MailboxAddress.Parse(_gmailingSettings.Username));
         message.To.Add(MailboxAddress.Parse(to));
         message.Subject = subject;
-
         message.Body = new TextPart("html")
         {
             Text = htmlBody
