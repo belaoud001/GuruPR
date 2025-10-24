@@ -3,7 +3,6 @@ using System.Text;
 
 using GuruPR.Application.Configuration.Security;
 using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Application.Settings.Security;
 
 using Microsoft.Extensions.Options;
 
@@ -18,7 +17,7 @@ public class TokenEncryptionService : ITokenEncryptionService
     public TokenEncryptionService(IOptions<TokenEncryptionSettings> tokenEncryptionSettings)
     {
         _tokenEncryptionSettings = tokenEncryptionSettings.Value;
-        
+
         var key = _tokenEncryptionSettings.Key;
 
         if (string.IsNullOrEmpty(key) || key.Length != 32)

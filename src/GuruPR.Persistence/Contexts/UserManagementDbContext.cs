@@ -1,5 +1,4 @@
-﻿using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Domain.Entities;
+﻿using GuruPR.Domain.Entities;
 using GuruPR.Persistence.Configuration.ContextConfiguration;
 
 using Microsoft.AspNetCore.Identity;

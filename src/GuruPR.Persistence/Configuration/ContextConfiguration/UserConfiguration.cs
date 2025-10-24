@@ -1,5 +1,4 @@
-﻿using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Domain.Entities;
+﻿using GuruPR.Domain.Entities;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

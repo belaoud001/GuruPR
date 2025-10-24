@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-using GuruPR.Application.Interfaces.Application;
+﻿using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Settings.FrontEnd;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Enums;
@@ -14,7 +12,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 namespace GuruPR.Controllers;
 

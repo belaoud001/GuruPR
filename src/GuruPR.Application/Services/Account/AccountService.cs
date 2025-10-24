@@ -290,7 +290,7 @@ public class AccountService : IAccountService
         var newRefreshToken = _tokenService.GenerateRefreshToken();
         var newRefreshTokenHash = _hasher.Hash(newRefreshToken);
         var refreshTokenExpiry = DateTime.UtcNow.AddDays(RefreshTokenExpirationDays);
-        
+
         user.RefreshTokenHash = newRefreshTokenHash;
         user.RefreshTokenExpiryTime = refreshTokenExpiry;
 
