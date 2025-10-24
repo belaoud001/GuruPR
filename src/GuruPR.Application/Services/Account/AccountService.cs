@@ -1,12 +1,10 @@
 ﻿using System.Security.Claims;
-using System.Text.Encodings.Web;
 
 using GuruPR.Application.Exceptions;
 using GuruPR.Application.Exceptions.Account;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Interfaces.Persistence;
-using GuruPR.Application.Services.Email;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Enums;
 using GuruPR.Domain.Extensions.Auth;
@@ -136,7 +134,7 @@ public class AccountService : IAccountService
     {
         var user = await GetUserByIdOrThrowException(userId);
 
-        if (user.RefreshToken != refreshToken  || user.RefreshTokenExpiryTime > DateTime.UtcNow)
+        if (user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime > DateTime.UtcNow)
         {
             throw new RefreshTokenException("Invalid refresh token or user ID.");
         }
