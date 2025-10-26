@@ -1,6 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 
-using GuruPR.Application.Configuration.Security;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Services.Account;

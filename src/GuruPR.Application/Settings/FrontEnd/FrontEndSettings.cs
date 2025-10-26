@@ -4,9 +4,9 @@ public class FrontEndSettings : ISettings
 {
     public static string SectionName => "FrontEnd";
 
-    public required string BaseUrl { get; set; }
+    public required string BaseUrl { get; init; }
 
-    public string? EmailConfirmationPath => "/confirm-email";
+    public string? EmailConfirmationPath { get; init; } = "/confirm-email";
 
-    public string? EmailConfirmationFailedPath => "/confirm-email-failed";
+    public string? EmailConfirmationFailedPath { get; init; } = "/confirm-email-failed";
 }

@@ -1,5 +1,4 @@
-﻿using GuruPR.Configuration;
-using GuruPR.Hubs;
+﻿using GuruPR.Hubs;
 using GuruPR.Middlewares;
 
 using Scalar.AspNetCore;

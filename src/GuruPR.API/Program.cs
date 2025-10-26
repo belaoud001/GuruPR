@@ -1,5 +1,7 @@
 using GuruPR.Extensions;
 
+namespace GuruPR;
+
 public class Program
 {
     public static async Task Main(string[] args)

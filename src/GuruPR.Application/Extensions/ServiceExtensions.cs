@@ -7,7 +7,7 @@ using GuruPR.Application.Services.Validators;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GuruPR.Application.Settings.Extensions;
+namespace GuruPR.Application.Extensions;
 
 public static class ServiceExtensions
 {

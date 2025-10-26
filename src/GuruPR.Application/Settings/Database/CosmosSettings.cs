@@ -3,9 +3,9 @@
 public class CosmosSettings
 {
     public const string SectionName = "Cosmos";
-    public required string AccountEndpoint { get; set; }
+    public required string AccountEndpoint { get; init; }
 
-    public required string AccountKey { get; set; }
+    public required string AccountKey { get; init; }
 
-    public required string DatabaseName { get; set; }
+    public required string DatabaseName { get; init; }
 }

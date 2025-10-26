@@ -30,7 +30,7 @@ public class ProviderService : IProviderService
     /// <summary>
     /// Creates a new OAuth provider and saves it to the database.
     /// </summary>
-    /// <param name="provider">The provider entity to create.</param>
+    /// <param name="createProviderRequest">The provider entity to create.</param>
     /// <returns>The created provider entity.</returns>
     /// <exception cref="DomainException">Thrown when the provider configuration is invalid.</exception>
     public async Task<Provider> CreateProviderAsync(CreateProviderRequest createProviderRequest)

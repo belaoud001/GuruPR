@@ -1,6 +1,4 @@
-﻿using GuruPR.Application.Settings;
-
-namespace GuruPR.Application.Configuration.Security;
+﻿namespace GuruPR.Application.Settings.Security;
 
 public class TokenEncryptionSettings : ISettings
 {

@@ -2,17 +2,17 @@
 
 public class CreateProviderConnectionRequest
 {
-    public required string ClientId { get; set; }
+    public required string ClientId { get; init; }
 
-    public required string ClientSecret { get; set; }
+    public required string ClientSecret { get; init; }
 
-    public required string AccessToken { get; set; }
+    public required string AccessToken { get; init; }
 
-    public required string RefreshToken { get; set; }
+    public required string RefreshToken { get; init; }
 
-    public required List<string> Scopes { get; set; }
+    public required List<string> Scopes { get; init; }
 
-    public required DateTime AccessExpiresAt { get; set; }
+    public required DateTime AccessExpiresAt { get; init; }
 
-    public required DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public required DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 }

@@ -14,7 +14,7 @@ public interface IProviderService
 
     Task<Provider> GetProviderByNameAsync(string providerName);
 
-    Task<Provider> GetProviderByTypeAsync(OAuthProviderType OAuthProviderType);
+    Task<Provider> GetProviderByTypeAsync(OAuthProviderType oAuthProviderType);
 
     Task<Provider> UpdateProviderAsync(string providerId, UpdateProviderRequest updateProviderRequest);
 

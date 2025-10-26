@@ -1,7 +1,6 @@
-﻿using GuruPR.Application.Configuration.Security;
+﻿using GuruPR.Application.Extensions;
 using GuruPR.Application.Settings;
 using GuruPR.Application.Settings.Email;
-using GuruPR.Application.Settings.Extensions;
 using GuruPR.Application.Settings.FrontEnd;
 using GuruPR.Application.Settings.Security;
 using GuruPR.Infrastructure.Configuration;
