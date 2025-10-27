@@ -1,4 +1,4 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Security.Claims;
 
 using GuruPR.Application.Exceptions;
 using GuruPR.Application.Exceptions.Account;
@@ -7,6 +7,7 @@ using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Enums;
+using GuruPR.Domain.Extensions.Auth;
 using GuruPR.Domain.Extensions.User;
 using GuruPR.Domain.Requests;
 
@@ -14,33 +15,46 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace GuruPR.Application.Services.Account;
 
 public class AccountService : IAccountService
 {
+    private readonly ILogger<AccountService> _logger;
     private readonly ITokenService _tokenService;
+    private readonly IHasher _hasher;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEmailSender _emailSender;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IEmailTemplateService _emailTemplateService;
+    private readonly IAccountLinkGenerator _accountLinkGenerator;
     private readonly LinkGenerator _linkGenerator;
     private readonly UserManager<User> _userManager;
 
     private const int RefreshTokenExpirationDays = 7;
 
-    public AccountService(ITokenService tokenService,
+    public AccountService(ILogger<AccountService> logger,
+                          ITokenService tokenService,
+                          IHasher hasher,
                           IUnitOfWork unitOfWork,
                           IEmailSender emailSender,
+                          IEmailTemplateService emailTemplateService,
+                          IAccountLinkGenerator accountLinkGenerator,
                           IHttpContextAccessor httpContextAccessor,
                           LinkGenerator linkGenerator,
                           UserManager<User> userManager)
     {
-        _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
-        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        _emailSender = emailSender ?? throw new ArgumentNullException(nameof(emailSender));
-        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-        _linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
-        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+        _logger = logger;
+        _tokenService = tokenService;
+        _hasher = hasher;
+        _unitOfWork = unitOfWork;
+        _emailSender = emailSender;
+        _emailTemplateService = emailTemplateService;
+        _accountLinkGenerator = accountLinkGenerator;
+        _httpContextAccessor = httpContextAccessor;
+        _linkGenerator = linkGenerator;
+        _userManager = userManager;
     }
 
     #region Public Methods
@@ -92,15 +106,21 @@ public class AccountService : IAccountService
         await SetAuthenticationTokensAsync(user);
     }
 
-    public async Task RefreshTokenAsync(string refreshToken)
+    public async Task RefreshTokenAsync(string userId, string refreshToken)
     {
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
             throw new RefreshTokenException("Refresh token is missing.");
         }
 
-        var user = await FindUserByRefreshTokenAsync(refreshToken);
-        if (user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            throw new RefreshTokenException($"User with the specified ID {userId} was not found.");
+        }
+
+        var isValidRefreshTokenHash = _hasher.Verify(user.RefreshTokenHash, refreshToken);
+        if (!isValidRefreshTokenHash || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {
             throw new RefreshTokenException("Refresh token has expired.");
         }
@@ -122,13 +142,13 @@ public class AccountService : IAccountService
     public async Task LogoutAsync(string userId, string refreshToken)
     {
         var user = await GetUserByIdOrThrowException(userId);
-
-        if (user.RefreshToken != refreshToken)
+        var isValidRefreshToken = _hasher.Verify(user.RefreshTokenHash, refreshToken);
+        if (!isValidRefreshToken || user.RefreshTokenExpiryTime < DateTime.UtcNow)
         {
             throw new RefreshTokenException("Invalid refresh token or user ID.");
         }
 
-        user.RefreshToken = null;
+        user.RefreshTokenHash = null;
 
         var updateResult = await _userManager.UpdateAsync(user);
         if (!updateResult.Succeeded)
@@ -159,6 +179,37 @@ public class AccountService : IAccountService
         if (!result.Succeeded)
         {
             throw new UserRoleOperationFailedException($"Failed to remove role {userRole.ToName()} from user with email {user.Email}");
+        }
+    }
+
+    public async Task LoginWithExternalProviderAsync(ClaimsPrincipal? claimsPrincipal, string provider)
+    {
+        if (claimsPrincipal == null)
+        {
+            throw new ExternalLoginProviderException(provider, "Claims principal is missing");
+        }
+
+        var email = ExtractEmailFromClaims(claimsPrincipal, provider);
+        var user = await _userManager.FindByEmailAsync(email);
+
+        await _unitOfWork.BeginUserManagementTransactionAsync();
+
+        try
+        {
+            if (user == null)
+            {
+                user = await CreateUserFromExternalProviderClaimsAsync(claimsPrincipal, provider, email);
+            }
+
+            await SetAuthenticationTokensAsync(user);
+
+            await _unitOfWork.CommitUserManagementTransactionAsync();
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollbackUserManagementTransactionAsync();
+
+            throw;
         }
     }
 
@@ -223,7 +274,7 @@ public class AccountService : IAccountService
             throw new UserAlreadyExistsException($"User with email '{email}' already exists.");
         }
 
-        return user;
+        return null;
     }
 
     private async Task<User> FindUserByEmailAsync(string email)
@@ -233,27 +284,20 @@ public class AccountService : IAccountService
         return user ?? throw new LoginFailedException("Invalid email or password.");
     }
 
-    private async Task<User> FindUserByRefreshTokenAsync(string refreshToken)
-    {
-        var user = await _unitOfWork.Users.GetUserByRefreshTokenAsync(refreshToken);
-
-        return user ?? throw new RefreshTokenException("Unable to retrieve user for refresh token.");
-    }
-
     private async Task SetAuthenticationTokensAsync(User user)
     {
         var jwtTokenResult = await _tokenService.GenerateTokenAsync(user);
         var newRefreshToken = _tokenService.GenerateRefreshToken();
+        var newRefreshTokenHash = _hasher.Hash(newRefreshToken);
         var refreshTokenExpiry = DateTime.UtcNow.AddDays(RefreshTokenExpirationDays);
 
-        user.RefreshToken = newRefreshToken;
+        user.RefreshTokenHash = newRefreshTokenHash;
         user.RefreshTokenExpiryTime = refreshTokenExpiry;
 
         var updateResult = await _userManager.UpdateAsync(user);
-
         if (!updateResult.Succeeded)
         {
-            throw new OperationFailedException($"Failed to update user with email {user.Email}.");
+            throw new OperationFailedException($"Failed to update tokens for user with email {user.Email}.");
         }
 
         _tokenService.WriteAuthTokenAsHttpOnlyCookie("AccessToken", jwtTokenResult.Token, jwtTokenResult.ExpiresAtUtc);
@@ -282,68 +326,69 @@ public class AccountService : IAccountService
     private async Task SendConfirmationEmailAsync(User user)
     {
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var confirmationLink = GenerateConfirmationLink(user.Id, token);
-        var emailBody = BuildConfirmationEmailBody(user.FirstName, confirmationLink);
+        var confirmationLink = _accountLinkGenerator.GenerateConfirmationLink(user.Id, token);
+        var emailBody = _emailTemplateService.BuildConfirmationEmailBody(user.FirstName, confirmationLink);
 
         await _emailSender.SendEmailAsync(user.Email ?? throw new OperationFailedException("Failed to send confirmation email."),
                                           "Confirm Your GuruPR Account ✨",
                                           emailBody);
     }
 
-    private string GenerateConfirmationLink(Guid userId, string token)
+    private static string ExtractEmailFromClaims(ClaimsPrincipal claimsPrincipal, string provider)
     {
-        var httpContext = _httpContextAccessor.HttpContext ?? throw new OperationFailedException("Unable to generate confirmation link.");
+        var email = claimsPrincipal.FindFirstValue(ClaimTypes.Email);
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            throw new ExternalLoginProviderException(provider, "Email claim is missing");
+        }
 
-        var confirmationLink = _linkGenerator.GetUriByAction(httpContext,
-                                                             action: "ConfirmEmail",
-                                                             controller: "Account",
-                                                             values: new { userId = userId, token });
-
-        return confirmationLink ?? throw new OperationFailedException("Failed to generate confirmation link.");
+        return email;
     }
 
-    private string BuildConfirmationEmailBody(string firstName, string confirmationLink)
+    private async Task<User> CreateUserFromExternalProviderClaimsAsync(ClaimsPrincipal claimsPrincipal, string provider, string email)
     {
-        return $@"
-                <div style=""font-family:'Inter', 'Noto Sans JP', Arial, sans-serif; color:#111; background-color:#f7f7f7; padding:40px 0;"">
-                  <div style=""max-width:600px; margin:0 auto; background-color:#fff; padding:40px 50px; border:1px solid #e0e0e0;"">
-    
-                    <h1 style=""color:#111; font-weight:500; font-size:26px; margin-bottom:15px;"">
-                      Welcome to <span style=""color:#1E40AF;"">GuruPR</span>
-                    </h1>
+        var user = new User
+        {
+            Email = email,
+            UserName = email,
+            FirstName = claimsPrincipal.FindFirstValue(ClaimTypes.GivenName) ?? provider.Normalize(),
+            LastName = claimsPrincipal.FindFirstValue(ClaimTypes.Surname) ?? "User",
+            EmailConfirmed = true
+        };
 
-                    <p style=""color:#333; font-size:16px; line-height:1.6; margin-bottom:25px;"">
-                      Hi <strong>{HtmlEncoder.Default.Encode(firstName)}</strong>,
-                    </p>
+        var createResult = await _userManager.CreateAsync(user);
+        if (!createResult.Succeeded)
+        {
+            var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
 
-                    <p style=""color:#555; font-size:15px; line-height:1.6; margin-bottom:35px;"">
-                      Thank you for joining <strong>GuruPR</strong>. Please confirm your email to activate your account and start exploring.
-                    </p>
+            _logger.LogError("Error creating user from external provider {Provider}: {Errors}", provider, errors);
 
-                    <div style=""text-align:center; margin-bottom:40px;"">
-                      <a href=""{HtmlEncoder.Default.Encode(confirmationLink)}""
-                         style=""background-color:#1E40AF; color:#fff; text-decoration:none; 
-                                padding:12px 28px; font-weight:500; font-size:15px; 
-                                display:inline-block;"">
-                        Confirm Email
-                      </a>
-                    </div>
+            throw new RegistrationFailedException($"Failed to create a user account using the external provider {provider}.");
+        }
 
-                    <p style=""color:#777; font-size:14px; line-height:1.6; margin-bottom:30px;"">
-                      If you didn’t create an account with GuruPR, you can safely ignore this message.
-                    </p>
+        await AssignRoleAsync(user.Id.ToString(), UserRole.User);
+        await AddLoginInfoAsync(user, provider, claimsPrincipal);
 
-                    <hr style=""border:none; border-top:1px solid #e0e0e0; margin:30px 0;"" />
+        return user;
+    }
 
-                    <p style=""font-size:12px; color:#999; text-align:center;"">
-                      © {DateTime.UtcNow.Year} GuruPR. All rights reserved.
-                    </p>
+    private async Task AddLoginInfoAsync(User user, string provider, ClaimsPrincipal claimsPrincipal)
+    {
+        var userNameIdentifier = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                    <p style=""font-size:12px; color:#aaa; text-align:center;"">
-                      Made with 💡 by the GuruPR team
-                    </p>
-                  </div>
-                </div>";
+        if (string.IsNullOrWhiteSpace(userNameIdentifier))
+        {
+            throw new ExternalLoginProviderException(provider, $"{provider} user ID claim is missing");
+        }
+
+        var loginInfo = new UserLoginInfo(provider, userNameIdentifier, provider);
+        var loginResult = await _userManager.AddLoginAsync(user, loginInfo);
+
+        if (!loginResult.Succeeded)
+        {
+            var errors = string.Join(", ", loginResult.Errors.Select(e => e.Description));
+            throw new ExternalLoginProviderException(provider, $"Unable to link {provider} login: {errors}");
+        }
     }
 
     #endregion

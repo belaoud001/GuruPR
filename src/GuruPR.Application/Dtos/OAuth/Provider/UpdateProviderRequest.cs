@@ -4,13 +4,13 @@ namespace GuruPR.Application.Dtos.OAuth.Provider;
 
 public class UpdateProviderRequest
 {
-    public string? DisplayName { get; set; }
+    public string? DisplayName { get; init; }
 
-    public OAuthProviderType? ProviderType { get; set; }
+    public OAuthProviderType? ProviderType { get; init; }
 
-    public string? AuthorizationUrl { get; set; }
+    public string? AuthorizationUrl { get; init; }
 
-    public string? TokenUrl { get; set; }
+    public string? TokenUrl { get; init; }
 
-    public List<string>? DefaultScopes { get; set; }
+    public List<string>? DefaultScopes { get; init; }
 }

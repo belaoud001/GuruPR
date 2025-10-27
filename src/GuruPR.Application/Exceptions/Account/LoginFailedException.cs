@@ -1,8 +1,3 @@
 ﻿namespace GuruPR.Application.Exceptions.Account;
 
-public class LoginFailedException : Exception
-{
-    public LoginFailedException(string message) : base(message)
-    {
-    }
-}
+public class LoginFailedException(string message) : Exception(message);

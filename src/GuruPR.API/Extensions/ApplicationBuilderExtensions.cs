@@ -1,10 +1,10 @@
 ﻿using GuruPR.Persistence.Identity;
 
-namespace GuruPR.Configuration;
+namespace GuruPR.Extensions;
 
 public static class ApplicationBuilderExtensions
 {
-    public async static Task<IApplicationBuilder> UseIdentityInitializationAsync(this IApplicationBuilder app)
+    public static async Task<IApplicationBuilder> UseIdentityInitializationAsync(this IApplicationBuilder app)
     {
         using (var scope = app.ApplicationServices.CreateScope())
         {

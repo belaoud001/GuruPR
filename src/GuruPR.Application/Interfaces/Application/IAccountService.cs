@@ -1,4 +1,6 @@
-﻿using GuruPR.Domain.Enums;
+﻿using System.Security.Claims;
+
+using GuruPR.Domain.Enums;
 using GuruPR.Domain.Requests;
 
 namespace GuruPR.Application.Interfaces.Application;
@@ -9,7 +11,7 @@ public interface IAccountService
 
     Task LoginAsync(LoginRequest loginRequest);
 
-    Task RefreshTokenAsync(string refreshToken);
+    Task RefreshTokenAsync(string userId, string refreshToken);
 
     Task ConfirmEmailAsync(string userId, string token);
 
@@ -19,4 +21,5 @@ public interface IAccountService
 
     Task RemoveRoleAsync(string userId, UserRole userRole);
 
+    Task LoginWithExternalProviderAsync(ClaimsPrincipal? claimsPrincipal, string provider);
 }

@@ -1,6 +1,6 @@
-﻿using GuruPR.Application.Settings;
+﻿using GuruPR.Application.Extensions;
+using GuruPR.Application.Settings;
 using GuruPR.Application.Settings.Email;
-using GuruPR.Application.Settings.Extensions;
 using GuruPR.Application.Settings.FrontEnd;
 using GuruPR.Application.Settings.Security;
 using GuruPR.Infrastructure.Configuration;
@@ -42,9 +42,11 @@ public static class ServiceCollectionExtensions
     private static void ConfigureSettings(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSettings<JwtSettings>(configuration);
-        services.AddSettings<EmailValidationSettings>(configuration);
-        services.AddSettings<GmailingAppSettings>(configuration);
         services.AddSettings<FrontEndSettings>(configuration);
+        services.AddSettings<GmailingAppSettings>(configuration);
+        services.AddSettings<TokenHashingSettings>(configuration);
+        services.AddSettings<EmailValidationSettings>(configuration);
+        services.AddSettings<TokenEncryptionSettings>(configuration);
     }
 
     private static void AddSettings<T>(this IServiceCollection services, IConfiguration configuration) where T : class, ISettings

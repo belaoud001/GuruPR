@@ -2,16 +2,24 @@
 using System.Text;
 
 using GuruPR.Application.Interfaces.Infrastructure;
+using GuruPR.Application.Settings.Security;
+
+using Microsoft.Extensions.Options;
 
 namespace GuruPR.Infrastructure.Services.Security;
 
 public class TokenEncryptionService : ITokenEncryptionService
 {
+    private readonly TokenEncryptionSettings _tokenEncryptionSettings;
     private readonly byte[] _key;
     private const int IvSize = 16;
 
-    public TokenEncryptionService(string key)
+    public TokenEncryptionService(IOptions<TokenEncryptionSettings> tokenEncryptionSettings)
     {
+        _tokenEncryptionSettings = tokenEncryptionSettings.Value;
+
+        var key = _tokenEncryptionSettings.Key;
+
         if (string.IsNullOrEmpty(key) || key.Length != 32)
         {
             throw new ArgumentException("Encryption key cannot be null or empty", nameof(key));

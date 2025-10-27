@@ -8,7 +8,7 @@ public class User : IdentityUser<Guid>
 
     public required string LastName { get; set; }
 
-    public string? RefreshToken { get; set; }
+    public string? RefreshTokenHash { get; set; }
 
     public DateTime? RefreshTokenExpiryTime { get; set; }
 

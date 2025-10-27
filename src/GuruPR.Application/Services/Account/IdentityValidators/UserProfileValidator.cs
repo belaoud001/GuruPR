@@ -9,7 +9,7 @@ namespace GuruPR.Application.Services.Account.IdentityValidators;
 
 public class UserProfileValidator : IUserValidator<User>
 {
-    // Regex to validate user names (first or last):
+    // Regex to validate usernames (first or last):
     // - Allows Unicode letters (\p{L})
     // - Allows spaces, apostrophes ('), hyphens (-), and dots (.) **only between letters**
     // - Prevents names from starting or ending with non-letter characters

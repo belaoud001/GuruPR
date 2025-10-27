@@ -5,17 +5,17 @@ namespace GuruPR.Application.Dtos.OAuth.Provider;
 
 public class CreateProviderRequest
 {
-    public required string DisplayName { get; set; }
+    public required string DisplayName { get; init; }
 
-    public OAuthProviderType ProviderType { get; set; }
+    public OAuthProviderType ProviderType { get; init; }
 
-    public required string AuthorizationUrl { get; set; }
+    public required string AuthorizationUrl { get; init; }
 
-    public required string TokenUrl { get; set; }
+    public required string TokenUrl { get; init; }
 
-    public required List<string> DefaultScopes { get; set; }
+    public required List<string> DefaultScopes { get; init; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
-    public List<CreateProviderConnectionRequest> ProviderConnections { get; set; } = [];
+    public List<CreateProviderConnectionRequest> ProviderConnections { get; init; } = [];
 }

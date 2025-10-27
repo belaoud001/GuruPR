@@ -1,8 +1,15 @@
 ﻿using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Settings.FrontEnd;
+using GuruPR.Domain.Entities;
+using GuruPR.Domain.Enums;
+using GuruPR.Domain.Extensions.Auth;
 using GuruPR.Domain.Requests;
+using GuruPR.Infrastructure.Identity.Constants;
 
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -15,12 +22,23 @@ public class AccountController : ControllerBase
 {
     private readonly ILogger<AccountController> _logger;
     private readonly IAccountService _accountService;
+    private readonly IUrlValidator _urlValidator;
+    private readonly LinkGenerator _linkGenerator;
+    private readonly SignInManager<User> _signInManager;
     private readonly FrontEndSettings _frontEndSettings;
 
-    public AccountController(ILogger<AccountController> logger, IAccountService accountService, IOptions<FrontEndSettings> frontEndSettings)
+    public AccountController(ILogger<AccountController> logger,
+                             IAccountService accountService,
+                             IUrlValidator urlValidator,
+                             LinkGenerator linkGenerator,
+                             SignInManager<User> signInManager,
+                             IOptions<FrontEndSettings> frontEndSettings)
     {
         _logger = logger;
         _accountService = accountService;
+        _urlValidator = urlValidator;
+        _linkGenerator = linkGenerator;
+        _signInManager = signInManager;
         _frontEndSettings = frontEndSettings.Value;
     }
 
@@ -43,16 +61,23 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> RefreshTokenAsync([FromBody] string refrehToken)
+    public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshRequest refreshRequest)
     {
-        await _accountService.RefreshTokenAsync(refrehToken);
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == JwtClaimTypes.Subject)?.Value;
+
+        if (userId == null)
+        {
+            return Unauthorized("Invalid token or missing subject claim.");
+        }
+
+        await _accountService.RefreshTokenAsync(userId, refreshRequest.RefreshToken);
 
         return Ok("Token refresh has succeeded.");
     }
 
-    [HttpGet("confirm-email")]
+    [HttpGet("confirm-email", Name = "ConfirmEmail")]
     [AllowAnonymous]
-    public async Task<IActionResult> ConfirmEmail(string userId, string token)
+    public async Task<IActionResult> ConfirmEmailAsync(string userId, string token)
     {
         try
         {
@@ -67,6 +92,41 @@ public class AccountController : ControllerBase
 
             return Redirect(_frontEndSettings.BaseUrl + _frontEndSettings.EmailConfirmationFailedPath);
         }
+    }
+
+    [HttpGet("login/google")]
+    [AllowAnonymous]
+    public IActionResult GoogleLogin([FromQuery] string? returnUrl)
+    {
+        _urlValidator.ValidateReturnUrl(returnUrl);
+
+        var callbackUrl = _linkGenerator.GetUriByName(HttpContext, "GoogleLoginCallback", new { returnUrl });
+        if (string.IsNullOrEmpty(callbackUrl))
+        {
+            return BadRequest("Unable to generate callback URL");
+        }
+
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", callbackUrl);
+
+        return new ChallengeResult("Google", properties);
+    }
+
+    [HttpGet("login/google/callback", Name = "GoogleLoginCallback")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GoogleLoginCallbackAsync([FromQuery] string returnUrl)
+    {
+        _urlValidator.ValidateReturnUrl(returnUrl);
+
+        var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+        if (!result.Succeeded)
+        {
+            return Unauthorized("Google authentication failed.");
+        }
+
+        var provider = ExternalProvider.Google.ToName();
+        await _accountService.LoginWithExternalProviderAsync(result.Principal, provider);
+
+        return Redirect(returnUrl);
     }
 
     [HttpPost("logout")]

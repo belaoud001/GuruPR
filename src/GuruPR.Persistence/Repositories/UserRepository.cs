@@ -12,9 +12,9 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     {
     }
 
-    public async Task<User?> GetUserByRefreshTokenAsync(string refreshToken)
+    public async Task<User?> GetUserByRefreshTokenHashAsync(string refreshTokenHash)
     {
-        var user = await _dbSet.FirstOrDefaultAsync<User>(user => user.RefreshToken == refreshToken);
+        var user = await _dbSet.FirstOrDefaultAsync<User>(user => user.RefreshTokenHash == refreshTokenHash);
 
         return user;
     }
