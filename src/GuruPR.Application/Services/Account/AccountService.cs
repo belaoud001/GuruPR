@@ -5,6 +5,7 @@ using GuruPR.Application.Exceptions.Account;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Interfaces.Persistence;
+using GuruPR.Application.Settings.FrontEnd;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Enums;
 using GuruPR.Domain.Extensions.Auth;
@@ -14,8 +15,8 @@ using GuruPR.Domain.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace GuruPR.Application.Services.Account;
 
@@ -29,7 +30,7 @@ public class AccountService : IAccountService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IEmailTemplateService _emailTemplateService;
     private readonly IAccountLinkGenerator _accountLinkGenerator;
-    private readonly LinkGenerator _linkGenerator;
+    private readonly FrontEndSettings _frontEndSettings;
     private readonly UserManager<User> _userManager;
 
     private const int RefreshTokenExpirationDays = 7;
@@ -42,7 +43,7 @@ public class AccountService : IAccountService
                           IEmailTemplateService emailTemplateService,
                           IAccountLinkGenerator accountLinkGenerator,
                           IHttpContextAccessor httpContextAccessor,
-                          LinkGenerator linkGenerator,
+                          IOptions<FrontEndSettings> frontEndSettings,
                           UserManager<User> userManager)
     {
         _logger = logger;
@@ -53,7 +54,7 @@ public class AccountService : IAccountService
         _emailTemplateService = emailTemplateService;
         _accountLinkGenerator = accountLinkGenerator;
         _httpContextAccessor = httpContextAccessor;
-        _linkGenerator = linkGenerator;
+        _frontEndSettings = frontEndSettings.Value;
         _userManager = userManager;
     }
 
@@ -137,6 +138,16 @@ public class AccountService : IAccountService
         {
             throw new EmailConfirmationException("Email confirmation failed.");
         }
+    }
+
+    public Task<string> GetEmailConfirmationRedirectUrlAsync(bool success)
+    {
+        var path = success ? _frontEndSettings.EmailConfirmationPath
+                           : _frontEndSettings.EmailConfirmationFailedPath;
+
+        var url = _frontEndSettings.BaseUrl + path;
+
+        return Task.FromResult(url);
     }
 
     public async Task LogoutAsync(string userId, string refreshToken)

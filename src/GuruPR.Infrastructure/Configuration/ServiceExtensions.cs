@@ -126,6 +126,7 @@ public static class ServiceExtensions
 
         services.AddScoped<ITokenService, JwtTokenService>();
         services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IExternalAuthService, ExternalAuthService>();
     }
 
     private static void AddSemanticKernel(this IServiceCollection services, IConfiguration configuration)

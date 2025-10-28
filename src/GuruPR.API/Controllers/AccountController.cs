@@ -1,17 +1,10 @@
 ﻿using GuruPR.Application.Interfaces.Application;
-using GuruPR.Application.Settings.FrontEnd;
-using GuruPR.Domain.Entities;
-using GuruPR.Domain.Enums;
-using GuruPR.Domain.Extensions.Auth;
+using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Domain.Requests;
 using GuruPR.Infrastructure.Identity.Constants;
 
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace GuruPR.Controllers;
 
@@ -22,24 +15,15 @@ public class AccountController : ControllerBase
 {
     private readonly ILogger<AccountController> _logger;
     private readonly IAccountService _accountService;
-    private readonly IUrlValidator _urlValidator;
-    private readonly LinkGenerator _linkGenerator;
-    private readonly SignInManager<User> _signInManager;
-    private readonly FrontEndSettings _frontEndSettings;
+    private readonly IExternalAuthService _externalAuthService;
 
     public AccountController(ILogger<AccountController> logger,
                              IAccountService accountService,
-                             IUrlValidator urlValidator,
-                             LinkGenerator linkGenerator,
-                             SignInManager<User> signInManager,
-                             IOptions<FrontEndSettings> frontEndSettings)
+                             IExternalAuthService externalAuthService)
     {
         _logger = logger;
         _accountService = accountService;
-        _urlValidator = urlValidator;
-        _linkGenerator = linkGenerator;
-        _signInManager = signInManager;
-        _frontEndSettings = frontEndSettings.Value;
+        _externalAuthService = externalAuthService;
     }
 
     [HttpPost("register")]
@@ -82,51 +66,34 @@ public class AccountController : ControllerBase
         try
         {
             await _accountService.ConfirmEmailAsync(userId, token);
+            var redirectUrl = await _accountService.GetEmailConfirmationRedirectUrlAsync(true);
 
-            // Redirect to login page
-            return Redirect(_frontEndSettings.BaseUrl + _frontEndSettings.EmailConfirmationPath);
+            return Redirect(redirectUrl);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            _logger.LogError(ex, "Email confirmation failed for userId: {UserId}", userId);
+            var redirectUrl = await _accountService.GetEmailConfirmationRedirectUrlAsync(false);
 
-            return Redirect(_frontEndSettings.BaseUrl + _frontEndSettings.EmailConfirmationFailedPath);
+            return Redirect(redirectUrl);
         }
     }
 
     [HttpGet("login/google")]
     [AllowAnonymous]
-    public IActionResult GoogleLogin([FromQuery] string? returnUrl)
+    public async Task<IActionResult> GoogleLoginAsync([FromQuery] string? returnUrl)
     {
-        _urlValidator.ValidateReturnUrl(returnUrl);
+        var challengeResult = await _externalAuthService.InitiateGoogleLoginAsync(returnUrl, HttpContext);
 
-        var callbackUrl = _linkGenerator.GetUriByName(HttpContext, "GoogleLoginCallback", new { returnUrl });
-        if (string.IsNullOrEmpty(callbackUrl))
-        {
-            return BadRequest("Unable to generate callback URL");
-        }
-
-        var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", callbackUrl);
-
-        return new ChallengeResult("Google", properties);
+        return challengeResult;
     }
 
     [HttpGet("login/google/callback", Name = "GoogleLoginCallback")]
     [AllowAnonymous]
     public async Task<IActionResult> GoogleLoginCallbackAsync([FromQuery] string returnUrl)
     {
-        _urlValidator.ValidateReturnUrl(returnUrl);
+        var redirectUrl = await _externalAuthService.HandleGoogleCallbackAsync(returnUrl, HttpContext);
 
-        var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-        if (!result.Succeeded)
-        {
-            return Unauthorized("Google authentication failed.");
-        }
-
-        var provider = ExternalProvider.Google.ToName();
-        await _accountService.LoginWithExternalProviderAsync(result.Principal, provider);
-
-        return Redirect(returnUrl);
+        return Redirect(redirectUrl);
     }
 
     [HttpPost("logout")]
