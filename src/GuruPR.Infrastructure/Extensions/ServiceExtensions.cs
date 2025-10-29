@@ -25,7 +25,7 @@ using Microsoft.SemanticKernel;
 
 using static System.Text.Encoding;
 
-namespace GuruPR.Infrastructure.Configuration;
+namespace GuruPR.Infrastructure.Extensions;
 
 #pragma warning disable SKEXP0070 // Suppress experimental feature warning
 
@@ -136,14 +136,14 @@ public static class ServiceExtensions
         AddHuggingFaceModels(configuration, kernelBuilder);
         AddAzureOpenAiModels(configuration, kernelBuilder);
 
-        services.AddScoped<Kernel>(_ =>
+        services.AddScoped(_ =>
         {
             kernelBuilder.CopyApplicationServices(services);
             var kernel = kernelBuilder.Build();
 
             // Plugins registration surely can be improved, but for now it works.
             // For next iterations, consider using reflection to find all plugins automatically.
-            kernel.ImportPluginFromType<SpotifyPlugin>();
+            kernel.ImportPluginFromType<SpotifyPlugin>("Spotify");
 
             return kernel;
         });

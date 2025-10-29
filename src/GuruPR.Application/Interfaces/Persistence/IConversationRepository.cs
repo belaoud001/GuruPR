@@ -1,0 +1,8 @@
+﻿using GuruPR.Domain.Entities;
+
+namespace GuruPR.Application.Interfaces.Persistence;
+
+public interface IConversationRepository : IGenericRepository<Conversation>
+{
+    Task<IEnumerable<Conversation>> GetAllByUserIdAsync(string userId);
+}

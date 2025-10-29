@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GuruPR.Persistence.Configuration;
+namespace GuruPR.Persistence.Extensions;
 
 public static class ServiceExtensions
 {
@@ -78,7 +78,13 @@ public static class ServiceExtensions
     private static void AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IProviderRepository, ProviderRepository>();
+
         services.AddScoped<IUserRepository, UserRepository>();
+
+        services.AddScoped<IToolRepository, ToolRepository>();
+        services.AddScoped<IAgentRepository, AgentRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IProviderRepository, ProviderRepository>();
+        services.AddScoped<IConversationRepository, ConversationRepository>();
     }
 }

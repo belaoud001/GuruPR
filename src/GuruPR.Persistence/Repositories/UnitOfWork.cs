@@ -17,7 +17,12 @@ public class UnitOfWork : IUnitOfWork
     private IDbContextTransaction? _userManagementTransaction;
     private TransactionScope? _transactionScope;
 
+    private IToolRepository? _toolRepository;
+    private IAgentRepository? _agentRepository;
+    private IMessageRepository? _messageRepository;
     private IProviderRepository? _providerRepository;
+    private IConversationRepository? _conversationRepository;
+
     private IUserRepository? _userRepository;
 
     public UnitOfWork(GuruDbContext guruDbContext, UserManagementDbContext userManagementDbContext)
@@ -26,7 +31,12 @@ public class UnitOfWork : IUnitOfWork
         _userManagementDbContext = userManagementDbContext;
     }
 
+    public IToolRepository Tools => _toolRepository ??= new ToolRepository(_guruDbContext);
+    public IAgentRepository Agents => _agentRepository ??= new AgentRepository(_guruDbContext);
+    public IMessageRepository Messages => _messageRepository ??= new MessageRepository(_guruDbContext);
     public IProviderRepository Providers => _providerRepository ??= new ProviderRepository(_guruDbContext);
+    public IConversationRepository Conversations => _conversationRepository ??= new ConversationRepository(_guruDbContext);
+
     public IUserRepository Users => _userRepository ??= new UserRepository(_userManagementDbContext);
 
     public Task BeginDistributedTransactionAsync(CancellationToken cancellationToken = default)

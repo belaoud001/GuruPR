@@ -6,6 +6,7 @@ using Microsoft.SemanticKernel;
 
 namespace GuruPR.Infrastructure.SemanticKernel.Plugins;
 
+
 public class SpotifyPlugin
 {
     private readonly ISpotifyService _spotifyService;

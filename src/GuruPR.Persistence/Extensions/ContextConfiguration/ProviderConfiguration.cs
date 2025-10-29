@@ -4,7 +4,7 @@ using GuruPR.Domain.Entities.OAuth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace GuruPR.Persistence.Configuration.ContextConfiguration;
+namespace GuruPR.Persistence.Extensions.ContextConfiguration;
 
 public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
 {

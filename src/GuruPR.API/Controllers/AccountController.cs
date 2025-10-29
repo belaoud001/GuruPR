@@ -1,6 +1,7 @@
 ﻿using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Domain.Requests;
+using GuruPR.Extensions;
 using GuruPR.Infrastructure.Identity.Constants;
 
 using Microsoft.AspNetCore.Authorization;
@@ -47,7 +48,7 @@ public class AccountController : ControllerBase
     [HttpPost("refresh")]
     public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshRequest refreshRequest)
     {
-        var userId = User.Claims.FirstOrDefault(claim => claim.Type == JwtClaimTypes.Subject)?.Value;
+        var userId = User.GetClaimValue(JwtClaimTypes.Subject);
 
         if (userId == null)
         {

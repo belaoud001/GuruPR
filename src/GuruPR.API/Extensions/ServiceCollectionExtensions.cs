@@ -3,8 +3,8 @@ using GuruPR.Application.Settings;
 using GuruPR.Application.Settings.Email;
 using GuruPR.Application.Settings.FrontEnd;
 using GuruPR.Application.Settings.Security;
-using GuruPR.Infrastructure.Configuration;
-using GuruPR.Persistence.Configuration;
+using GuruPR.Infrastructure.Extensions;
+using GuruPR.Persistence.Extensions;
 
 namespace GuruPR.Extensions;
 

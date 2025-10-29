@@ -3,7 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace GuruPR.Persistence.Configuration.ContextConfiguration;
+namespace GuruPR.Persistence.Extensions.ContextConfiguration;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {

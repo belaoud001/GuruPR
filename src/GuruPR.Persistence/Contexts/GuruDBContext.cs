@@ -1,6 +1,7 @@
 ﻿using GuruPR.Application.Interfaces.Infrastructure;
+using GuruPR.Domain.Entities;
 using GuruPR.Domain.Entities.OAuth;
-using GuruPR.Persistence.Configuration.ContextConfiguration;
+using GuruPR.Persistence.Extensions.ContextConfiguration;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,10 @@ public class GuruDbContext : DbContext
     private readonly ITokenEncryptionService _tokenEncryptionService;
 
     public DbSet<Provider> Providers { get; set; } = null!;
+    public DbSet<Message> Messages { get; set; } = null!;
+    public DbSet<Conversation> Conversations { get; set; } = null!;
+    public DbSet<Agent> Agents { get; set; } = null!;
+    public DbSet<Tool> Tools { get; set; } = null!;
 
     public GuruDbContext(DbContextOptions<GuruDbContext> options, ITokenEncryptionService tokenEncryptionService) : base(options)
     {
@@ -31,6 +36,10 @@ public class GuruDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.ApplyConfiguration(new ToolConfiguration());
+        modelBuilder.ApplyConfiguration(new AgentConfiguration());
+        modelBuilder.ApplyConfiguration(new MessageConfiguration());
+        modelBuilder.ApplyConfiguration(new ConversationConfiguration());
         modelBuilder.ApplyConfiguration(new ProviderConfiguration(_tokenEncryptionService));
     }
 }
