@@ -8,7 +8,6 @@ using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Application.Settings.FrontEnd;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Enums;
-using GuruPR.Domain.Extensions.Auth;
 using GuruPR.Domain.Extensions.User;
 using GuruPR.Domain.Requests;
 

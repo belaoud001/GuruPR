@@ -1,4 +1,4 @@
-﻿namespace GuruPR.Domain.Extensions.Auth;
+﻿namespace GuruPR.Domain.Extensions.Authentication;
 
 public static class ExternalProviderExtensions
 {

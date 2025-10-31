@@ -2,7 +2,7 @@
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Enums;
-using GuruPR.Domain.Extensions.Auth;
+using GuruPR.Domain.Extensions.Authentication;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 
-namespace GuruPR.Infrastructure.Services.Auth;
+namespace GuruPR.Infrastructure.Services.Authentication;
 
 public class ExternalAuthService : IExternalAuthService
 {

@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace GuruPR.Infrastructure.Services.Auth;
+namespace GuruPR.Infrastructure.Services.Authentication;
 
 public class JwtTokenService : ITokenService
 {
