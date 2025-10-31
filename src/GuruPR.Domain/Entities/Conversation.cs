@@ -15,4 +15,17 @@ public class Conversation
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedAt { get; set; }
+
+    public ConversationMetadata Metadata { get; set; } = null!;
+}
+
+public class ConversationMetadata
+{
+    public string Summary { get; set; } = string.Empty;
+
+    public int TotalMessages { get; set; } = 0;
+
+    public int TotalTokens { get; set; } = 0;
+
+    public IDictionary<string, object> CustomData { get; set; } = new Dictionary<string, object>();
 }

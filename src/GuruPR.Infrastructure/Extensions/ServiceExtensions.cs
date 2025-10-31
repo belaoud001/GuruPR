@@ -9,7 +9,6 @@ using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
 using GuruPR.Application.Settings.Security;
 using GuruPR.Infrastructure.HttpClients.Spotify;
 using GuruPR.Infrastructure.Identity.Constants;
-using GuruPR.Infrastructure.SemanticKernel.Plugins;
 using GuruPR.Infrastructure.Services.Auth;
 using GuruPR.Infrastructure.Services.Email;
 using GuruPR.Infrastructure.Services.Security;
@@ -26,8 +25,6 @@ using Microsoft.SemanticKernel;
 using static System.Text.Encoding;
 
 namespace GuruPR.Infrastructure.Extensions;
-
-#pragma warning disable SKEXP0070 // Suppress experimental feature warning
 
 public static class ServiceExtensions
 {
@@ -139,13 +136,8 @@ public static class ServiceExtensions
         services.AddScoped(_ =>
         {
             kernelBuilder.CopyApplicationServices(services);
-            var kernel = kernelBuilder.Build();
 
-            // Plugins registration surely can be improved, but for now it works.
-            // For next iterations, consider using reflection to find all plugins automatically.
-            kernel.ImportPluginFromType<SpotifyPlugin>("Spotify");
-
-            return kernel;
+            return kernelBuilder.Build();
         });
     }
 
@@ -173,6 +165,7 @@ public static class ServiceExtensions
         foreach (var huggingFaceModel in huggingFaceModels ?? [])
         {
             kernelBuilder.Services.AddHuggingFaceChatCompletion(
+                serviceId: huggingFaceModel.ModelName,
                 model: huggingFaceModel.ModelName,
                 apiKey: huggingFaceModelsConfig?.ApiKey,
                 endpoint: new Uri(huggingFaceModel.Endpoint)
@@ -196,8 +189,8 @@ public static class ServiceExtensions
         foreach (var azureOpenAiModel in azureOpenAiModels ?? [])
         {
             kernelBuilder.Services.AddAzureOpenAIChatCompletion(
-                serviceId: azureOpenAiModel.DeploymentName,
-                deploymentName: azureOpenAiModel.DeploymentName,
+                serviceId: azureOpenAiModel.ModelName,
+                deploymentName: azureOpenAiModel.ModelName,
                 endpoint: azureOpenAiModel.Endpoint,
                 apiKey: azureOpenAiModelsConfig!.ApiKey,
                 apiVersion: azureOpenAiModel.ApiVersion
@@ -243,5 +236,3 @@ public static class ServiceExtensions
 
     #endregion
 }
-
-#pragma warning restore SKEXP0070 // Suppress experimental feature warning

@@ -28,7 +28,7 @@ public class MessageService : IMessageService
             throw new UnauthorizedAccessException("User does not have access to this conversation.");
         }
 
-        var messages = await _unitOfWork.Messages.GetMessagesbyConversationIdAsync(conversationId);
+        var messages = await _unitOfWork.Messages.GetMessagesAsync(conversationId);
 
         return messages;
     }

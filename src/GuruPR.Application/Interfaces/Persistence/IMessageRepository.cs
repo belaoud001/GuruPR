@@ -4,5 +4,5 @@ namespace GuruPR.Application.Interfaces.Persistence;
 
 public interface IMessageRepository : IGenericRepository<Message>
 {
-    Task<List<Message>> GetMessagesbyConversationIdAsync(string conversationId);
+    Task<List<Message>> GetMessagesAsync(string conversationId, int? lastMessages = null);
 }

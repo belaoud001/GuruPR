@@ -12,12 +12,22 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
     {
     }
 
-    public async Task<List<Message>> GetMessagesbyConversationIdAsync(string conversationId)
+    public async Task<List<Message>> GetMessagesAsync(string conversationId, int? lastMessages = null)
     {
-        var messages = await _dbSet.Where(message => message.ConversationId == conversationId)
-                                   .OrderBy(message => message.CreatedAt)
-                                   .ToListAsync();
+        var baseQuery = _dbSet.Where(m => m.ConversationId == conversationId);
 
-        return messages;
+        if (lastMessages.HasValue && lastMessages.Value > 0)
+        {
+            var recent = await baseQuery.OrderByDescending(m => m.CreatedAt)
+                                        .Take(lastMessages.Value)
+                                        .ToListAsync();
+
+            recent.Reverse();
+
+            return recent;
+        }
+
+        return await baseQuery.OrderBy(m => m.CreatedAt)
+                              .ToListAsync();
     }
 }
