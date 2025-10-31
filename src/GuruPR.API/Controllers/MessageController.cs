@@ -9,6 +9,7 @@ namespace GuruPR.Controllers;
 
 [Authorize]
 [ApiController]
+[Route("api/v1/conversations/{conversationId}/messages")]
 public class MessageController : ControllerBase
 {
     private readonly IMessageService _messageService;
@@ -18,7 +19,6 @@ public class MessageController : ControllerBase
         _messageService = messageService;
     }
 
-    [HttpGet("api/v1/conversations/{conversationId}/messages")]
     public async Task<IActionResult> GetMessagesByConversationId(string conversationId)
     {
         var userId = User.GetClaimValue(JwtClaimTypes.Subject);

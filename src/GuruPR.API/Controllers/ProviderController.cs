@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/v1/providers")]
-[Authorize]
 public class ProviderController : ControllerBase
 {
     private readonly ILogger<ProviderController> _logger;

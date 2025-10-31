@@ -3,10 +3,12 @@
 using GuruPR.Application.Dtos.OAuth.ProviderConnection;
 using GuruPR.Application.Interfaces.Application;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/v1/providers/{providerId}/provider-connections")]
 public class ProviderConnectionController : ControllerBase
