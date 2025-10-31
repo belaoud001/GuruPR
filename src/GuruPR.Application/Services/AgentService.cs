@@ -28,6 +28,16 @@ public class AgentService : IAgentService
 
     #region Public Methods
 
+    public async Task<IEnumerable<Agent>> GetAllAgentsAsync(string? userId = null)
+    {
+        if (string.IsNullOrEmpty(userId))
+        {
+            return await _unitOfWork.Agents.GetAllAsync();
+        }
+
+        return await _unitOfWork.Agents.GetAllAgentsAsync(userId);
+    }
+
     public async Task<string> ExecuteAgentAsync(AgentExecutionRequest request, string userId)
     {
         var startTime = DateTime.UtcNow;

@@ -9,6 +9,7 @@ using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
 using GuruPR.Application.Settings.Security;
 using GuruPR.Infrastructure.HttpClients.Spotify;
 using GuruPR.Infrastructure.Identity.Constants;
+using GuruPR.Infrastructure.SemanticKernel.Services;
 using GuruPR.Infrastructure.Services.Authentication;
 using GuruPR.Infrastructure.Services.Email;
 using GuruPR.Infrastructure.Services.Security;
@@ -38,6 +39,7 @@ public static class ServiceExtensions
         services.AddHttpClients();
         services.AddThirdPartyServices();
         services.AddTransient<IEmailSender, GmailSender>();
+        services.AddScoped<IAIChatProvider, SemanticKernelChatProvider>();
     }
 
     #endregion

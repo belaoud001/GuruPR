@@ -1,4 +1,6 @@
-﻿using GuruPR.Application.Interfaces.Application;
+﻿using Asp.Versioning;
+
+using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Domain.Requests;
 using GuruPR.Extensions;
@@ -7,11 +9,12 @@ using GuruPR.Infrastructure.Identity.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GuruPR.Controllers;
+namespace GuruPR.Controllers.v1;
 
 [Authorize]
 [ApiController]
-[Route("api/v1/accounts")]
+[ApiVersion(1.0)]
+[Route("api/v{version:apiVersion}/accounts")]
 public class AccountController : ControllerBase
 {
     private readonly ILogger<AccountController> _logger;

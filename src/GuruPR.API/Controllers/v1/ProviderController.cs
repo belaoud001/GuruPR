@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+
+using AutoMapper;
 
 using GuruPR.Application.Dtos.OAuth.Provider;
 using GuruPR.Application.Interfaces.Application;
@@ -6,11 +8,12 @@ using GuruPR.Application.Interfaces.Application;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GuruPR.Controllers;
+namespace GuruPR.Controllers.v1;
 
 [Authorize]
 [ApiController]
-[Route("api/v1/providers")]
+[ApiVersion(1.0)]
+[Route("api/v{version:apiVersion}/providers")]
 public class ProviderController : ControllerBase
 {
     private readonly ILogger<ProviderController> _logger;

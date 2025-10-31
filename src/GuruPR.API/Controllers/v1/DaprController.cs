@@ -1,13 +1,16 @@
-﻿using GuruPR.Application.Dapr;
+﻿using Asp.Versioning;
+
+using GuruPR.Application.Dapr;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GuruPR.Controllers;
+namespace GuruPR.Controllers.v1;
 
-[ApiController]
-[Route("api/v1/Dapr")]
 [Authorize]
+[ApiController]
+[ApiVersion(1.0)]
+[Route("api/v{version:apiVersion}/Dapr")]
 public class DaprController : ControllerBase
 {
     private readonly ILogger _logger;

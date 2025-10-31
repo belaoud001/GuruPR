@@ -28,8 +28,14 @@ public static class WebApplicationExtensions
 
         if (env.IsDevelopment())
         {
-            app.MapOpenApi();
-            app.MapScalarApiReference();
+            app.MapOpenApi("/openapi/{documentName}.json");
+            app.MapScalarApiReference(options =>
+            {
+                options.WithTitle("GuruPR API")
+                       .WithTheme(ScalarTheme.Purple)
+                       .WithOpenApiRoutePattern("/openapi/{documentName}.json")
+                       .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+            });
         }
 
         return app;

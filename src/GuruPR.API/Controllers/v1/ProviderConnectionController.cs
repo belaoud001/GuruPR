@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+
+using AutoMapper;
 
 using GuruPR.Application.Dtos.OAuth.ProviderConnection;
 using GuruPR.Application.Interfaces.Application;
@@ -6,11 +8,12 @@ using GuruPR.Application.Interfaces.Application;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GuruPR.Controllers;
+namespace GuruPR.Controllers.v1;
 
 [Authorize]
 [ApiController]
-[Route("api/v1/providers/{providerId}/provider-connections")]
+[ApiVersion(1.0)]
+[Route("api/v{version:apiVersion}/providers/{providerId}/provider-connections")]
 public class ProviderConnectionController : ControllerBase
 {
     private readonly ILogger<ProviderConnectionController> _logger;
@@ -52,7 +55,7 @@ public class ProviderConnectionController : ControllerBase
         var providerConnectionDto = _mapper.Map<ProviderConnectionDto>(providerConnection);
 
         return CreatedAtRoute("GetProviderConnectionById",
-                              new { providerId = providerId, providerConnectionId = providerConnectionDto.Id },
+                              new { providerId, providerConnectionId = providerConnectionDto.Id },
                               providerConnection);
     }
 
