@@ -1,3 +1,3 @@
 ﻿namespace GuruPR.Application.Exceptions.Account;
 
-public class LoginFailedException(string message) : Exception(message);
+public class LoginFailedException(string message) : AccountException(message);

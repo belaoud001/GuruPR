@@ -43,12 +43,12 @@ public class SemanticKernelChatProvider : IAIChatProvider
                                                        ? toolTrace as ToolTraceBuffer : null;
 
         var toolCalls = toolTraceBuffer?.Events.Select(evnt => new ToolCall
-        {
-            Name = evnt.FunctionName,
-            PluginName = evnt.PluginName,
-            Arguments = evnt.ArgumentsJson,
-            Output = evnt.OutputJson ?? string.Empty
-        }
+                                                               {
+                                                                   Name = evnt.FunctionName,
+                                                                   PluginName = evnt.PluginName,
+                                                                   Arguments = evnt.ArgumentsJson,
+                                                                   Output = evnt.OutputJson ?? string.Empty
+                                                               }
                                                        ).ToList() ?? new List<ToolCall>();
 
         if (toolTraceBuffer == null)

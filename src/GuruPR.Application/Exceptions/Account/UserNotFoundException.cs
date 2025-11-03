@@ -1,3 +1,8 @@
 ﻿namespace GuruPR.Application.Exceptions.Account;
 
-public class UserNotFoundException(string message) : NotFoundException(message);
+public class UserNotFoundException : NotFoundException
+{
+    public UserNotFoundException(string message) : base(message)
+    {
+    }
+}

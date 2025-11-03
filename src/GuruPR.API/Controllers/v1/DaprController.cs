@@ -20,7 +20,7 @@ public class DaprController : ControllerBase
         _logger = logger;
     }
 
-    [HttpPost("/handle")]
+    [HttpPost("handle")]
     public async Task<ActionResult<string>> HandleInputBindingsAsync([FromBody] MessageEnvelope messageEnvelope)
     {
         // Treat incoming messages here ( Redirect based on operation-type ) ...

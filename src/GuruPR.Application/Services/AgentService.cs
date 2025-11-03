@@ -1,12 +1,19 @@
-﻿using GuruPR.Application.Exceptions;
+﻿using AutoMapper;
+
+using GuruPR.Application.Dtos.Agent;
+using GuruPR.Application.Exceptions;
+using GuruPR.Application.Exceptions.Account;
+using GuruPR.Application.Exceptions.Agent;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Models;
 using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Entities.Configurations.Enums;
+using GuruPR.Domain.Errors;
 using GuruPR.Domain.Requests;
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace GuruPR.Application.Services;
@@ -15,15 +22,18 @@ public class AgentService : IAgentService
 {
     private readonly ILogger<AgentService> _logger;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IAIChatProvider _aiChatProvider;
+    private readonly IMapper _mapper;
+    private readonly UserManager<User> _userManager;
 
     public AgentService(ILogger<AgentService> logger,
                         IUnitOfWork unitOfWork,
-                        IAIChatProvider aiChatProvider)
+                        IMapper mapper,
+                        UserManager<User> userManager)
     {
         _logger = logger;
         _unitOfWork = unitOfWork;
-        _aiChatProvider = aiChatProvider;
+        _mapper = mapper;
+        _userManager = userManager;
     }
 
     #region Public Methods
@@ -38,124 +48,89 @@ public class AgentService : IAgentService
         return await _unitOfWork.Agents.GetAllAgentsAsync(userId);
     }
 
-    public async Task<string> ExecuteAgentAsync(AgentExecutionRequest request, string userId)
-    {
-        var startTime = DateTime.UtcNow;
-
-        var agent = await ValidateAgentAsync(request.AgentId);
-        var conversation = await ValidateConversationAsync(request.ConversationId, userId);
-        var messages = await _unitOfWork.Messages.GetMessagesAsync(conversation.Id,
-                                                                   agent.MemoryConfiguration.MaxContextMessages);
-
-        var result = await _aiChatProvider.ExecuteAsync(agent, conversation, messages, request.Message);
-
-        await SaveMessagesAsync(conversation, request.Message, result);
-
-        await HandleSummaryAsync(agent, conversation);
-
-        await _unitOfWork.SaveGuruChangesAsync();
-
-        return result.Content;
-    }
-
-    private async Task<Agent> ValidateAgentAsync(string agentId)
+    public async Task<Agent> GetAgentByIdAsync(string agentId)
     {
         var agent = await _unitOfWork.Agents.GetByIdAsync(agentId);
         if (agent == null)
         {
-            throw new NotFoundException($"Agent with ID {agentId} not found.");
-        }
-
-        if (agent.Status != AgentStatus.Active)
-        {
-            throw new InvalidOperationException($"Agent with ID {agentId} is not active.");
+            throw new NotFoundException("Agent with ID {agentId} not found.");
         }
 
         return agent;
+    }
+
+    public async Task<Agent> CreateAgentAsync(CreateAgentRequest createAgentRequest, string userId)
+    {
+        var user = await GetUserByIdOrThrowException(userId);
+        var agent = _mapper.Map<Agent>(createAgentRequest);
+
+        agent.CreatedByUserId = user.Id.ToString();
+
+        ValidateAgent(agent);
+
+        var createdAgent = await _unitOfWork.Agents.AddAsync(agent);
+        await _unitOfWork.SaveGuruChangesAsync();
+
+        return createdAgent;
+    }
+
+    public async Task<Agent> UpdateAgentAsync(string agentId, UpdateAgentRequest updateAgentRequest)
+    {
+        var agent = await GetAgentByIdAsync(agentId);
+        var updatedAgent = _mapper.Map(updateAgentRequest, agent);
+
+        ValidateAgent(updatedAgent);
+
+        _unitOfWork.Agents.Update(updatedAgent);
+        await _unitOfWork.SaveGuruChangesAsync();
+
+        return updatedAgent;
+    }
+
+    public async Task<bool> DeleteAgentAsync(string agentId)
+    {
+        var agent = await GetAgentByIdAsync(agentId);
+
+        _unitOfWork.Agents.Delete(agent);
+
+        var result = await _unitOfWork.SaveGuruChangesAsync();
+        return result > 0;
     }
 
     #endregion
 
     #region Private Methods
 
-    private async Task<Conversation> ValidateConversationAsync(string conversationId, string userId)
+    private void ValidateAgent(Agent agent)
     {
-        var conversation = await _unitOfWork.Conversations.GetByIdAsync(conversationId);
-
-        if (conversation == null)
+        var validationErrors = agent.Validate().ToList();
+        if (validationErrors.Any())
         {
-            throw new NotFoundException($"Conversation with ID {conversationId} not found.");
+            throw CreateValidationException(validationErrors);
         }
-
-        if (conversation.UserId != userId)
-        {
-            throw new UnauthorizedAccessException("User does not have access to this conversation.");
-        }
-
-        return conversation;
     }
 
-    private async Task SaveMessagesAsync(Conversation conversation, string userMessageContent, AgentExecutionResult result)
+    private AgentValidationException CreateValidationException(IEnumerable<ValidationError> errors)
     {
-        var userMessage = new Message
-        {
-            ConversationId = conversation.Id,
-            Role = "User",
-            Content = userMessageContent,
-            CreatedAt = DateTime.UtcNow,
-            MetaData = new MessageMetadata
-            {
-                TokenCount = result.InputTokens
-            }
-        };
-        var agentMessage = new Message
-        {
-            ConversationId = conversation.Id,
-            Role = "Assistant",
-            Content = result.Content,
-            ToolCalls = result.ToolCalls,
-            CreatedAt = DateTime.UtcNow,
-            MetaData = new MessageMetadata
-            {
-                AgentName = result.AgentName,
-                TokenCount = result.OutputTokens,
-                ProcessingTime = result.ProcessingTime,
-                ModelUsed = result.ModelId
-            }
-        };
+        var errorGroups = errors.GroupBy(error => error.Field)
+                                .ToDictionary(
+                                    group => group.Key,
+                                    group => group.Select(error => error.Message)
+                                                  .ToList()
+                                );
 
-        await _unitOfWork.Messages.AddAsync(userMessage);
-        await _unitOfWork.Messages.AddAsync(agentMessage);
-
-        conversation.UpdatedAt = DateTime.UtcNow;
-        conversation.Metadata.TotalMessages += 2;
-        conversation.Metadata.TotalTokens += result.TotalTokens;
-
-        _unitOfWork.Conversations.Update(conversation);
+        return new AgentValidationException($"Agent validation failed.", errorGroups);
     }
 
-    private async Task HandleSummaryAsync(Agent agent, Conversation conversation)
+    private async Task<User> GetUserByIdOrThrowException(string userId)
     {
-        if (agent.MemoryConfiguration.EnableSummary &&
-            conversation.Metadata.TotalMessages >= agent.MemoryConfiguration.SummaryThresholdMessages)
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
         {
-            var messages = await _unitOfWork.Messages.GetMessagesAsync(conversation.Id, 4);
-
-            var updatedSummary = await _aiChatProvider.GenerateSummaryAsync(messages, conversation.Metadata.Summary);
-
-            if (string.IsNullOrEmpty(updatedSummary))
-            {
-                _logger.LogWarning("Summary generation returned empty for conversation {ConversationId}", conversation.Id);
-
-                return;
-            }
-
-            conversation.Metadata.Summary = updatedSummary ?? conversation.Metadata.Summary;
-
-            _unitOfWork.Conversations.Update(conversation);
+            throw new UserNotFoundException($"User with the specified ID {userId} was not found.");
         }
 
-        _unitOfWork.Conversations.Update(conversation);
+        return user;
     }
 
     #endregion
