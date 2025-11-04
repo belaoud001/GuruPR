@@ -1,7 +1,7 @@
 ﻿using GuruPR.Application.Exceptions;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Persistence;
-using GuruPR.Domain.Entities;
+using GuruPR.Domain.Entities.Message;
 
 namespace GuruPR.Application.Services;
 

@@ -1,8 +1,10 @@
 ﻿using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Models;
 using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Plugins;
-using GuruPR.Domain.Entities;
 using GuruPR.Domain.Entities.Configurations;
+using GuruPR.Domain.Entities.Conversation;
+using GuruPR.Domain.Entities.Message;
+using GuruPR.Domain.Entities.Tool;
 using GuruPR.Infrastructure.SemanticKernel.Models;
 
 using Microsoft.Extensions.Logging;
@@ -43,12 +45,12 @@ public class SemanticKernelChatProvider : IAIChatProvider
                                                        ? toolTrace as ToolTraceBuffer : null;
 
         var toolCalls = toolTraceBuffer?.Events.Select(evnt => new ToolCall
-                                                               {
-                                                                   Name = evnt.FunctionName,
-                                                                   PluginName = evnt.PluginName,
-                                                                   Arguments = evnt.ArgumentsJson,
-                                                                   Output = evnt.OutputJson ?? string.Empty
-                                                               }
+        {
+            Name = evnt.FunctionName,
+            PluginName = evnt.PluginName,
+            Arguments = evnt.ArgumentsJson,
+            Output = evnt.OutputJson ?? string.Empty
+        }
                                                        ).ToList() ?? new List<ToolCall>();
 
         if (toolTraceBuffer == null)

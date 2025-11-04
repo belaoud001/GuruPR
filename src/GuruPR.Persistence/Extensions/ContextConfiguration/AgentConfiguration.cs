@@ -1,6 +1,5 @@
-﻿using System.Text.Json;
-
-using GuruPR.Domain.Entities;
+﻿using GuruPR.Domain.Entities;
+using GuruPR.Persistence.Helpers;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -25,12 +24,7 @@ public class AgentConfiguration : IEntityTypeConfiguration<Agent>
         builder.OwnsOne(agent => agent.ModelConfiguration, modelConfig =>
         {
             modelConfig.Property(mc => mc.AdditionalParameters)
-                       .HasConversion(
-                           v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                           v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, (JsonSerializerOptions)null)
-                       );
+                       .HasConversion(new DictionaryJsonConverter());
         });
-
-        builder.OwnsOne(agent => agent.MemoryConfiguration);
     }
 }

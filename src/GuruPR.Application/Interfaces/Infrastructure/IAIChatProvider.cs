@@ -1,5 +1,7 @@
 ﻿using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Models;
 using GuruPR.Domain.Entities;
+using GuruPR.Domain.Entities.Conversation;
+using GuruPR.Domain.Entities.Message;
 
 namespace GuruPR.Application.Interfaces.Infrastructure;
 

@@ -1,6 +1,9 @@
 ﻿using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Domain.Entities;
+using GuruPR.Domain.Entities.Conversation;
+using GuruPR.Domain.Entities.Message;
 using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Domain.Entities.Tool;
 using GuruPR.Persistence.Extensions.ContextConfiguration;
 
 using Microsoft.EntityFrameworkCore;

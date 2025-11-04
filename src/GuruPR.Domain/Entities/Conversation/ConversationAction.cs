@@ -1,4 +1,4 @@
-﻿namespace GuruPR.Domain.Entities;
+﻿namespace GuruPR.Domain.Entities.Conversation;
 
 public class ConversationAction
 {

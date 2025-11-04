@@ -1,6 +1,5 @@
 ﻿using GuruPR.Application.Dtos.Agent;
 using GuruPR.Domain.Entities;
-using GuruPR.Domain.Requests;
 
 namespace GuruPR.Application.Interfaces.Application;
 

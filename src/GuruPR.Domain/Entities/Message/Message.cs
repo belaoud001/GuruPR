@@ -1,4 +1,6 @@
-﻿namespace GuruPR.Domain.Entities;
+﻿using GuruPR.Domain.Entities.Tool;
+
+namespace GuruPR.Domain.Entities.Message;
 
 public class Message
 {

@@ -19,10 +19,11 @@ public class MemoryConfiguration
 
     public int MaxRelevantMemories { get; set; } = 5;
 
-    public bool EnableSummary { get; set; } = true;
+    public bool EnableSummary { get; set; } = false;
 
     public int SummaryThresholdMessages { get; set; } = 20;
 
+    // Validation Method
     public IEnumerable<ValidationError> Validate()
     {
         var errors = new List<ValidationError>();

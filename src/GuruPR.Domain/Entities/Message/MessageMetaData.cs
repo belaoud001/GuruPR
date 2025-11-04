@@ -1,4 +1,4 @@
-﻿namespace GuruPR.Domain.Entities;
+﻿namespace GuruPR.Domain.Entities.Message;
 
 public class MessageMetadata
 {
@@ -12,5 +12,5 @@ public class MessageMetadata
 
     public string? ModelUsed { get; set; }
 
-    public IDictionary<string, object> CustomData { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> CustomData { get; set; } = new Dictionary<string, object>();
 }

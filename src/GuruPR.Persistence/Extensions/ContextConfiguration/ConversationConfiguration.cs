@@ -1,6 +1,5 @@
-﻿using System.Text.Json;
-
-using GuruPR.Domain.Entities;
+﻿using GuruPR.Domain.Entities.Conversation;
+using GuruPR.Persistence.Helpers;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -25,10 +24,7 @@ public class ConversationConfiguration : IEntityTypeConfiguration<Conversation>
         builder.OwnsOne(conversation => conversation.Metadata, modelConfig =>
         {
             modelConfig.Property(mc => mc.CustomData)
-                       .HasConversion(
-                           v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                           v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, (JsonSerializerOptions)null)
-                       );
+                       .HasConversion(new DictionaryJsonConverter());
         });
     }
 }

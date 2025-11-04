@@ -1,4 +1,4 @@
-﻿using GuruPR.Domain.Entities;
+﻿using GuruPR.Domain.Entities.Message;
 
 namespace GuruPR.Application.Interfaces.Application;
 

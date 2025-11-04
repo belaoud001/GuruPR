@@ -6,6 +6,7 @@ namespace GuruPR.Domain.Entities;
 
 public class Agent
 {
+    // Basic Info
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = null!;
     public string AvatarUrl { get; set; } = null!;
@@ -28,6 +29,7 @@ public class Agent
 
     public bool IsValid() => !Validate().Any();
 
+    // Validation Method
     public IEnumerable<ValidationError> Validate()
     {
         var errors = new List<ValidationError>();
@@ -116,5 +118,4 @@ public class Agent
 
         return errors;
     }
-
 }

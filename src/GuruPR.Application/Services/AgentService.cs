@@ -5,13 +5,9 @@ using GuruPR.Application.Exceptions;
 using GuruPR.Application.Exceptions.Account;
 using GuruPR.Application.Exceptions.Agent;
 using GuruPR.Application.Interfaces.Application;
-using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Models;
 using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Domain.Entities;
-using GuruPR.Domain.Entities.Configurations.Enums;
 using GuruPR.Domain.Errors;
-using GuruPR.Domain.Requests;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;

@@ -1,4 +1,4 @@
-﻿namespace GuruPR.Domain.Entities;
+﻿namespace GuruPR.Domain.Entities.Tool;
 
 public class Tool
 {
@@ -12,7 +12,7 @@ public class Tool
 
     public Dictionary<string, object> ParametersSchema { get; set; } = null!;
 
-    public IDictionary<string, object> Config { get; set; } = null!;
+    public Dictionary<string, object> Config { get; set; } = null!;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

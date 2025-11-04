@@ -12,13 +12,12 @@ public class AgentProfile : Profile
         CreateMap<Agent, AgentDto>();
         CreateMap<AgentDto, Agent>();
 
-        CreateMap<CreateAgentRequest, Agent>();
         CreateMap<Agent, CreateAgentRequest>();
+        CreateMap<CreateAgentRequest, Agent>();
 
-        CreateMap<UpdateAgentRequest, Agent>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         CreateMap<Agent, UpdateAgentRequest>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-
+        CreateMap<UpdateAgentRequest, Agent>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
     }
 }

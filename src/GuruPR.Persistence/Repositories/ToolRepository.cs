@@ -1,5 +1,5 @@
 ﻿using GuruPR.Application.Interfaces.Persistence;
-using GuruPR.Domain.Entities;
+using GuruPR.Domain.Entities.Tool;
 using GuruPR.Persistence.Contexts;
 
 namespace GuruPR.Persistence.Repositories;

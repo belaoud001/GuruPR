@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Controllers.v1;
 
+[Authorize]
 [ApiController]
 [ApiVersion(1.0)]
 [Route("api/v{version:apiVersion}/agents")]
@@ -39,7 +40,7 @@ public class AgentController : ControllerBase
         return Ok(agentDtos);
     }
 
-    [HttpGet("{agentId}")]
+    [HttpGet("{agentId}", Name = "GetAgentById")]
     public async Task<IActionResult> GetAgentByIdAsync(string agentId)
     {
         var agent = await _agentService.GetAgentByIdAsync(agentId);
@@ -59,7 +60,7 @@ public class AgentController : ControllerBase
         var agent = await _agentService.CreateAgentAsync(createAgentRequest, userId);
         var agentDto = _mapper.Map<AgentDto>(agent);
 
-        return Ok(agentDto);
+        return CreatedAtRoute("GetAgentById", new { agentId = agent.Id }, agentDto);
     }
 
     [HttpPut("{agentId}")]

@@ -1,10 +1,15 @@
-﻿using GuruPR.Application.Exceptions;
+﻿using AutoMapper;
+
+using GuruPR.Application.Dtos.Conversation;
+using GuruPR.Application.Exceptions;
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Models;
 using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Entities.Configurations.Enums;
+using GuruPR.Domain.Entities.Conversation;
+using GuruPR.Domain.Entities.Message;
 using GuruPR.Domain.Requests;
 
 using Microsoft.Extensions.Logging;
@@ -16,14 +21,17 @@ public class ConversationService : IConversationService
     private readonly ILogger<ConversationService> _logger;
     private readonly IAIChatProvider _aiChatProvider;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
     public ConversationService(ILogger<ConversationService> logger,
-                               IAIChatProvider aiChatProvider,    
-                               IUnitOfWork unitOfWork)
+                               IAIChatProvider aiChatProvider,
+                               IUnitOfWork unitOfWork,
+                               IMapper mapper)
     {
         _logger = logger;
         _aiChatProvider = aiChatProvider;
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
 
     #region Public Methods
@@ -50,6 +58,44 @@ public class ConversationService : IConversationService
         }
 
         return conversation;
+    }
+
+    public async Task<Conversation> CreateConversationAsync(CreateConversationRequest createConversationRequest)
+    {
+        var conversation = _mapper.Map<Conversation>(createConversationRequest);
+
+        var createdConversation = await _unitOfWork.Conversations.AddAsync(conversation);
+
+        await _unitOfWork.SaveGuruChangesAsync();
+
+        return createdConversation;
+    }
+
+    public async Task<Conversation> UpdateConversationAsync(string conversationId, string userId, UpdateConversationRequest updateConversationRequest)
+    {
+        var conversation = await GetConversationByIdAsync(conversationId, userId);
+        var updatedConversation = _mapper.Map(updateConversationRequest, conversation);
+
+        _unitOfWork.Conversations.Update(conversation);
+
+        await _unitOfWork.SaveGuruChangesAsync();
+
+        return conversation;
+    }
+
+    public async Task<bool> DeleteConversationAsync(string conversationId)
+    {
+        var conversation = await _unitOfWork.Conversations.GetByIdAsync(conversationId);
+        if (conversation == null)
+        {
+            throw new NotFoundException("Conversation with the given ID {conversationId} not found");
+        }
+
+        await _unitOfWork.Messages.DeleteConversationMessagesAsync(conversationId);
+        _unitOfWork.Conversations.Delete(conversation);
+
+        var result = await _unitOfWork.SaveGuruChangesAsync();
+        return result > 0;
     }
 
     public async Task RunAgentWorkflowAsync(AgentExecutionRequest request, string userId)
@@ -103,6 +149,8 @@ public class ConversationService : IConversationService
         {
             throw new UnauthorizedAccessException("User does not have access to this conversation.");
         }
+
+        // Add admin check 
 
         return conversation;
     }

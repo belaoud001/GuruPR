@@ -22,7 +22,7 @@ public class ModelConfiguration
 
     public IList<string> StopSequences { get; set; } = new List<string>();
 
-    public IDictionary<string, object> AdditionalParameters { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> AdditionalParameters { get; set; } = new Dictionary<string, object>();
 
     public bool IsValid() => !Validate().Any();
 

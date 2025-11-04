@@ -20,6 +20,5 @@ public class CreateAgentRequest
     public MemoryConfiguration MemoryConfiguration { get; set; } = null!;
 
     // Metadata
-    public string CreatedBy { get; set; } = null!;
     public AgentStatus Status { get; set; } = AgentStatus.Inactive;
 }

@@ -1,4 +1,4 @@
-﻿using GuruPR.Domain.Entities;
+﻿using GuruPR.Domain.Entities.Tool;
 
 namespace GuruPR.Application.Interfaces.Persistence;
 

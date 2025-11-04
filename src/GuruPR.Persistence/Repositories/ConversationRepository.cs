@@ -1,5 +1,5 @@
 ﻿using GuruPR.Application.Interfaces.Persistence;
-using GuruPR.Domain.Entities;
+using GuruPR.Domain.Entities.Conversation;
 using GuruPR.Persistence.Contexts;
 
 using Microsoft.EntityFrameworkCore;
