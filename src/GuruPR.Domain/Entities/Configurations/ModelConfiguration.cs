@@ -105,4 +105,5 @@ public class ModelConfiguration
         return errors;
     }
 
+    public bool IsReasoningModel() => ModelType?.Contains("Reasoning", StringComparison.OrdinalIgnoreCase) ?? false;
 }

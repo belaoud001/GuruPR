@@ -20,7 +20,7 @@ public class Agent
     public ModelConfiguration ModelConfiguration { get; set; } = null!;
 
     // Memory Settings
-    public MemoryConfiguration? MemoryConfiguration { get; set; } = null!;
+    public MemoryConfiguration MemoryConfiguration { get; set; } = null!;
 
     // Metadata
     public string CreatedByUserId { get; set; } = null!;

@@ -2,9 +2,9 @@
 
 public static class Constants
 {
-    public const string TokenInputCount = "TokenInputCount";
+    public const string InputTokenCount = "InputTokenCount";
 
-    public const string TokenOutputCount = "TokenOutputCount";
+    public const string OutputTokenCount = "OutputTokenCount";
 
-    public const string TokenTotalCount = "TokenTotalCount";
+    public const string TotalTokenCount = "TotalTokenCount";
 }

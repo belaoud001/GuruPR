@@ -2,6 +2,7 @@
 
 using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Interfaces.Infrastructure;
+using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Plugins;
 using GuruPR.Application.Services.Account;
 using GuruPR.Application.Settings.Authentication;
 using GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
@@ -9,6 +10,7 @@ using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
 using GuruPR.Application.Settings.Security;
 using GuruPR.Infrastructure.HttpClients.Spotify;
 using GuruPR.Infrastructure.Identity.Constants;
+using GuruPR.Infrastructure.SemanticKernel.Plugins;
 using GuruPR.Infrastructure.SemanticKernel.Services;
 using GuruPR.Infrastructure.Services.Authentication;
 using GuruPR.Infrastructure.Services.Email;
@@ -135,6 +137,8 @@ public static class ServiceExtensions
         AddHuggingFaceModels(configuration, kernelBuilder);
         AddAzureOpenAiModels(configuration, kernelBuilder);
 
+        services.AddScoped<IAgentTool, SpotifyPlugin>();
+
         services.AddScoped(_ =>
         {
             kernelBuilder.CopyApplicationServices(services);
@@ -194,8 +198,7 @@ public static class ServiceExtensions
                 serviceId: azureOpenAiModel.ModelName,
                 deploymentName: azureOpenAiModel.ModelName,
                 endpoint: azureOpenAiModel.Endpoint,
-                apiKey: azureOpenAiModelsConfig!.ApiKey,
-                apiVersion: azureOpenAiModel.ApiVersion
+                apiKey: azureOpenAiModelsConfig!.ApiKey
             );
         }
     }

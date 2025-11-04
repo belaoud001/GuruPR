@@ -49,7 +49,7 @@ public class AgentService : IAgentService
         var agent = await _unitOfWork.Agents.GetByIdAsync(agentId);
         if (agent == null)
         {
-            throw new NotFoundException("Agent with ID {agentId} not found.");
+            throw new NotFoundException($"Agent with ID {agentId} not found.");
         }
 
         return agent;

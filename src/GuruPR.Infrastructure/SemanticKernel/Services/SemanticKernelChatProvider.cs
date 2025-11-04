@@ -36,7 +36,7 @@ public class SemanticKernelChatProvider : IAIChatProvider
         var startTime = DateTime.UtcNow;
 
         var kernel = SetupKernel(agent);
-        var chatHistory = PrepareChatHistory(agent, conversation, messages);
+        var chatHistory = PrepareChatHistory(agent, conversation, messages, userMessage);
         var response = await ExecuteWithKernelAsync(kernel, chatHistory, agent);
 
         kernel.Data.TryGetValue(nameof(ToolTraceBuffer), out var trace);
@@ -45,12 +45,12 @@ public class SemanticKernelChatProvider : IAIChatProvider
                                                        ? toolTrace as ToolTraceBuffer : null;
 
         var toolCalls = toolTraceBuffer?.Events.Select(evnt => new ToolCall
-        {
-            Name = evnt.FunctionName,
-            PluginName = evnt.PluginName,
-            Arguments = evnt.ArgumentsJson,
-            Output = evnt.OutputJson ?? string.Empty
-        }
+                                                               {
+                                                                   Name = evnt.FunctionName,
+                                                                   PluginName = evnt.PluginName,
+                                                                   Arguments = evnt.ArgumentsJson,
+                                                                   Output = evnt.OutputJson ?? string.Empty
+                                                               }
                                                        ).ToList() ?? new List<ToolCall>();
 
         if (toolTraceBuffer == null)
@@ -63,9 +63,9 @@ public class SemanticKernelChatProvider : IAIChatProvider
             AgentName = agent.Name,
             Content = response.Messages.FirstOrDefault() ?? string.Empty,
             ModelId = response.ModelId ?? agent.ModelConfiguration.ModelName,
-            InputTokens = GetTokenCount(response.LastInnerContent, Constants.TokenInputCount),
-            OutputTokens = GetTokenCount(response.LastInnerContent, Constants.TokenOutputCount),
-            TotalTokens = GetTokenCount(response.LastInnerContent, Constants.TokenTotalCount),
+            InputTokens = GetTokenCount(response.LastInnerContent, Constants.InputTokenCount),
+            OutputTokens = GetTokenCount(response.LastInnerContent, Constants.OutputTokenCount),
+            TotalTokens = GetTokenCount(response.LastInnerContent, Constants.TotalTokenCount),
             ToolCalls = toolCalls,
             ProcessingTime = DateTime.UtcNow - startTime
         };
@@ -144,7 +144,7 @@ public class SemanticKernelChatProvider : IAIChatProvider
         return _kernel;
     }
 
-    private ChatHistory PrepareChatHistory(Agent agent, Conversation conversation, IList<Message> messages)
+    private ChatHistory PrepareChatHistory(Agent agent, Conversation conversation, IList<Message> messages, string userMessage)
     {
         var chatHistory = new ChatHistory();
         var memoryConfiguration = agent.MemoryConfiguration;
@@ -175,6 +175,8 @@ public class SemanticKernelChatProvider : IAIChatProvider
                     break;
             }
         }
+
+        chatHistory.AddUserMessage(userMessage);
 
         return chatHistory;
     }
@@ -214,7 +216,7 @@ public class SemanticKernelChatProvider : IAIChatProvider
         var settings = new OpenAIPromptExecutionSettings();
         ApplyCommonExecutionSettings(settings, config);
 
-        if (IsReasoningModel(config))
+        if (config.IsReasoningModel())
         {
             settings.Temperature = 1.0;
         }
@@ -228,7 +230,7 @@ public class SemanticKernelChatProvider : IAIChatProvider
 
         ApplyCommonExecutionSettings(azureOpenAIPromptExecutionSettings, config);
 
-        if (IsReasoningModel(config))
+        if (config.IsReasoningModel())
         {
             azureOpenAIPromptExecutionSettings.SetNewMaxCompletionTokensEnabled = true;
             azureOpenAIPromptExecutionSettings.Temperature = 1.0;
@@ -249,7 +251,6 @@ public class SemanticKernelChatProvider : IAIChatProvider
         settings.StopSequences = config.StopSequences?.ToList();
 
         settings.FunctionChoiceBehavior = FunctionChoiceBehavior.Auto();
-        settings.ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions;
     }
 
     private PromptExecutionSettings CreateDefaultSettings(ModelConfiguration config)
@@ -260,9 +261,6 @@ public class SemanticKernelChatProvider : IAIChatProvider
             FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
         };
     }
-
-    private static bool IsReasoningModel(ModelConfiguration config) =>
-        config.ModelType?.Contains("Reasoning", StringComparison.OrdinalIgnoreCase) ?? false;
 
     private async Task<AgentResponseAggregate> GetAgentResponseAsync(IAsyncEnumerable<AgentResponseItem<ChatMessageContent>> agentResponseItems)
     {

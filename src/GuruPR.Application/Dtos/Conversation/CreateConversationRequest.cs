@@ -8,9 +8,9 @@ public class CreateConversationRequest
 
     public string Title { get; set; } = null!;
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public ConversationMetadata? Metadata { get; set; } = null!;
 }

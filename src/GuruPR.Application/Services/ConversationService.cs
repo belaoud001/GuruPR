@@ -60,9 +60,11 @@ public class ConversationService : IConversationService
         return conversation;
     }
 
-    public async Task<Conversation> CreateConversationAsync(CreateConversationRequest createConversationRequest)
+    public async Task<Conversation> CreateConversationAsync(CreateConversationRequest createConversationRequest, string userId)
     {
         var conversation = _mapper.Map<Conversation>(createConversationRequest);
+
+        conversation.UserId = userId;
 
         var createdConversation = await _unitOfWork.Conversations.AddAsync(conversation);
 
@@ -214,8 +216,6 @@ public class ConversationService : IConversationService
 
             _unitOfWork.Conversations.Update(conversation);
         }
-
-        _unitOfWork.Conversations.Update(conversation);
     }
 
     #endregion

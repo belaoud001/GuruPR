@@ -10,7 +10,7 @@ public interface IConversationService
 
     Task<Conversation> GetConversationByIdAsync(string conversationId, string userId);
 
-    Task<Conversation> CreateConversationAsync(CreateConversationRequest createConversationRequest);
+    Task<Conversation> CreateConversationAsync(CreateConversationRequest createConversationRequest, string userId);
 
     Task<Conversation> UpdateConversationAsync(string conversationId, string userId, UpdateConversationRequest updateConversationRequest);
 

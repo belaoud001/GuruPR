@@ -1,5 +1,6 @@
 ﻿using GuruPR.Application.Interfaces.Application;
 using GuruPR.Application.Profiles.Agents;
+using GuruPR.Application.Profiles.Conversations;
 using GuruPR.Application.Profiles.OAuth;
 using GuruPR.Application.Services;
 using GuruPR.Application.Services.Account;
@@ -22,6 +23,7 @@ public static class ServiceExtensions
             config.AddProfile<ProviderProfile>();
             config.AddProfile<ProviderConnectionProfile>();
             config.AddProfile<AgentProfile>();
+            config.AddProfile<ConversationProfile>();
         });
 
         services.AddScoped<IUrlValidator, UrlValidator>();

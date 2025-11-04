@@ -64,7 +64,13 @@ public class ConversationController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateConversationAsync(CreateConversationRequest createConversationRequest)
     {
-        var conversation = await _conversationService.CreateConversationAsync(createConversationRequest);
+        var userId = User.GetClaimValue(JwtClaimTypes.Subject);
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized("Invalid token or missing subject claim.");
+        }
+
+        var conversation = await _conversationService.CreateConversationAsync(createConversationRequest, userId);
         var conversationDto = _mapper.Map<ConversationDto>(conversation);
 
         return CreatedAtRoute("GetConversationById", new { conversationId = conversation.Id }, conversationDto);
