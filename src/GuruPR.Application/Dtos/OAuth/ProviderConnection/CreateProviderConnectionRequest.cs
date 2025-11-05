@@ -13,6 +13,4 @@ public class CreateProviderConnectionRequest
     public required List<string> Scopes { get; init; }
 
     public required DateTime AccessExpiresAt { get; init; }
-
-    public required DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 }
