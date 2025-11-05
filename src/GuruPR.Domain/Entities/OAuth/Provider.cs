@@ -40,7 +40,7 @@ public class Provider
     /// <summary>
     /// Date and time when the provider was created.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// List of connections associated with this provider.

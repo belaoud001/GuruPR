@@ -13,9 +13,7 @@ public class CreateProviderRequest
 
     public required string TokenUrl { get; init; }
 
-    public required List<string> DefaultScopes { get; init; }
+    public List<string>? DefaultScopes { get; init; } = [];
 
-    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
-
-    public List<CreateProviderConnectionRequest> ProviderConnections { get; init; } = [];
+    public List<CreateProviderConnectionRequest>? ProviderConnections { get; init; } = [];
 }
