@@ -2,7 +2,6 @@
 
 public class UpdateProviderConnectionRequest
 {
-
     /// <summary>
     /// Client ID used for OAuth authentication.
     /// </summary>
@@ -32,9 +31,4 @@ public class UpdateProviderConnectionRequest
     /// Expiration date and time of the access token.
     /// </summary>
     public DateTime? AccessExpiresAt { get; init; }
-
-    /// <summary>
-    /// Creation date and time of the provider connection.
-    /// </summary>
-    public DateTime? CreatedAt { get; init; }
 }

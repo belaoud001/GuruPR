@@ -44,7 +44,7 @@ public class ProviderConnection
     /// <summary>
     /// Creation date and time of the provider connection.
     /// </summary>
-    public required DateTime CreatedAt { get; set; }
+    public required DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 
     public bool IsTokenExpired(int bufferSeconds) => DateTime.UtcNow >= AccessExpiresAt.AddSeconds(-bufferSeconds);
