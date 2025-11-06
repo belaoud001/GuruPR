@@ -44,13 +44,13 @@ public class SemanticKernelChatProvider : IAIChatProvider
         ToolTraceBuffer? toolTraceBuffer = kernel.Data.TryGetValue(nameof(ToolTraceBuffer), out var toolTrace)
                                                        ? toolTrace as ToolTraceBuffer : null;
 
-        var toolCalls = toolTraceBuffer?.Events.Select(evnt => new ToolCall
-                                                               {
-                                                                   Name = evnt.FunctionName,
-                                                                   PluginName = evnt.PluginName,
-                                                                   Arguments = evnt.ArgumentsJson,
-                                                                   Output = evnt.OutputJson ?? string.Empty
-                                                               }
+        var toolCalls = toolTraceBuffer?.Events.Select(@event => new ToolCall
+                                                                 {
+                                                                     Name = @event.FunctionName,
+                                                                     PluginName = @event.PluginName,
+                                                                     Arguments = @event.ArgumentsJson,
+                                                                     Output = @event.OutputJson ?? string.Empty
+                                                                 }
                                                        ).ToList() ?? new List<ToolCall>();
 
         if (toolTraceBuffer == null)
@@ -59,16 +59,19 @@ public class SemanticKernelChatProvider : IAIChatProvider
         }
 
         return new AgentExecutionResult
-        {
-            AgentName = agent.Name,
-            Content = response.Messages.FirstOrDefault() ?? string.Empty,
-            ModelId = response.ModelId ?? agent.ModelConfiguration.ModelName,
-            InputTokens = GetTokenCount(response.LastInnerContent, Constants.InputTokenCount),
-            OutputTokens = GetTokenCount(response.LastInnerContent, Constants.OutputTokenCount),
-            TotalTokens = GetTokenCount(response.LastInnerContent, Constants.TotalTokenCount),
-            ToolCalls = toolCalls,
-            ProcessingTime = DateTime.UtcNow - startTime
-        };
+               {
+                   AgentName = agent.Name,
+                   Content   = response.Messages.FirstOrDefault() ?? string.Empty,
+                   ModelId   = response.ModelId ?? agent.ModelConfiguration.ModelName,
+
+                   InputTokens  = GetTokenCount(response.LastInnerContent, Constants.InputTokenCount),
+                   OutputTokens = GetTokenCount(response.LastInnerContent, Constants.OutputTokenCount),
+                   TotalTokens  = GetTokenCount(response.LastInnerContent, Constants.TotalTokenCount),
+
+                   ToolCalls = toolCalls,
+
+                   ProcessingTime = DateTime.UtcNow - startTime
+               };
     }
 
     public async Task<string?> GenerateSummaryAsync(IList<Message> messages, string? existingSummary)
@@ -77,14 +80,26 @@ public class SemanticKernelChatProvider : IAIChatProvider
 
         if (string.IsNullOrEmpty(existingSummary))
         {
-            summaryPrompt = $@"Summarize the following conversation in 2-3 sentences: {string.Join("\n", messages.Select(m => $"{m.Role}: {m.Content}"))}";
+            summaryPrompt = $@"You are an expert conversation summarizer. Summarize the following conversation clearly and concisely in 4-5 sentences. 
+                               Include the key points, decisions, or actions mentioned. 
+                               Do not add any personal opinions or unnecessary details.
+
+                               Conversation:
+                               {string.Join("\n", messages.Select(m => $"{m.Role}: {m.Content}"))}";
         }
         else
         {
-            summaryPrompt = $@"Update the following summary based on the new conversation messages. Keep it concise (2-3 sentences). 
-                               Previous Summary: {existingSummary}.
-                               New Messages : {string.Join("\n", messages.Select(m => $"{m.Role}: {m.Content}"))}";
+            summaryPrompt = $@"You are an expert conversation summarizer. Update the existing summary to reflect new conversation messages. 
+                               Keep it concise (4-5 sentences), preserving previously mentioned key points unless they have been contradicted or updated. 
+                               Include any new important points, decisions, or actions, and avoid repeating trivial details.
+
+                               Previous Summary:
+                               {existingSummary}
+
+                               New Messages:
+                               {string.Join("\n", messages.Select(m => $"{m.Role}: {m.Content}"))}";
         }
+
 
         return await _kernel.InvokePromptAsync<string>(summaryPrompt);
     }
@@ -102,16 +117,13 @@ public class SemanticKernelChatProvider : IAIChatProvider
 
         try
         {
-            var usage = innerContent.GetType().GetProperty("Usage")
-                                    ?.GetValue(innerContent);
-
+            var usage = innerContent.GetType().GetProperty("Usage")?.GetValue(innerContent);
             if (usage == null)
             {
                 return 0;
             }
 
-            var tokenValue = usage.GetType().GetProperty(tokenMetric)
-                                  ?.GetValue(usage);
+            var tokenValue = usage.GetType().GetProperty(tokenMetric)?.GetValue(usage);
 
             return tokenValue is int count ? count : 0;
         }
@@ -187,10 +199,11 @@ public class SemanticKernelChatProvider : IAIChatProvider
 
         //TODO: Adjust settings based on request provider (e.g., different settings for Azure OpenAI)
         var executionSettings = GetPromptExecutionSettings(agent);
+        var safeAgentName = agent.Name.Replace(" ", "_");
         var chatCompletionAgent = new ChatCompletionAgent()
         {
             Kernel = kernel,
-            Name = agent.Name,
+            Name = safeAgentName,
             Instructions = agent.Instrunctions,
             Arguments = new KernelArguments(executionSettings)
         };
@@ -204,16 +217,17 @@ public class SemanticKernelChatProvider : IAIChatProvider
         var config = agent.ModelConfiguration ?? throw new ArgumentNullException(nameof(agent.ModelConfiguration));
 
         return config.Provider switch
-        {
-            "OpenAI" => CreateOpenAISettings(config),
-            "Azure" => CreateAzureSettings(config),
-            _ => CreateDefaultSettings(config)
-        };
+               {
+                   "OpenAI" => CreateOpenAISettings(config),
+                   "Azure" => CreateAzureSettings(config),
+                   _ => CreateDefaultSettings(config)
+               };
     }
 
     private OpenAIPromptExecutionSettings CreateOpenAISettings(ModelConfiguration config)
     {
         var settings = new OpenAIPromptExecutionSettings();
+        
         ApplyCommonExecutionSettings(settings, config);
 
         if (config.IsReasoningModel())
@@ -256,10 +270,10 @@ public class SemanticKernelChatProvider : IAIChatProvider
     private PromptExecutionSettings CreateDefaultSettings(ModelConfiguration config)
     {
         return new PromptExecutionSettings
-        {
-            ModelId = config.ModelName,
-            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
-        };
+               {
+                   ModelId = config.ModelName,
+                   FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
+               };
     }
 
     private async Task<AgentResponseAggregate> GetAgentResponseAsync(IAsyncEnumerable<AgentResponseItem<ChatMessageContent>> agentResponseItems)

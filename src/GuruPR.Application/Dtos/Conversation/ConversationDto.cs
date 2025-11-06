@@ -14,8 +14,6 @@ public class ConversationDto
 
     public Dictionary<string, object> State { get; set; } = null!;
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
     public DateTime UpdatedAt { get; set; }
 
     public ConversationMetadata Metadata { get; set; } = null!;

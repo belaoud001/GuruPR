@@ -114,8 +114,6 @@ public class ConversationService : IConversationService
         await SaveMessagesAsync(conversation, request.Message, result);
 
         await HandleSummaryAsync(agent, conversation);
-
-        await _unitOfWork.SaveGuruChangesAsync();
     }
 
     #endregion
@@ -194,6 +192,8 @@ public class ConversationService : IConversationService
         conversation.Metadata.TotalTokens += result.TotalTokens;
 
         _unitOfWork.Conversations.Update(conversation);
+
+        await _unitOfWork.SaveGuruChangesAsync();
     }
 
     private async Task HandleSummaryAsync(Agent agent, Conversation conversation)
@@ -201,7 +201,7 @@ public class ConversationService : IConversationService
         if (agent.MemoryConfiguration.EnableSummary &&
             conversation.Metadata.TotalMessages >= agent.MemoryConfiguration.SummaryThresholdMessages)
         {
-            var messages = await _unitOfWork.Messages.GetMessagesAsync(conversation.Id, 4);
+            var messages = await _unitOfWork.Messages.GetMessagesAsync(conversation.Id, agent.MemoryConfiguration.MaxContextMessages);
 
             var updatedSummary = await _aiChatProvider.GenerateSummaryAsync(messages, conversation.Metadata.Summary);
 
@@ -215,6 +215,8 @@ public class ConversationService : IConversationService
             conversation.Metadata.Summary = updatedSummary ?? conversation.Metadata.Summary;
 
             _unitOfWork.Conversations.Update(conversation);
+
+            await _unitOfWork.SaveGuruChangesAsync();
         }
     }
 

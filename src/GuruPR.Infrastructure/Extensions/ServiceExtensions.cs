@@ -10,6 +10,7 @@ using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
 using GuruPR.Application.Settings.Security;
 using GuruPR.Infrastructure.HttpClients.Spotify;
 using GuruPR.Infrastructure.Identity.Constants;
+using GuruPR.Infrastructure.SemanticKernel.Filters;
 using GuruPR.Infrastructure.SemanticKernel.Plugins;
 using GuruPR.Infrastructure.SemanticKernel.Services;
 using GuruPR.Infrastructure.Services.Authentication;
@@ -36,12 +37,12 @@ public static class ServiceExtensions
     public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddCustomAuthentication(configuration);
+        services.AddTransient<IEmailSender, GmailSender>();
+        services.AddScoped<IAIChatProvider, SemanticKernelChatProvider>();
         services.AddSemanticKernel(configuration);
         services.AddSecurity(configuration);
         services.AddHttpClients();
         services.AddThirdPartyServices();
-        services.AddTransient<IEmailSender, GmailSender>();
-        services.AddScoped<IAIChatProvider, SemanticKernelChatProvider>();
     }
 
     #endregion
@@ -137,6 +138,7 @@ public static class ServiceExtensions
         AddHuggingFaceModels(configuration, kernelBuilder);
         AddAzureOpenAiModels(configuration, kernelBuilder);
 
+        services.AddScoped<IFunctionInvocationFilter, FunctionCallTracerFilter>();
         services.AddScoped<IAgentTool, SpotifyPlugin>();
 
         services.AddScoped(_ =>
