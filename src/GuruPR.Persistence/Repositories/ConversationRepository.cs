@@ -12,7 +12,7 @@ public class ConversationRepository : GenericRepository<Conversation>, IConversa
     {
     }
 
-    public async Task<IEnumerable<Conversation>> GetAllByUserIdAsync(string userId)
+    public async Task<List<Conversation>> GetAllByUserIdAsync(string userId)
     {
         var conversations = await _dbSet.Where(conversation => conversation.UserId == userId)
                                         .ToListAsync();

@@ -34,7 +34,7 @@ public class AgentService : IAgentService
 
     #region Public Methods
 
-    public async Task<IEnumerable<Agent>> GetAllAgentsAsync(string? userId = null)
+    public async Task<List<Agent>> GetAllAgentsAsync(string? userId = null)
     {
         if (string.IsNullOrEmpty(userId))
         {

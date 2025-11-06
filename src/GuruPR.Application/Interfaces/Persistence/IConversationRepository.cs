@@ -4,5 +4,5 @@ namespace GuruPR.Application.Interfaces.Persistence;
 
 public interface IConversationRepository : IGenericRepository<Conversation>
 {
-    Task<IEnumerable<Conversation>> GetAllByUserIdAsync(string userId);
+    Task<List<Conversation>> GetAllByUserIdAsync(string userId);
 }

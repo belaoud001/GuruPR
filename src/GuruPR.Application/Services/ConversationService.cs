@@ -36,7 +36,7 @@ public class ConversationService : IConversationService
 
     #region Public Methods
 
-    public async Task<IEnumerable<Conversation>> GetAllConversationsByUserIdAsync(string userId)
+    public async Task<List<Conversation>> GetAllConversationsByUserIdAsync(string userId)
     {
         var conversations = await _unitOfWork.Conversations.GetAllByUserIdAsync(userId);
 

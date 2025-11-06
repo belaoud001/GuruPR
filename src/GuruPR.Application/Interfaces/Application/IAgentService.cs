@@ -5,7 +5,7 @@ namespace GuruPR.Application.Interfaces.Application;
 
 public interface IAgentService
 {
-    Task<IEnumerable<Agent>> GetAllAgentsAsync(string? userId = null);
+    Task<List<Agent>> GetAllAgentsAsync(string? userId = null);
 
     Task<Agent> GetAgentByIdAsync(string agentId);
 

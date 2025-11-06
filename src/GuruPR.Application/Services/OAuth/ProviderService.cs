@@ -51,7 +51,7 @@ public class ProviderService : IProviderService
     /// Retrieves all OAuth providers from the database.
     /// </summary>
     /// <returns>A collection of provider entities.</returns>
-    public async Task<IEnumerable<Provider>> GetAllProvidersAsync()
+    public async Task<List<Provider>> GetAllProvidersAsync()
     {
         var providers = await _unitOfWork.Providers.GetAllAsync();
 
