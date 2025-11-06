@@ -26,20 +26,25 @@ public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
 
         builder.OwnsMany(provider => provider.ProviderConnections, navigationBuilder =>
         {
+            navigationBuilder.Property(navigationBuilder => navigationBuilder.ClientSecret)
+                             .HasConversion(
+                                 plainText => _tokenEncryptionService.Encrypt(plainText),
+                                 cipherText => _tokenEncryptionService.Decrypt(cipherText));
+
             navigationBuilder.Property(providerConnection => providerConnection.ClientSecret)
-                .HasConversion(
-                    plainText => _tokenEncryptionService.Encrypt(plainText),
-                    cipherText => _tokenEncryptionService.Decrypt(cipherText));
+                             .HasConversion(
+                                 plainText => _tokenEncryptionService.Encrypt(plainText),
+                                 cipherText => _tokenEncryptionService.Decrypt(cipherText));
 
             navigationBuilder.Property(providerConnection => providerConnection.AccessToken)
-                .HasConversion(
-                    plainText => _tokenEncryptionService.Encrypt(plainText),
-                    cipherText => _tokenEncryptionService.Decrypt(cipherText));
+                             .HasConversion(
+                                 plainText => _tokenEncryptionService.Encrypt(plainText),
+                                 cipherText => _tokenEncryptionService.Decrypt(cipherText));
 
             navigationBuilder.Property(providerConnection => providerConnection.RefreshToken)
-                .HasConversion(
-                    plainText => _tokenEncryptionService.Encrypt(plainText),
-                    cipherText => _tokenEncryptionService.Decrypt(cipherText));
+                             .HasConversion(
+                                 plainText => _tokenEncryptionService.Encrypt(plainText),
+                                 cipherText => _tokenEncryptionService.Decrypt(cipherText));
         });
     }
 }

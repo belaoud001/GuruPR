@@ -14,11 +14,11 @@ public class GuruDbContext : DbContext
 {
     private readonly ITokenEncryptionService _tokenEncryptionService;
 
-    public DbSet<Provider> Providers { get; set; } = null!;
-    public DbSet<Message> Messages { get; set; } = null!;
-    public DbSet<Conversation> Conversations { get; set; } = null!;
-    public DbSet<Agent> Agents { get; set; } = null!;
     public DbSet<Tool> Tools { get; set; } = null!;
+    public DbSet<Agent> Agents { get; set; } = null!;
+    public DbSet<Message> Messages { get; set; } = null!;
+    public DbSet<Provider> Providers { get; set; } = null!;
+    public DbSet<Conversation> Conversations { get; set; } = null!;
 
     public GuruDbContext(DbContextOptions<GuruDbContext> options, ITokenEncryptionService tokenEncryptionService) : base(options)
     {

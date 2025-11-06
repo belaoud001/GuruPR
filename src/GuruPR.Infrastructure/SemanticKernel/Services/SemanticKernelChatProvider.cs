@@ -45,12 +45,12 @@ public class SemanticKernelChatProvider : IAIChatProvider
                                                        ? toolTrace as ToolTraceBuffer : null;
 
         var toolCalls = toolTraceBuffer?.Events.Select(@event => new ToolCall
-                                                                 {
-                                                                     Name = @event.FunctionName,
-                                                                     PluginName = @event.PluginName,
-                                                                     Arguments = @event.ArgumentsJson,
-                                                                     Output = @event.OutputJson ?? string.Empty
-                                                                 }
+        {
+            Name = @event.FunctionName,
+            PluginName = @event.PluginName,
+            Arguments = @event.ArgumentsJson,
+            Output = @event.OutputJson ?? string.Empty
+        }
                                                        ).ToList() ?? new List<ToolCall>();
 
         if (toolTraceBuffer == null)
@@ -59,19 +59,19 @@ public class SemanticKernelChatProvider : IAIChatProvider
         }
 
         return new AgentExecutionResult
-               {
-                   AgentName = agent.Name,
-                   Content   = response.Messages.FirstOrDefault() ?? string.Empty,
-                   ModelId   = response.ModelId ?? agent.ModelConfiguration.ModelName,
+        {
+            AgentName = agent.Name,
+            Content = response.Messages.FirstOrDefault() ?? string.Empty,
+            ModelId = response.ModelId ?? agent.ModelConfiguration.ModelName,
 
-                   InputTokens  = GetTokenCount(response.LastInnerContent, Constants.InputTokenCount),
-                   OutputTokens = GetTokenCount(response.LastInnerContent, Constants.OutputTokenCount),
-                   TotalTokens  = GetTokenCount(response.LastInnerContent, Constants.TotalTokenCount),
+            InputTokens = GetTokenCount(response.LastInnerContent, Constants.InputTokenCount),
+            OutputTokens = GetTokenCount(response.LastInnerContent, Constants.OutputTokenCount),
+            TotalTokens = GetTokenCount(response.LastInnerContent, Constants.TotalTokenCount),
 
-                   ToolCalls = toolCalls,
+            ToolCalls = toolCalls,
 
-                   ProcessingTime = DateTime.UtcNow - startTime
-               };
+            ProcessingTime = DateTime.UtcNow - startTime
+        };
     }
 
     public async Task<string?> GenerateSummaryAsync(IList<Message> messages, string? existingSummary)
@@ -217,17 +217,17 @@ public class SemanticKernelChatProvider : IAIChatProvider
         var config = agent.ModelConfiguration ?? throw new ArgumentNullException(nameof(agent.ModelConfiguration));
 
         return config.Provider switch
-               {
-                   "OpenAI" => CreateOpenAISettings(config),
-                   "Azure" => CreateAzureSettings(config),
-                   _ => CreateDefaultSettings(config)
-               };
+        {
+            "OpenAI" => CreateOpenAISettings(config),
+            "Azure" => CreateAzureSettings(config),
+            _ => CreateDefaultSettings(config)
+        };
     }
 
     private OpenAIPromptExecutionSettings CreateOpenAISettings(ModelConfiguration config)
     {
         var settings = new OpenAIPromptExecutionSettings();
-        
+
         ApplyCommonExecutionSettings(settings, config);
 
         if (config.IsReasoningModel())
@@ -270,10 +270,10 @@ public class SemanticKernelChatProvider : IAIChatProvider
     private PromptExecutionSettings CreateDefaultSettings(ModelConfiguration config)
     {
         return new PromptExecutionSettings
-               {
-                   ModelId = config.ModelName,
-                   FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
-               };
+        {
+            ModelId = config.ModelName,
+            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
+        };
     }
 
     private async Task<AgentResponseAggregate> GetAgentResponseAsync(IAsyncEnumerable<AgentResponseItem<ChatMessageContent>> agentResponseItems)

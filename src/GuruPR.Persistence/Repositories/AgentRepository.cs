@@ -9,9 +9,4 @@ public class AgentRepository : GenericRepository<Agent>, IAgentRepository
     public AgentRepository(GuruDbContext dbContext) : base(dbContext)
     {
     }
-
-    public async Task<IEnumerable<Agent>> GetAllAgentsAsync(string userId)
-    {
-        throw new NotImplementedException();
-    }
 }

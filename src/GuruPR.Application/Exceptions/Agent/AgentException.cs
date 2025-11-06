@@ -1,4 +1,3 @@
 ﻿namespace GuruPR.Application.Exceptions.Agent;
-internal class AgentException
-{
-}
+
+public class AgentException(string message) : Exception(message);

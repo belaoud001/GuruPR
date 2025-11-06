@@ -22,6 +22,7 @@ public class ToolConfiguration : IEntityTypeConfiguration<Tool>
 
         builder.Property(tool => tool.Id);
 
+        // Configure JSON options if needed
         var jsonOptions = new JsonSerializerOptions
         {
         };

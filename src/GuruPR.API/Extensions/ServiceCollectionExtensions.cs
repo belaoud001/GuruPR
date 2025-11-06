@@ -26,9 +26,6 @@ public static class ServiceCollectionExtensions
                         document.Info.Version = "v1";
                         document.Info.Description = "GuruPR API Version 1.0";
 
-                        Console.WriteLine($"Processing: {context.DescriptionGroups.ToString}");
-
-
                         return Task.CompletedTask;
                     }
                 );
