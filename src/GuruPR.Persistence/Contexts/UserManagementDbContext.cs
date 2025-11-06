@@ -1,5 +1,5 @@
 ﻿using GuruPR.Domain.Entities;
-using GuruPR.Persistence.Configuration.ContextConfiguration;
+using GuruPR.Persistence.Extensions.ContextConfiguration;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;

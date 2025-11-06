@@ -44,12 +44,13 @@ public class ExceptionHandlingMiddleware
         {
             // Client Errors
             ArgumentNullException => (StatusCodes.Status400BadRequest, "A required argument was missing"),
+            InvalidReturnUrlException => (StatusCodes.Status400BadRequest, "Invalid Return URL"),
             RegistrationFailedException => (StatusCodes.Status400BadRequest, "User Registration Failed"),
             UntrustedReturnUrlException => (StatusCodes.Status400BadRequest, "Untrusted Return URL"),
-            InvalidReturnUrlException => (StatusCodes.Status400BadRequest, "Invalid Return URL"),
 
-            RefreshTokenException => (StatusCodes.Status401Unauthorized, "Invalid Refresh Token"),
             LoginFailedException => (StatusCodes.Status401Unauthorized, "Login Failed"),
+            RefreshTokenException => (StatusCodes.Status401Unauthorized, "Invalid Refresh Token"),
+            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized Access"),
 
             NotFoundException => (StatusCodes.Status404NotFound, "Resource Not Found"),
 

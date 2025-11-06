@@ -1,10 +1,12 @@
-﻿using GuruPR.Application.Extensions;
+﻿using Asp.Versioning;
+
+using GuruPR.Application.Extensions;
 using GuruPR.Application.Settings;
 using GuruPR.Application.Settings.Email;
 using GuruPR.Application.Settings.FrontEnd;
 using GuruPR.Application.Settings.Security;
-using GuruPR.Infrastructure.Configuration;
-using GuruPR.Persistence.Configuration;
+using GuruPR.Infrastructure.Extensions;
+using GuruPR.Persistence.Extensions;
 
 namespace GuruPR.Extensions;
 
@@ -12,9 +14,23 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection ConfigureAllApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.ConfigureVersioning();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        services.AddOpenApi();
+        services.AddOpenApi("v1", options =>
+            {
+                options.AddDocumentTransformer(
+                    (document, context, cancellationToken) =>
+                    {
+                        document.Info.Title = "GuruPR API";
+                        document.Info.Version = "v1";
+                        document.Info.Description = "GuruPR API Version 1.0";
+
+                        return Task.CompletedTask;
+                    }
+                );
+            }
+        );
 
         services.ConfigureCors();
         services.ConfigureLogging();
@@ -26,6 +42,16 @@ public static class ServiceCollectionExtensions
         services.ConfigureInfrastructure(configuration);
 
         return services;
+    }
+
+    private static void ConfigureVersioning(this IServiceCollection services)
+    {
+        services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+        });
     }
 
     private static void ConfigureCors(this IServiceCollection services)

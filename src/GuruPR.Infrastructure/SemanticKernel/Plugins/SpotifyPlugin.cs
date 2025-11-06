@@ -1,14 +1,18 @@
 ﻿using System.ComponentModel;
 
 using GuruPR.Application.Interfaces.Infrastructure;
+using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Plugins;
 
 using Microsoft.SemanticKernel;
 
 namespace GuruPR.Infrastructure.SemanticKernel.Plugins;
 
-public class SpotifyPlugin
+
+public class SpotifyPlugin : IAgentTool
 {
     private readonly ISpotifyService _spotifyService;
+
+    public string Name => "SpotifyPlugin";
 
     public SpotifyPlugin(ISpotifyService spotifyService)
     {

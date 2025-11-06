@@ -22,7 +22,7 @@ public class ProviderConnectionService : IProviderConnectionService
 
     #region Public Methods
 
-    public async Task<IEnumerable<ProviderConnection>> GetConnectionsByProviderIdAsync(string providerId)
+    public async Task<List<ProviderConnection>> GetConnectionsByProviderIdAsync(string providerId)
     {
         var provider = await GetProviderByIdOrThrowExceptionAsync(providerId);
 

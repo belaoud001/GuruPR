@@ -15,6 +15,8 @@ public interface IAccountService
 
     Task ConfirmEmailAsync(string userId, string token);
 
+    Task<string> GetEmailConfirmationRedirectUrlAsync(bool success);
+
     Task LogoutAsync(string userId, string refreshToken);
 
     Task AssignRoleAsync(string userId, UserRole userRole);

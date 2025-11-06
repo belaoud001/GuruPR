@@ -6,7 +6,7 @@ namespace GuruPR.Application.Interfaces.Application;
 
 public interface IProviderConnectionService
 {
-    Task<IEnumerable<ProviderConnection>> GetConnectionsByProviderIdAsync(string providerId);
+    Task<List<ProviderConnection>> GetConnectionsByProviderIdAsync(string providerId);
 
     Task<ProviderConnection> GetProviderConnectionByIdAsync(string providerId, string providerConnectionId);
 

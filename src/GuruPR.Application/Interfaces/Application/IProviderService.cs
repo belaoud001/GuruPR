@@ -8,7 +8,7 @@ public interface IProviderService
 {
     Task<Provider> CreateProviderAsync(CreateProviderRequest createProviderRequest);
 
-    Task<IEnumerable<Provider>> GetAllProvidersAsync();
+    Task<List<Provider>> GetAllProvidersAsync();
 
     Task<Provider> GetProviderByIdAsync(string providerId);
 

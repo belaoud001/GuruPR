@@ -2,7 +2,12 @@
 
 public interface IUnitOfWork : IDisposable
 {
+    IToolRepository Tools { get; }
+    IAgentRepository Agents { get; }
+    IMessageRepository Messages { get; }
     IProviderRepository Providers { get; }
+    IConversationRepository Conversations { get; }
+
     IUserRepository Users { get; }
 
     // Distributed transaction (both contexts)
