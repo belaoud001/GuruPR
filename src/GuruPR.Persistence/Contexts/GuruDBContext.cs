@@ -1,5 +1,5 @@
 ﻿using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Domain.Entities;
+using GuruPR.Domain.Entities.Agents;
 using GuruPR.Domain.Entities.Conversation;
 using GuruPR.Domain.Entities.Message;
 using GuruPR.Domain.Entities.OAuth;

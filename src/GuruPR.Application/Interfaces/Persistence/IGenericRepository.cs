@@ -2,11 +2,13 @@
 
 public interface IGenericRepository<T> where T : class
 {
-    Task<T?> GetByIdAsync(string id);
+    IQueryable<T> AsQueryable();
 
-    Task<List<T>> GetAllAsync();
+    Task<T?> GetByIdAsync(string id, CancellationToken cancellationToken = default);
 
-    Task<T> AddAsync(T entity);
+    Task<List<T>> GetAllAsync(CancellationToken cancellationToken = default);
+
+    Task<T> AddAsync(T entity, CancellationToken cancellationToken = default);
 
     void Update(T entity);
 

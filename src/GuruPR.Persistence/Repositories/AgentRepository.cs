@@ -1,5 +1,5 @@
 ﻿using GuruPR.Application.Interfaces.Persistence;
-using GuruPR.Domain.Entities;
+using GuruPR.Domain.Entities.Agents;
 using GuruPR.Persistence.Contexts;
 
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +14,7 @@ public class AgentRepository : GenericRepository<Agent>, IAgentRepository
 
     public async Task<List<Agent>> GetAllAgentsAsync(string userId)
     {
-        return await _dbSet.Where(agent => agent.CreatedByUserId == userId)
+        return await _dbSet.Where(agent => agent.UserId == userId)
                            .ToListAsync();
     }
 }

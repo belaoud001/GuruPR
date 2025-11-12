@@ -1,4 +1,4 @@
-﻿using GuruPR.Application.Exceptions.Interfaces;
+﻿using GuruPR.Application.Common.Exceptions.Interfaces;
 
 namespace GuruPR.Application.Exceptions.Account;
 

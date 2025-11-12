@@ -1,19 +1,14 @@
-﻿
-using GuruPR.Application.Exceptions.Interfaces;
+﻿using GuruPR.Application.Common.Exceptions;
 
 namespace GuruPR.Application.Exceptions.Agent;
 
-public class AgentValidationException : AgentException, IValidationException
+public class AgentValidationException : ValidationExceptionBase
 {
-    public IReadOnlyDictionary<string, List<string>> Errors { get; }
-
     public AgentValidationException(string message) : base(message)
     {
-        Errors = new Dictionary<string, List<string>>();
     }
 
-    public AgentValidationException(string message, IReadOnlyDictionary<string, List<string>> errors) : base(message)
+    public AgentValidationException(string message, IReadOnlyDictionary<string, List<string>> errors) : base(message, errors)
     {
-        Errors = errors;
     }
 }

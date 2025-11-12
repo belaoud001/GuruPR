@@ -1,5 +1,7 @@
 ﻿using Asp.Versioning;
 
+using GuruPR.Application.Common.Interfaces.Presentation;
+using GuruPR.Application.Common.Markers;
 using GuruPR.Application.Extensions;
 using GuruPR.Application.Settings;
 using GuruPR.Application.Settings.Email;
@@ -7,6 +9,7 @@ using GuruPR.Application.Settings.FrontEnd;
 using GuruPR.Application.Settings.Security;
 using GuruPR.Infrastructure.Extensions;
 using GuruPR.Persistence.Extensions;
+using GuruPR.Services;
 
 namespace GuruPR.Extensions;
 
@@ -32,11 +35,20 @@ public static class ServiceCollectionExtensions
             }
         );
 
+        services.AddMediatR(configuration =>
+        {
+            configuration.RegisterServicesFromAssembly(typeof(ApplicationMarker).Assembly);
+        });
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+
         services.ConfigureCors();
         services.ConfigureLogging();
         services.ConfigureSignalR();
 
         services.ConfigureSettings(configuration);
+        services.ConfigurePresentationServices();
         services.ConfigureApplicationServices();
         services.ConfigurePersistence(configuration);
         services.ConfigureInfrastructure(configuration);
@@ -88,6 +100,11 @@ public static class ServiceCollectionExtensions
     private static void ConfigureSignalR(this IServiceCollection services)
     {
         services.AddSignalR();
+    }
+
+    private static void ConfigurePresentationServices(this IServiceCollection services)
+    {
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
     }
 
     private static void ConfigureApplicationServices(this IServiceCollection services)

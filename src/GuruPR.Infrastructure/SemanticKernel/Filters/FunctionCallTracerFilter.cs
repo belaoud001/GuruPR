@@ -1,7 +1,7 @@
 ﻿
 using System.Text.Json;
 
-using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Models;
+using GuruPR.Application.Features.Conversations.Models.ToolCalls;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;

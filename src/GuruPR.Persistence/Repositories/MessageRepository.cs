@@ -12,15 +12,15 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
     {
     }
 
-    public async Task<List<Message>> GetMessagesAsync(string conversationId, int? lastMessages = null)
+    public async Task<List<Message>> GetMessagesAsync(string conversationId, int? lastMessages = null, CancellationToken cancellationToken = default)
     {
         var baseQuery = _dbSet.Where(message => message.ConversationId == conversationId);
 
         if (lastMessages.HasValue && lastMessages.Value > 0)
         {
-            var recent = await baseQuery.OrderByDescending(m => m.CreatedAt)
+            var recent = await baseQuery.OrderByDescending(message => message.CreatedAt)
                                         .Take(lastMessages.Value)
-                                        .ToListAsync();
+                                        .ToListAsync(cancellationToken);
 
             recent.Reverse();
 
@@ -28,12 +28,12 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
         }
 
         return await baseQuery.OrderBy(m => m.CreatedAt)
-                              .ToListAsync();
+                              .ToListAsync(cancellationToken);
     }
 
-    public async Task DeleteConversationMessagesAsync(string conversationId)
+    public async Task DeleteConversationMessagesAsync(string conversationId, CancellationToken cancellationToken = default)
     {
         var messages = await _dbSet.Where(message => message.ConversationId == conversationId)
-                                   .ExecuteDeleteAsync();
+                                   .ExecuteDeleteAsync(cancellationToken);
     }
 }

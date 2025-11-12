@@ -1,12 +1,17 @@
 ﻿using Asp.Versioning;
 
-using AutoMapper;
+using GuruPR.Application.Common.Models;
+using GuruPR.Application.Features.Conversations.Commands.ClearConversation;
+using GuruPR.Application.Features.Conversations.Commands.CreateCompletion;
+using GuruPR.Application.Features.Conversations.Commands.CreateConversation;
+using GuruPR.Application.Features.Conversations.Commands.DeleteConversation;
+using GuruPR.Application.Features.Conversations.Commands.UpdateConversation;
+using GuruPR.Application.Features.Conversations.Dtos;
+using GuruPR.Application.Features.Conversations.Queries.GetConversationById;
+using GuruPR.Application.Features.Conversations.Queries.GetConversationsByUserId;
+using GuruPR.Application.Features.Conversations.Queries.GetMessages;
 
-using GuruPR.Application.Dtos.Conversation;
-using GuruPR.Application.Interfaces.Application;
-using GuruPR.Domain.Requests;
-using GuruPR.Extensions;
-using GuruPR.Infrastructure.Identity.Constants;
+using MediatR;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,108 +25,78 @@ namespace GuruPR.Controllers.v1;
 public class ConversationController : ControllerBase
 {
     private readonly ILogger<ConversationController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IConversationService _conversationService;
-    private readonly IMessageService _messageService;
+    private readonly IMediator _mediator;
 
-    public ConversationController(ILogger<ConversationController> logger,
-                                  IMapper mapper,
-                                  IConversationService conversationService,
-                                  IMessageService messageService)
+    public ConversationController(ILogger<ConversationController> logger, IMediator mediator)
     {
         _logger = logger;
-        _mapper = mapper;
-        _conversationService = conversationService;
-        _messageService = messageService;
+        _mediator = mediator;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllConversationsAsync()
+    public async Task<ActionResult<PaginatedList<ConversationDto>>> GetAllConversationsByUserIdAsync()
     {
-        var userId = User.GetClaimValue(JwtClaimTypes.Subject);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized("Invalid token or missing subject claim.");
-        }
+        var conversations = await _mediator.Send(new GetConversationsByUserIdQuery());
 
-        var conversations = await _conversationService.GetAllConversationsByUserIdAsync(userId);
         return Ok(conversations);
     }
 
     [HttpGet("{conversationId}", Name = "GetConversationById")]
-    public async Task<IActionResult> GetConversationByIdAsync(string conversationId)
+    public async Task<ActionResult<ConversationDto>> GetConversationByIdAsync(string conversationId)
     {
-        var userId = User.GetClaimValue(JwtClaimTypes.Subject);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized("Invalid token or missing subject claim.");
-        }
+        var conversation = await _mediator.Send(new GetConversationByIdQuery(conversationId));
 
-        var conversation = await _conversationService.GetConversationByIdAsync(conversationId, userId);
         return Ok(conversation);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateConversationAsync(CreateConversationRequest createConversationRequest)
+    public async Task<ActionResult<ConversationDto>> CreateConversationAsync(CreateConversationCommand createConversationCommand)
     {
-        var userId = User.GetClaimValue(JwtClaimTypes.Subject);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized("Invalid token or missing subject claim.");
-        }
+        var conversation = await _mediator.Send(createConversationCommand);
 
-        var conversation = await _conversationService.CreateConversationAsync(createConversationRequest, userId);
-        var conversationDto = _mapper.Map<ConversationDto>(conversation);
-
-        return CreatedAtRoute("GetConversationById", new { conversationId = conversation.Id }, conversationDto);
+        return CreatedAtRoute("GetConversationById", new { conversationId = conversation.Id }, conversation);
     }
 
     [HttpPut("{conversationId}")]
-    public async Task<IActionResult> UpdateConversationAsync(string conversationId, [FromBody] UpdateConversationRequest updateConversationRequest)
+    public async Task<ActionResult<ConversationDto>> UpdateConversationAsync(string conversationId, [FromBody] UpdateConversationCommand updateConversationCommand)
     {
-        var userId = User.GetClaimValue(JwtClaimTypes.Subject);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized("Invalid token or missing subject claim.");
-        }
+        updateConversationCommand.Id = conversationId;
 
-        var conversation = await _conversationService.UpdateConversationAsync(conversationId, userId, updateConversationRequest);
-        var conversationDto = _mapper.Map<ConversationDto>(conversation);
+        var conversation = await _mediator.Send(updateConversationCommand);
 
-        return Ok(conversationDto);
+        return Ok(conversation);
     }
 
     [HttpDelete("{conversationId}")]
-    public async Task<IActionResult> DeleteConversationAsync([FromQuery] string conversationId)
+    public async Task<IActionResult> DeleteConversationAsync(string conversationId)
     {
-        var result = await _conversationService.DeleteConversationAsync(conversationId);
+        await _mediator.Send(new DeleteConversationCommand(conversationId));
 
-        return result ? NoContent() : NotFound();
+        return NoContent();
     }
 
     [HttpGet("{conversationId}/messages")]
-    public async Task<IActionResult> GetMessagesByConversationIdAsync(string conversationId)
+    public async Task<ActionResult<PaginatedList<MessageDto>>> GetMessagesByConversationIdAsync(string conversationId)
     {
-        var userId = User.GetClaimValue(JwtClaimTypes.Subject);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized("Invalid token or missing subject claim.");
-        }
+        var messages = await _mediator.Send(new GetMessagesQuery(conversationId));
 
-        var messages = await _messageService.GetMessagesByConversationIdAsync(conversationId, userId);
         return Ok(messages);
     }
 
-    [HttpPost("{conversationId}/completions")]
-    public async Task<IActionResult> CreateCompletionAsync(string conversationId, [FromBody] AgentExecutionRequest agentExecutionRequest)
+    [HttpGet("{conversationId}/messages/clear")]
+    public async Task<IActionResult> ClearConversationAsync(string conversationId)
     {
-        var userId = User.GetClaimValue(JwtClaimTypes.Subject);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized("Invalid token or missing subject claim.");
-        }
+        await _mediator.Send(new ClearConversationCommand(conversationId));
 
-        await _conversationService.RunAgentWorkflowAsync(agentExecutionRequest, userId);
+        return NoContent();
+    }
+
+    [HttpPost("{conversationId}/completions")]
+    public async Task<ActionResult<MessageDto>> CreateCompletionAsync(string conversationId, [FromBody] CreateCompletionCommand createCompletionCommand)
+    {
+        createCompletionCommand.ConversationId = conversationId;
+
+        var message = await _mediator.Send(createCompletionCommand);
 
         // ToDo: Change to Accepted when streaming is implemented
         return NoContent();

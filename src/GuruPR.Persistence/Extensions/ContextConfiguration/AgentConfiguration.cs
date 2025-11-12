@@ -1,4 +1,4 @@
-﻿using GuruPR.Domain.Entities;
+﻿using GuruPR.Domain.Entities.Agents;
 using GuruPR.Persistence.Helpers;
 
 using Microsoft.EntityFrameworkCore;

@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 
-using GuruPR.Application.Dtos.Agent;
-using GuruPR.Domain.Entities;
+using GuruPR.Application.Features.Agents.Commands.CreateAgent;
+using GuruPR.Application.Features.Agents.Commands.UpdateAgent;
+using GuruPR.Application.Features.Agents.Dtos;
+using GuruPR.Domain.Entities.Agents;
+using GuruPR.Domain.Entities.Agents.Operations;
 
 namespace GuruPR.Application.Profiles.Agents;
 
@@ -12,12 +15,10 @@ public class AgentProfile : Profile
         CreateMap<Agent, AgentDto>();
         CreateMap<AgentDto, Agent>();
 
-        CreateMap<Agent, CreateAgentRequest>();
-        CreateMap<CreateAgentRequest, Agent>();
+        CreateMap<CreateAgentCommand, Agent>();
+        CreateMap<Agent, CreateAgentCommand>();
 
-        CreateMap<Agent, UpdateAgentRequest>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-        CreateMap<UpdateAgentRequest, Agent>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+        CreateMap<UpdateAgentCommand, AgentUpdateData>();
+        CreateMap<AgentUpdateData, UpdateAgentCommand>();
     }
 }

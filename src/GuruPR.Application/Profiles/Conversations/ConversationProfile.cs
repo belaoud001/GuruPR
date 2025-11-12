@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 
-using GuruPR.Application.Dtos.Conversation;
+using GuruPR.Application.Features.Conversations.Commands.CreateConversation;
+using GuruPR.Application.Features.Conversations.Commands.UpdateConversation;
+using GuruPR.Application.Features.Conversations.Dtos;
 using GuruPR.Domain.Entities.Conversation;
+using GuruPR.Domain.Entities.Conversation.Operations;
 
 namespace GuruPR.Application.Profiles.Conversations;
 
@@ -12,12 +15,10 @@ public class ConversationProfile : Profile
         CreateMap<Conversation, ConversationDto>();
         CreateMap<ConversationDto, Conversation>();
 
-        CreateMap<Conversation, CreateConversationRequest>();
-        CreateMap<CreateConversationRequest, Conversation>();
+        CreateMap<Conversation, CreateConversationCommand>();
+        CreateMap<CreateConversationCommand, Conversation>();
 
-        CreateMap<Conversation, UpdateConversationRequest>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-        CreateMap<UpdateConversationRequest, Conversation>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+        CreateMap<UpdateConversationCommand, ConversationUpdateData>();
+        CreateMap<ConversationUpdateData, UpdateConversationCommand>();
     }
 }

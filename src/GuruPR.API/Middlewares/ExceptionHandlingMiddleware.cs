@@ -1,6 +1,6 @@
-﻿using GuruPR.Application.Exceptions;
+﻿using GuruPR.Application.Common.Exceptions.Interfaces;
+using GuruPR.Application.Exceptions;
 using GuruPR.Application.Exceptions.Account;
-using GuruPR.Application.Exceptions.Interfaces;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,6 +57,7 @@ public class ExceptionHandlingMiddleware
             UserAlreadyExistsException => (StatusCodes.Status409Conflict, "User Already Exists"),
 
             // Server Errors
+            InvalidOperationException => (StatusCodes.Status500InternalServerError, "Invalid Operation"),
             MissingAllowedOriginsException => (StatusCodes.Status500InternalServerError, "Missing Allowed Origins Configuration"),
             UserRoleOperationFailedException => (StatusCodes.Status500InternalServerError, "User Role Operation Failed"),
             OperationFailedException => (StatusCodes.Status500InternalServerError, "Operation Failed"),
