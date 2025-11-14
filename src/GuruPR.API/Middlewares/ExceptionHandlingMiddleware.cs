@@ -1,6 +1,7 @@
-﻿using GuruPR.Application.Common.Exceptions.Interfaces;
-using GuruPR.Application.Exceptions;
+﻿using GuruPR.Application.Common.Exceptions;
+using GuruPR.Application.Common.Exceptions.Interfaces;
 using GuruPR.Application.Exceptions.Account;
+using GuruPR.Application.Features.Account.Exceptions;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,10 +44,11 @@ public class ExceptionHandlingMiddleware
         var (statusCode, title) = exception switch
         {
             // Client Errors
-            ArgumentNullException => (StatusCodes.Status400BadRequest, "A required argument was missing"),
             InvalidReturnUrlException => (StatusCodes.Status400BadRequest, "Invalid Return URL"),
-            RegistrationFailedException => (StatusCodes.Status400BadRequest, "User Registration Failed"),
             UntrustedReturnUrlException => (StatusCodes.Status400BadRequest, "Untrusted Return URL"),
+            EmailConfirmationException => (StatusCodes.Status400BadRequest, "Email Confirmation Failed"),
+            RegistrationFailedException => (StatusCodes.Status400BadRequest, "User Registration Failed"),
+            ArgumentNullException => (StatusCodes.Status400BadRequest, "A required argument was missing"),
 
             LoginFailedException => (StatusCodes.Status401Unauthorized, "Login Failed"),
             RefreshTokenException => (StatusCodes.Status401Unauthorized, "Invalid Refresh Token"),

@@ -15,8 +15,6 @@ public class CreateCompletionCommand : IRequest<MessageDto>, IOwnedEntityRequest
     [JsonIgnore]
     public string UserId { get; set; } = null!;
 
-    public string AgentId { get; set; } = null!;
-
     public string ConversationId { get; set; } = null!;
 
     public string Message { get; set; } = null!;

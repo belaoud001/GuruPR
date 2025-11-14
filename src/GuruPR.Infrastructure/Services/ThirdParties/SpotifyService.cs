@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using System.Text.Json;
 
+using GuruPR.Application.Common.Interfaces.Application;
+using GuruPR.Application.Common.Interfaces.Infrastructure;
 using GuruPR.Application.Dtos.OAuth.ProviderConnection;
-using GuruPR.Application.Interfaces.Application;
-using GuruPR.Application.Interfaces.Infrastructure;
 using GuruPR.Domain.Entities.Enums;
 using GuruPR.Infrastructure.HttpClients.Spotify;
 

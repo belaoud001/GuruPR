@@ -1,6 +1,6 @@
 ﻿using System.Transactions;
 
-using GuruPR.Application.Interfaces.Persistence;
+using GuruPR.Application.Common.Interfaces.Persistence;
 using GuruPR.Persistence.Contexts;
 
 using Microsoft.EntityFrameworkCore;

@@ -20,13 +20,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Common\Constants\" />
-      <Folder Include="Features\Messages\" />
-      <Folder Include="Features\Account\" />
-      <Folder Include="Features\Tools\" />
       <Folder Include="Features\ProviderConnections\" />
       <Folder Include="Features\Providers\" />
-      <Folder Include="Interfaces\Infrastructure\SemanticKernel\Models\" />
+      <Folder Include="Common\Interfaces\Infrastructure\SemanticKernel\Models\" />
     </ItemGroup>
 
 </Project>

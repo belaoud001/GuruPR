@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-using GuruPR.Application.Interfaces.Infrastructure;
+using GuruPR.Application.Common.Interfaces.Infrastructure;
 using GuruPR.Application.Settings.Security;
 
 using Microsoft.Extensions.Options;

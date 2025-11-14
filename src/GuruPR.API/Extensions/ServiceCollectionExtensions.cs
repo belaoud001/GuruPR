@@ -4,6 +4,7 @@ using GuruPR.Application.Common.Interfaces.Presentation;
 using GuruPR.Application.Common.Markers;
 using GuruPR.Application.Extensions;
 using GuruPR.Application.Settings;
+using GuruPR.Application.Settings.Authentication;
 using GuruPR.Application.Settings.Email;
 using GuruPR.Application.Settings.FrontEnd;
 using GuruPR.Application.Settings.Security;
@@ -82,6 +83,7 @@ public static class ServiceCollectionExtensions
         services.AddSettings<JwtSettings>(configuration);
         services.AddSettings<FrontEndSettings>(configuration);
         services.AddSettings<GmailingAppSettings>(configuration);
+        services.AddSettings<RefreshTokenSettings>(configuration);
         services.AddSettings<TokenHashingSettings>(configuration);
         services.AddSettings<EmailValidationSettings>(configuration);
         services.AddSettings<TokenEncryptionSettings>(configuration);

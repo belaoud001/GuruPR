@@ -1,5 +1,5 @@
-﻿using GuruPR.Application.Features.Conversations.Exceptions;
-using GuruPR.Application.Interfaces.Persistence;
+﻿using GuruPR.Application.Common.Interfaces.Persistence;
+using GuruPR.Application.Features.Conversations.Exceptions;
 using GuruPR.Domain.Entities.Conversation;
 
 namespace GuruPR.Application.Features.Conversations.Extensions;

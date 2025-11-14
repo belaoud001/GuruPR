@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 
-using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Plugins;
+using GuruPR.Application.Common.Interfaces.Infrastructure;
+using GuruPR.Application.Common.Interfaces.Infrastructure.SemanticKernel.Plugins;
 
 using Microsoft.SemanticKernel;
 

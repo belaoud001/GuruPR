@@ -1,9 +1,8 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 
-using GuruPR.Application.Interfaces.Application;
-using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Plugins;
-using GuruPR.Application.Services.Account;
+using GuruPR.Application.Common.Interfaces.Application;
+using GuruPR.Application.Common.Interfaces.Infrastructure;
+using GuruPR.Application.Common.Interfaces.Infrastructure.SemanticKernel.Plugins;
 using GuruPR.Application.Settings.Authentication;
 using GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
 using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
@@ -127,7 +126,6 @@ public static class ServiceExtensions
                 );
 
         services.AddScoped<ITokenService, JwtTokenService>();
-        services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IExternalAuthService, ExternalAuthService>();
     }
 

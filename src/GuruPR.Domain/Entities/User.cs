@@ -15,4 +15,42 @@ public class User : IdentityUser<Guid>
     private string FullName => $"{FirstName} {LastName}".Trim();
 
     public override string ToString() => FullName;
+
+    public void UpdateRefreshToken(string tokenHash, DateTime expiryTime)
+    {
+        if (string.IsNullOrWhiteSpace(tokenHash))
+        {
+            throw new ArgumentException("Token hash cannot be empty.", nameof(tokenHash));
+        }
+
+        if (expiryTime <= DateTime.UtcNow)
+        {
+            throw new ArgumentException("Expiry time must be in the future.", nameof(expiryTime));
+        }
+
+        RefreshTokenHash = tokenHash;
+        RefreshTokenExpiryTime = expiryTime;
+    }
+
+    public void ClearRefreshToken()
+    {
+        RefreshTokenHash = null;
+        RefreshTokenExpiryTime = null;
+    }
+
+    public bool NeedsRefreshTokenRenewal(int renewalThresholdDays = 7)
+    {
+        if (RefreshTokenExpiryTime == null)
+        {
+            return true;
+        }
+
+        var renewalThreshold = DateTime.UtcNow.AddDays(renewalThresholdDays);
+        return RefreshTokenExpiryTime < renewalThreshold;
+    }
+
+    public bool IsRefreshTokenExpired()
+    {
+        return RefreshTokenExpiryTime == null || RefreshTokenExpiryTime < DateTime.UtcNow;
+    }
 }

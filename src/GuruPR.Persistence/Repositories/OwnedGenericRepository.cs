@@ -1,4 +1,4 @@
-﻿using GuruPR.Application.Interfaces.Persistence;
+﻿using GuruPR.Application.Common.Interfaces.Persistence;
 using GuruPR.Domain.Interfaces.Markers;
 using GuruPR.Persistence.Contexts;
 

@@ -1,4 +1,4 @@
-﻿using GuruPR.Application.Interfaces.Infrastructure;
+﻿using GuruPR.Application.Common.Interfaces.Infrastructure;
 using GuruPR.Domain.Entities.OAuth;
 
 using Microsoft.EntityFrameworkCore;

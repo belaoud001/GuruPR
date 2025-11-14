@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 
+using GuruPR.Application.Common.Exceptions;
+using GuruPR.Application.Common.Interfaces.Application;
+using GuruPR.Application.Common.Interfaces.Persistence;
 using GuruPR.Application.Dtos.OAuth.ProviderConnection;
-using GuruPR.Application.Exceptions;
-using GuruPR.Application.Interfaces.Application;
-using GuruPR.Application.Interfaces.Persistence;
 using GuruPR.Domain.Entities.Enums;
 using GuruPR.Domain.Entities.OAuth;
 

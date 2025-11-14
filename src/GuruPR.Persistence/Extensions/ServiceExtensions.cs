@@ -1,8 +1,8 @@
-﻿using GuruPR.Application.Interfaces.Persistence;
-using GuruPR.Application.Services.Account.IdentityValidators;
+﻿using GuruPR.Application.Common.Interfaces.Persistence;
 using GuruPR.Application.Settings.Database;
 using GuruPR.Domain.Entities;
 using GuruPR.Persistence.Contexts;
+using GuruPR.Persistence.Identity.IdentityValidators;
 using GuruPR.Persistence.Repositories;
 
 using Microsoft.AspNetCore.Identity;

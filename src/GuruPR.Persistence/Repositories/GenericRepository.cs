@@ -1,4 +1,4 @@
-﻿using GuruPR.Application.Interfaces.Persistence;
+﻿using GuruPR.Application.Common.Interfaces.Persistence;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +27,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
     public async Task<T?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FindAsync(id, cancellationToken);
+        return await _dbSet.FindAsync([id], cancellationToken); ;
     }
 
     public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)

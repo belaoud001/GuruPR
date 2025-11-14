@@ -1,7 +1,7 @@
-﻿using GuruPR.Application.Features.Conversations.Models.CreateCompletion;
+﻿using GuruPR.Application.Common.Interfaces.Infrastructure;
+using GuruPR.Application.Common.Interfaces.Infrastructure.SemanticKernel.Plugins;
+using GuruPR.Application.Features.Conversations.Models.CreateCompletion;
 using GuruPR.Application.Features.Conversations.Models.ToolCalls;
-using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Plugins;
 using GuruPR.Domain.Entities.Agents.Configurations;
 using GuruPR.Domain.Entities.Conversation;
 using GuruPR.Domain.Entities.Message;

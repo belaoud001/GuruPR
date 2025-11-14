@@ -1,4 +1,4 @@
-﻿using GuruPR.Application.Exceptions;
+﻿using GuruPR.Application.Common.Exceptions;
 using GuruPR.Application.Exceptions.Account;
 using GuruPR.Application.Settings.Database;
 using GuruPR.Domain.Entities;

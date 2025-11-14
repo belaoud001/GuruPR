@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 
+using FluentValidation;
+
 using GuruPR.Application.Common.Extensions;
-using GuruPR.Application.Exceptions.Agent;
+using GuruPR.Application.Common.Interfaces.Persistence;
 using GuruPR.Application.Features.Agents.Dtos;
-using GuruPR.Application.Interfaces.Persistence;
+using GuruPR.Application.Features.Agents.Exceptions;
 using GuruPR.Domain.Entities.Agents;
 
 using MediatR;
@@ -14,18 +16,17 @@ public class CreateAgentHandler : IRequestHandler<CreateAgentCommand, AgentDto>
 {
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly CreateAgentValidator _validator = new CreateAgentValidator();
+    private readonly IValidator<CreateAgentCommand> _validator;
 
-    public CreateAgentHandler(IMapper mapper, IUnitOfWork unitOfWork)
+    public CreateAgentHandler(IMapper mapper, IUnitOfWork unitOfWork, IValidator<CreateAgentCommand> validator)
     {
         _mapper = mapper;
         _unitOfWork = unitOfWork;
+        _validator = validator;
     }
 
     public async Task<AgentDto> Handle(CreateAgentCommand request, CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-
         await _validator.ThrowIfInvalidAsync(request,
                                              (message, errors) => new AgentValidationException(message, errors));
 

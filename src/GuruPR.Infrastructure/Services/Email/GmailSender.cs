@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 
 namespace GuruPR.Infrastructure.Services.Email;
+
 public class GmailSender : IEmailSender
 {
     private GmailingAppSettings _gmailingSettings;

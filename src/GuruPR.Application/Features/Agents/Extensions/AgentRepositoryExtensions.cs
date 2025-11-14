@@ -1,5 +1,5 @@
-﻿using GuruPR.Application.Features.Agents.Exceptions;
-using GuruPR.Application.Interfaces.Persistence;
+﻿using GuruPR.Application.Common.Interfaces.Persistence;
+using GuruPR.Application.Features.Agents.Exceptions;
 using GuruPR.Domain.Entities.Agents;
 
 namespace GuruPR.Application.Features.Agents.Extensions;
