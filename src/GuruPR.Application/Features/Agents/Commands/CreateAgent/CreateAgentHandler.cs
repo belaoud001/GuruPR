@@ -2,7 +2,7 @@
 
 using FluentValidation;
 
-using GuruPR.Application.Common.Extensions;
+using GuruPR.Application.Common.Extensions.Validation;
 using GuruPR.Application.Common.Interfaces.Persistence;
 using GuruPR.Application.Features.Agents.Dtos;
 using GuruPR.Application.Features.Agents.Exceptions;

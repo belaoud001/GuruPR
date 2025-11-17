@@ -4,8 +4,8 @@ using GuruPR.Application.Common.Behaviors;
 using GuruPR.Application.Common.Interfaces.Application;
 using GuruPR.Application.Common.Services;
 using GuruPR.Application.Features.Account.Commands.ConfirmEmail;
-using GuruPR.Application.Features.Account.Commands.ExternalLogin.GoogleCallback;
-using GuruPR.Application.Features.Account.Commands.ExternalLogin.GoogleLogin;
+using GuruPR.Application.Features.Account.Commands.ExternalLogin.Google.GoogleCallback;
+using GuruPR.Application.Features.Account.Commands.ExternalLogin.Google.GoogleLogin;
 using GuruPR.Application.Features.Account.Commands.Login;
 using GuruPR.Application.Features.Account.Commands.Logout;
 using GuruPR.Application.Features.Account.Commands.Register;
@@ -16,7 +16,6 @@ using GuruPR.Application.Features.Conversations.Commands.CreateConversation;
 using GuruPR.Application.Profiles.Agents;
 using GuruPR.Application.Profiles.Conversations;
 using GuruPR.Application.Profiles.OAuth;
-using GuruPR.Application.Services.OAuth;
 
 using MediatR;
 
@@ -47,9 +46,6 @@ public static class ServiceExtensions
         services.AddScoped<IAccountLinkGenerator, AccountLinkGenerator>();
 
         services.AddScoped<IEmailTemplateService, EmailTemplateService>();
-
-        services.AddScoped<IProviderService, ProviderService>();
-        services.AddScoped<IProviderConnectionService, ProviderConnectionService>();
     }
 
     private static void AddFluentValidators(this IServiceCollection services)

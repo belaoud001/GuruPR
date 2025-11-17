@@ -4,7 +4,7 @@ using System.Text.Json;
 using GuruPR.Application.Common.Interfaces.Application;
 using GuruPR.Application.Common.Interfaces.Infrastructure;
 using GuruPR.Application.Dtos.OAuth.ProviderConnection;
-using GuruPR.Domain.Entities.Enums;
+using GuruPR.Domain.Entities.Provider.Enums;
 using GuruPR.Infrastructure.HttpClients.Spotify;
 
 using Microsoft.Extensions.Logging;

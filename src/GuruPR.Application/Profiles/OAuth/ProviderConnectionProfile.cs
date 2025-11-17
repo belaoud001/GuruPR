@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 
-using GuruPR.Application.Dtos.OAuth.ProviderConnection;
+using GuruPR.Application.Features.ProviderConnections.Commands.CreateProviderConnection;
+using GuruPR.Application.Features.ProviderConnections.Commands.UpdateProviderConnection;
+using GuruPR.Application.Features.ProviderConnections.Dtos;
 using GuruPR.Domain.Entities.OAuth;
 
 namespace GuruPR.Application.Profiles.OAuth;
@@ -12,12 +14,11 @@ public class ProviderConnectionProfile : Profile
         CreateMap<ProviderConnection, ProviderConnectionDto>();
         CreateMap<ProviderConnectionDto, ProviderConnection>();
 
-        CreateMap<ProviderConnection, CreateProviderConnectionRequest>();
-        CreateMap<CreateProviderConnectionRequest, ProviderConnection>();
+        CreateMap<ProviderConnection, CreateProviderConnectionCommand>();
+        CreateMap<CreateProviderConnectionCommand, ProviderConnection>();
 
-        CreateMap<ProviderConnection, UpdateProviderConnectionRequest>()
+        CreateMap<ProviderConnection, UpdateProviderConnectionCommand>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-        CreateMap<UpdateProviderConnectionRequest, ProviderConnection>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+        CreateMap<UpdateProviderConnectionCommand, ProviderConnection>();
     }
 }

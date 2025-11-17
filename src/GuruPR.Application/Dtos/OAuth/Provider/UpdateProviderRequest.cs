@@ -1,4 +1,4 @@
-﻿using GuruPR.Domain.Entities.Enums;
+﻿using GuruPR.Domain.Entities.Provider.Enums;
 
 namespace GuruPR.Application.Dtos.OAuth.Provider;
 

@@ -1,8 +1,8 @@
 ﻿using Asp.Versioning;
 
 using GuruPR.Application.Features.Account.Commands.ConfirmEmail;
-using GuruPR.Application.Features.Account.Commands.ExternalLogin.GoogleCallback;
-using GuruPR.Application.Features.Account.Commands.ExternalLogin.GoogleLogin;
+using GuruPR.Application.Features.Account.Commands.ExternalLogin.Google.GoogleCallback;
+using GuruPR.Application.Features.Account.Commands.ExternalLogin.Google.GoogleLogin;
 using GuruPR.Application.Features.Account.Commands.Login;
 using GuruPR.Application.Features.Account.Commands.Logout;
 using GuruPR.Application.Features.Account.Commands.RefreshToken;

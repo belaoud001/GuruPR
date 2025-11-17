@@ -4,6 +4,7 @@ using AutoMapper;
 
 using GuruPR.Application.Common.Interfaces.Application;
 using GuruPR.Application.Dtos.OAuth.ProviderConnection;
+using GuruPR.Application.Features.ProviderConnections.Dtos;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

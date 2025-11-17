@@ -1,5 +1,5 @@
 ﻿using GuruPR.Application.Common.Interfaces.Infrastructure;
-using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Domain.Entities.Provider;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -8,11 +8,8 @@ namespace GuruPR.Persistence.Extensions.ContextConfiguration;
 
 public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
 {
-    private readonly ITokenEncryptionService _tokenEncryptionService;
-
-    public ProviderConfiguration(ITokenEncryptionService tokenEncryptionService)
+    public ProviderConfiguration()
     {
-        _tokenEncryptionService = tokenEncryptionService;
     }
 
     public void Configure(EntityTypeBuilder<Provider> builder)
@@ -23,28 +20,5 @@ public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
 
         builder.Property(provider => provider.Id)
                .IsRequired();
-
-        builder.OwnsMany(provider => provider.ProviderConnections, navigationBuilder =>
-        {
-            navigationBuilder.Property(navigationBuilder => navigationBuilder.ClientSecret)
-                             .HasConversion(
-                                 plainText => _tokenEncryptionService.Encrypt(plainText),
-                                 cipherText => _tokenEncryptionService.Decrypt(cipherText));
-
-            navigationBuilder.Property(providerConnection => providerConnection.ClientSecret)
-                             .HasConversion(
-                                 plainText => _tokenEncryptionService.Encrypt(plainText),
-                                 cipherText => _tokenEncryptionService.Decrypt(cipherText));
-
-            navigationBuilder.Property(providerConnection => providerConnection.AccessToken)
-                             .HasConversion(
-                                 plainText => _tokenEncryptionService.Encrypt(plainText),
-                                 cipherText => _tokenEncryptionService.Decrypt(cipherText));
-
-            navigationBuilder.Property(providerConnection => providerConnection.RefreshToken)
-                             .HasConversion(
-                                 plainText => _tokenEncryptionService.Encrypt(plainText),
-                                 cipherText => _tokenEncryptionService.Decrypt(cipherText));
-        });
     }
 }

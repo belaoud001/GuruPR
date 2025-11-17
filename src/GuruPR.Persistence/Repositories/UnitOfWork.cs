@@ -22,6 +22,7 @@ public class UnitOfWork : IUnitOfWork
     private IMessageRepository? _messageRepository;
     private IProviderRepository? _providerRepository;
     private IConversationRepository? _conversationRepository;
+    private IProviderConnectionRepository? _providerConnectionRepository;
 
     private IUserRepository? _userRepository;
 
@@ -36,6 +37,7 @@ public class UnitOfWork : IUnitOfWork
     public IMessageRepository Messages => _messageRepository ??= new MessageRepository(_guruDbContext);
     public IProviderRepository Providers => _providerRepository ??= new ProviderRepository(_guruDbContext);
     public IConversationRepository Conversations => _conversationRepository ??= new ConversationRepository(_guruDbContext);
+    public IProviderConnectionRepository ProviderConnections => _providerConnectionRepository ??= new ProviderConnectionRepository(_guruDbContext);
 
     public IUserRepository Users => _userRepository ??= new UserRepository(_userManagementDbContext);
 

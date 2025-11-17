@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-using GuruPR.Application.Common.Extensions;
+using GuruPR.Application.Common.Extensions.Validation;
 using GuruPR.Application.Features.Account.Exceptions;
 using GuruPR.Application.Features.Users.Extensions;
 using GuruPR.Domain.Entities;

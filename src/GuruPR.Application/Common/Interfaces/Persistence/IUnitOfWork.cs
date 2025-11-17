@@ -7,6 +7,7 @@ public interface IUnitOfWork : IDisposable
     IMessageRepository Messages { get; }
     IProviderRepository Providers { get; }
     IConversationRepository Conversations { get; }
+    IProviderConnectionRepository ProviderConnections { get; }
 
     IUserRepository Users { get; }
 

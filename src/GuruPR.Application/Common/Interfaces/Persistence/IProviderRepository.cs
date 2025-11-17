@@ -1,5 +1,5 @@
-﻿using GuruPR.Domain.Entities.Enums;
-using GuruPR.Domain.Entities.OAuth;
+﻿using GuruPR.Domain.Entities.Provider;
+using GuruPR.Domain.Entities.Provider.Enums;
 
 namespace GuruPR.Application.Common.Interfaces.Persistence;
 

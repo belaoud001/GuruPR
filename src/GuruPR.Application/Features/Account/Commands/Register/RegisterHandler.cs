@@ -2,6 +2,7 @@
 
 using GuruPR.Application.Common.Constants;
 using GuruPR.Application.Common.Extensions;
+using GuruPR.Application.Common.Extensions.Validation;
 using GuruPR.Application.Common.Interfaces.Application;
 using GuruPR.Application.Common.Interfaces.Persistence;
 using GuruPR.Application.Features.Account.Exceptions;

@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 
-using GuruPR.Application.Dtos.OAuth.Provider;
-using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Application.Features.Agents.Commands.CreateAgent;
+using GuruPR.Application.Features.Providers.Commands.UpdateProvider;
+using GuruPR.Application.Features.Providers.Dtos;
+using GuruPR.Domain.Entities.Provider;
+using GuruPR.Domain.Entities.Provider.Operations;
 
 namespace GuruPR.Application.Profiles.OAuth;
 
@@ -15,13 +18,10 @@ public class ProviderProfile : Profile
         CreateMap<Provider, ProviderDto>();
         CreateMap<ProviderDto, Provider>();
 
-        CreateMap<Provider, CreateProviderRequest>();
-        CreateMap<CreateProviderRequest, Provider>()
-            .ForMember(dest => dest.ProviderConnections, opt => opt.MapFrom(src => src.ProviderConnections));
+        CreateMap<Provider, CreateAgentCommand>();
+        CreateMap<CreateAgentCommand, Provider>();
 
-        CreateMap<Provider, UpdateProviderRequest>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-        CreateMap<UpdateProviderRequest, Provider>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+        CreateMap<ProviderUpdateData, UpdateProviderCommand>();
+        CreateMap<UpdateProviderCommand, ProviderUpdateData>();
     }
 }

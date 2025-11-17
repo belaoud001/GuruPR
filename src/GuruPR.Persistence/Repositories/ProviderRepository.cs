@@ -1,6 +1,6 @@
 ﻿using GuruPR.Application.Common.Interfaces.Persistence;
-using GuruPR.Domain.Entities.Enums;
-using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Domain.Entities.Provider;
+using GuruPR.Domain.Entities.Provider.Enums;
 using GuruPR.Persistence.Contexts;
 
 using Microsoft.EntityFrameworkCore;
