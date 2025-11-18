@@ -1,4 +1,6 @@
-﻿namespace GuruPR.Application.Common.Interfaces.Persistence;
+﻿using System.Linq.Expressions;
+
+namespace GuruPR.Application.Common.Interfaces.Persistence;
 
 public interface IGenericRepository<T> where T : class
 {
@@ -6,7 +8,7 @@ public interface IGenericRepository<T> where T : class
 
     Task<T?> GetByIdAsync(string id, CancellationToken cancellationToken = default);
 
-    Task<List<T>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, CancellationToken cancellationToken = default);
 
     Task<T> AddAsync(T entity, CancellationToken cancellationToken = default);
 

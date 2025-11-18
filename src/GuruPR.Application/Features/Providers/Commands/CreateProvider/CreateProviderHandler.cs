@@ -6,24 +6,23 @@ using GuruPR.Application.Common.Extensions.Validation;
 using GuruPR.Application.Common.Interfaces.Persistence;
 using GuruPR.Application.Features.Providers.Dtos;
 using GuruPR.Application.Features.Providers.Exceptions;
-using GuruPR.Domain.Entities.OAuth;
 using GuruPR.Domain.Entities.Provider;
 
 using MediatR;
 
-namespace GuruPR.Application.Features.Providers.Commands.CreateProviderWithConnections;
+namespace GuruPR.Application.Features.Providers.Commands.CreateProvider;
 
-public class CreateProviderWithConnectionsHandler : IRequestHandler<CreateProviderWithConnectionsCommand, ProviderDto>
+public class CreateProviderHandler : IRequestHandler<CreateProviderCommand, ProviderDto>
 {
     private readonly IMapper _mapper;
     private readonly IMediator _mediator;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IValidator<CreateProviderWithConnectionsCommand> _validator;
+    private readonly IValidator<CreateProviderCommand> _validator;
 
-    public CreateProviderWithConnectionsHandler(IMapper mapper, 
-                                                IMediator mediator, 
-                                                IUnitOfWork unitOfWork, 
-                                                IValidator<CreateProviderWithConnectionsCommand> validator)
+    public CreateProviderHandler(IMapper mapper,
+                                                IMediator mediator,
+                                                IUnitOfWork unitOfWork,
+                                                IValidator<CreateProviderCommand> validator)
     {
         _mapper = mapper;
         _mediator = mediator;
@@ -31,7 +30,7 @@ public class CreateProviderWithConnectionsHandler : IRequestHandler<CreateProvid
         _validator = validator;
     }
 
-    public async Task<ProviderDto> Handle(CreateProviderWithConnectionsCommand request, CancellationToken cancellationToken)
+    public async Task<ProviderDto> Handle(CreateProviderCommand request, CancellationToken cancellationToken)
     {
         await _validator.ThrowIfInvalidAsync(request,
                                              (message, errors) => new ProviderValidationException(message, errors),

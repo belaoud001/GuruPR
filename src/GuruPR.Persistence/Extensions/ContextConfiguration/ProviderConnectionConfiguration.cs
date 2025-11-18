@@ -1,5 +1,5 @@
 ﻿using GuruPR.Application.Common.Interfaces.Infrastructure;
-using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Domain.Entities.ProviderConnection;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

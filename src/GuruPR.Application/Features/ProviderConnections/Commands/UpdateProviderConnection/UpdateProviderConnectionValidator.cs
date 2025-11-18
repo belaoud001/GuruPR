@@ -8,9 +8,7 @@ public class UpdateProviderConnectionValidator : AbstractValidator<UpdateProvide
 {
     public UpdateProviderConnectionValidator()
     {
-        RuleFor(command => command.ProviderId!).ValidProviderId();
-
-        RuleFor(command => command.ProviderConnectionId!).ValidProviderConnectionId();
+        RuleFor(command => command.Id!).ValidProviderConnectionId();
 
         RuleFor(command => command.ClientId).ValidClientId();
 

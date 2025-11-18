@@ -1,74 +1,73 @@
 ﻿using Asp.Versioning;
 
-using AutoMapper;
-
-using GuruPR.Application.Common.Interfaces.Application;
-using GuruPR.Application.Dtos.OAuth.Provider;
+using GuruPR.Application.Features.Providers.Commands.CreateProvider;
+using GuruPR.Application.Features.Providers.Commands.DeleteProvider;
+using GuruPR.Application.Features.Providers.Commands.UpdateProvider;
 using GuruPR.Application.Features.Providers.Dtos;
+using GuruPR.Application.Features.Providers.Queries.GetProviderById;
+using GuruPR.Application.Features.Providers.Queries.GetProviders;
+
+using MediatR;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Controllers.v1;
 
-[Authorize]
+[Authorize(Roles = "Admin")]
 [ApiController]
 [ApiVersion(1.0)]
 [Route("api/v{version:apiVersion}/providers")]
 public class ProviderController : ControllerBase
 {
     private readonly ILogger<ProviderController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IProviderService _providerService;
+    private readonly IMediator _mediator;
 
-    public ProviderController(ILogger<ProviderController> logger, IMapper mapper, IProviderService providerService)
+    public ProviderController(ILogger<ProviderController> logger, IMediator mediator)
     {
         _logger = logger;
-        _mapper = mapper;
-        _providerService = providerService;
+        _mediator = mediator;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllProvidersAsync()
+    public async Task<ActionResult<List<ProviderDto>>> GetAllProvidersAsync()
     {
-        var providers = await _providerService.GetAllProvidersAsync();
-        var providerDtos = _mapper.Map<IEnumerable<ProviderDto>>(providers);
+        var providers = await _mediator.Send(new GetProvidersQuery());
 
-        return Ok(providerDtos);
+        return Ok(providers);
     }
 
     [HttpGet("{providerId}", Name = "GetProviderById")]
-    public async Task<IActionResult> GetProviderByIdAsync(string providerId)
+    public async Task<ActionResult<ProviderDto>> GetProviderByIdAsync(string providerId)
     {
-        var provider = await _providerService.GetProviderByIdAsync(providerId);
-        var providerDto = _mapper.Map<ProviderDto>(provider);
+        var provider = await _mediator.Send(new GetProviderByIdQuery(providerId));
 
-        return provider == null ? NotFound() : Ok(providerDto);
+        return provider == null ? NotFound() : Ok(provider);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateProviderAsync([FromBody] CreateProviderRequest createProviderRequest)
+    public async Task<ActionResult<ProviderDto>> CreateProviderAsync([FromBody] CreateProviderCommand createProviderCommand)
     {
-        var provider = await _providerService.CreateProviderAsync(createProviderRequest);
-        var providerDto = _mapper.Map<ProviderDto>(provider);
+        var provider = await _mediator.Send(createProviderCommand);
 
-        return CreatedAtRoute("GetProviderById", new { providerId = providerDto.Id }, providerDto);
+        return CreatedAtRoute("GetProviderById", new { providerId = provider.Id}, provider);
     }
 
     [HttpPut("{providerId}")]
-    public async Task<IActionResult> UpdateProviderAsync(string providerId, [FromBody] UpdateProviderRequest updateProviderRequest)
+    public async Task<ActionResult<ProviderDto>> UpdateProviderAsync(string providerId, [FromBody] UpdateProviderCommand updateProviderCommand)
     {
-        var provider = await _providerService.UpdateProviderAsync(providerId, updateProviderRequest);
-        var providerDto = _mapper.Map<ProviderDto>(provider);
+        updateProviderCommand.Id = providerId;
 
-        return provider == null ? NotFound() : Ok(providerDto);
+        var provider = await _mediator.Send(updateProviderCommand);
+
+        return Ok(provider);
     }
 
     [HttpDelete("{providerId}")]
     public async Task<IActionResult> DeleteProviderAsync(string providerId)
     {
-        var result = await _providerService.DeleteProviderAsync(providerId);
+        await _mediator.Send(new DeleteProviderCommand(providerId));
 
-        return result ? NotFound() : NoContent();
+        return NoContent();
     }
 }

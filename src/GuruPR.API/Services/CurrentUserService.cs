@@ -3,7 +3,6 @@ using GuruPR.Infrastructure.Identity.Constants;
 
 namespace GuruPR.Services;
 
-
 public sealed class CurrentUserService : ICurrentUserService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;

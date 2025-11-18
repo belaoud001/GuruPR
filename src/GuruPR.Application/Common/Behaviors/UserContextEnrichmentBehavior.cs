@@ -6,7 +6,7 @@ using MediatR;
 namespace GuruPR.Application.Common.Behaviors;
 
 public sealed class UserContextEnrichmentBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-                                                        where TRequest : IRequest<TResponse>
+                                                        where TRequest : IUserContextCommand
 {
     private readonly ICurrentUserService _currentUserService;
 
@@ -17,17 +17,14 @@ public sealed class UserContextEnrichmentBehavior<TRequest, TResponse> : IPipeli
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        if (request is IUserContextCommand userContextCommand)
+        var userId = _currentUserService.UserId;
+
+        if (string.IsNullOrWhiteSpace(userId))
         {
-            var userId = _currentUserService.UserId;
-
-            if (string.IsNullOrWhiteSpace(userId))
-            {
-                throw new UnauthorizedAccessException("Authenticated user id is required but was not found.");
-            }
-
-            userContextCommand.UserId = userId;
+            throw new UnauthorizedAccessException("Authenticated user id is required but was not found.");
         }
+
+        request.UserId = userId;
 
         return await next();
     }

@@ -6,9 +6,7 @@ namespace GuruPR.Application.Features.ProviderConnections.Commands.UpdateProvide
 
 public record UpdateProviderConnectionCommand : IRequest<ProviderConnectionDto>
 {
-    public string? ProviderId { get; init; }
-
-    public string? ProviderConnectionId { get; init; }
+    public string? Id { get; set; }
 
     public required string ClientId { get; init; }
 

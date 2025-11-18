@@ -36,11 +36,6 @@ public static class ServiceCollectionExtensions
             }
         );
 
-        services.AddMediatR(configuration =>
-        {
-            configuration.RegisterServicesFromAssembly(typeof(ApplicationMarker).Assembly);
-        });
-
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 

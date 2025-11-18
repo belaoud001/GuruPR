@@ -8,6 +8,11 @@ public class ProviderConnectionDto
     public string Id { get; init; } = null!;
 
     /// <summary>
+    /// Provider identifier associated with this connection.
+    /// </summary>
+    public string ProviderId { get; init; } = null!;
+
+    /// <summary>
     /// Access token used for authentication.
     /// </summary>
     public required string AccessToken { get; init; }

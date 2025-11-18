@@ -21,8 +21,6 @@
 
     <ItemGroup>
       <Folder Include="Common\Interfaces\Infrastructure\SemanticKernel\Models\" />
-      <Folder Include="Features\Providers\Queries\GetProviders\" />
-      <Folder Include="Features\Providers\Queries\GetProvidersWithConnections\" />
     </ItemGroup>
 
 </Project>

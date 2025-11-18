@@ -1,6 +1,6 @@
 ﻿using GuruPR.Application.Common.Interfaces.Persistence;
 using GuruPR.Application.Features.ProviderConnections.Exceptions;
-using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Domain.Entities.ProviderConnection;
 
 namespace GuruPR.Application.Features.ProviderConnections.Extensions;
 

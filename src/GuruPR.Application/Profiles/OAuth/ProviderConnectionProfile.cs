@@ -3,7 +3,7 @@
 using GuruPR.Application.Features.ProviderConnections.Commands.CreateProviderConnection;
 using GuruPR.Application.Features.ProviderConnections.Commands.UpdateProviderConnection;
 using GuruPR.Application.Features.ProviderConnections.Dtos;
-using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Domain.Entities.ProviderConnection;
 
 namespace GuruPR.Application.Profiles.OAuth;
 

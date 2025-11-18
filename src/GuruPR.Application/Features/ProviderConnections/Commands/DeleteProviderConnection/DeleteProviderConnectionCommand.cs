@@ -2,4 +2,4 @@
 
 namespace GuruPR.Application.Features.ProviderConnections.Commands.DeleteProviderConnection;
 
-public record DeleteProviderConnectionCommand(string ProviderConnectionId) : IRequest;
+public record DeleteProviderConnectionCommand(string Id) : IRequest;

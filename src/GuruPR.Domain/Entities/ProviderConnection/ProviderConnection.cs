@@ -1,6 +1,6 @@
 ﻿using GuruPR.Domain.Entities.ProviderConnection.Operations;
 
-namespace GuruPR.Domain.Entities.OAuth;
+namespace GuruPR.Domain.Entities.ProviderConnection;
 
 /// <summary>
 /// Represents a connection to an OAuth provider, including tokens, scopes, and expiration details.

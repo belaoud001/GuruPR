@@ -1,5 +1,4 @@
-﻿using GuruPR.Application.Features.ProviderConnections.Dtos;
-using GuruPR.Domain.Entities.Provider.Enums;
+﻿using GuruPR.Domain.Entities.Provider.Enums;
 
 namespace GuruPR.Application.Features.Providers.Dtos;
 
@@ -18,6 +17,4 @@ public class ProviderDto
     public IReadOnlyList<string> DefaultScopes { get; init; } = [];
 
     public DateTime CreatedAt { get; init; }
-
-    public List<ProviderConnectionDto> ProviderConnections { get; init; } = [];
 }

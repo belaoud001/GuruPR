@@ -1,5 +1,4 @@
-﻿using GuruPR.Application.Dtos.OAuth.ProviderConnection;
-using GuruPR.Application.Features.ProviderConnections.Dtos;
+﻿using GuruPR.Application.Features.ProviderConnections.Dtos;
 
 using MediatR;
 
@@ -7,7 +6,7 @@ namespace GuruPR.Application.Features.ProviderConnections.Commands.CreateProvide
 
 public record CreateProviderConnectionCommand : IRequest<ProviderConnectionDto>
 {
-    public string? ProviderId { get; init; }
+    public string? ProviderId { get; set; }
 
     public required string ClientId { get; init; }
 

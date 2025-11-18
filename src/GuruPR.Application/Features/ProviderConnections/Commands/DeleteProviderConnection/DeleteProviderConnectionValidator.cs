@@ -8,6 +8,6 @@ public class DeleteProviderConnectionValidator : AbstractValidator<DeleteProvide
 {
     public DeleteProviderConnectionValidator()
     {
-        RuleFor(command => command.ProviderConnectionId).ValidProviderConnectionId();
+        RuleFor(command => command.Id).ValidProviderConnectionId();
     }
 }

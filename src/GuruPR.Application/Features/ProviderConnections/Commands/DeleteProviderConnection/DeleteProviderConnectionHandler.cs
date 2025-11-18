@@ -8,18 +8,24 @@ using GuruPR.Application.Features.Providers.Extensions;
 
 using MediatR;
 
+using Microsoft.Extensions.Logging;
+
 namespace GuruPR.Application.Features.ProviderConnections.Commands.DeleteProviderConnection;
 
 public class DeleteProviderConnectionHandler : IRequestHandler<DeleteProviderConnectionCommand>
 {
+    private readonly ILogger<DeleteProviderConnectionHandler> _logger;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<DeleteProviderConnectionCommand> _validator;
 
-    public DeleteProviderConnectionHandler(IUnitOfWork unitOfWork, IValidator<DeleteProviderConnectionCommand> validator)
+    public DeleteProviderConnectionHandler(ILogger<DeleteProviderConnectionHandler> logger,
+                                           IUnitOfWork unitOfWork, 
+                                           IValidator<DeleteProviderConnectionCommand> validator)
     {
+        _logger = logger;
         _unitOfWork = unitOfWork;
-        _validator  = validator;
-    } 
+        _validator = validator;
+    }
 
     public async Task Handle(DeleteProviderConnectionCommand request, CancellationToken cancellationToken)
     {
@@ -27,10 +33,17 @@ public class DeleteProviderConnectionHandler : IRequestHandler<DeleteProviderCon
                                              (message, errors) => new ProviderConnectionValidationException(message, errors),
                                              cancellationToken);
 
-        var provider = await _unitOfWork.ProviderConnections.GetByIdOrThrowAsync(request.ProviderConnectionId);
+        var provider = await _unitOfWork.ProviderConnections.GetByIdOrThrowAsync(request.Id);
 
         _unitOfWork.ProviderConnections.Delete(provider);
 
-        await _unitOfWork.SaveGuruChangesAsync(cancellationToken);
+        var result = await _unitOfWork.SaveGuruChangesAsync();
+
+        if (result == 0)
+        {
+            _logger.LogError("Provider Connection {providerConnectionId} was found but SaveChanges affected 0 rows", request.Id);
+
+            throw new InvalidOperationException($"Failed to delete provider connection {request.Id}");
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace GuruPR.Application.Features.Providers.Commands.UpdateProvider;
 
 public record UpdateProviderCommand : IRequest<ProviderDto>
 {
-    public required string Id { get; init; }
+    public string? Id { get; set; }
 
     public string? DisplayName { get; init; }
 

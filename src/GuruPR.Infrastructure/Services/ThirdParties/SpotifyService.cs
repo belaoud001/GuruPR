@@ -1,9 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-using GuruPR.Application.Common.Interfaces.Application;
 using GuruPR.Application.Common.Interfaces.Infrastructure;
-using GuruPR.Application.Dtos.OAuth.ProviderConnection;
 using GuruPR.Domain.Entities.Provider.Enums;
 using GuruPR.Infrastructure.HttpClients.Spotify;
 
@@ -16,20 +14,14 @@ public class SpotifyService : ISpotifyService
     private readonly ILogger<SpotifyService> _logger;
     private readonly SpotifyClient _spotifyClient;
     private readonly SpotifyOAuthClient _spotifyOAuthClient;
-    private readonly IProviderService _providerService;
-    private readonly IProviderConnectionService _providerConnectionService;
 
     public SpotifyService(ILogger<SpotifyService> logger,
                           SpotifyClient spotifyClient,
-                          SpotifyOAuthClient spotifyOAuthClient,
-                          IProviderService providerService,
-                          IProviderConnectionService providerConnectionService)
+                          SpotifyOAuthClient spotifyOAuthClient)
     {
         _logger = logger;
         _spotifyClient = spotifyClient;
         _spotifyOAuthClient = spotifyOAuthClient;
-        _providerService = providerService;
-        _providerConnectionService = providerConnectionService;
     }
 
     #region Public Methods
@@ -37,35 +29,37 @@ public class SpotifyService : ISpotifyService
     public async Task<string> GetSpotifyAccessTokenAsync(string userId, string scope)
     {
         //TODO: Integrate userId in the query to fetch the correct connection
-        var provider = await _providerService.GetProviderByTypeAsync(OAuthProviderType.Spotify);
-        var providerConnection = await _providerConnectionService.GetProviderConnectionByProviderTypeAndScopeAsync(OAuthProviderType.Spotify, scope);
+        //var provider = await _providerService.GetProviderByTypeAsync(OAuthProviderType.Spotify);
+        //var providerConnection = await _providerConnectionService.GetProviderConnectionByProviderTypeAndScopeAsync(OAuthProviderType.Spotify, scope);
 
-        if (providerConnection == null)
-        {
-            throw new InvalidOperationException("No Spotify connection found for the user.");
-        }
+        //if (providerConnection == null)
+        //{
+        //    throw new InvalidOperationException("No Spotify connection found for the user.");
+        //}
 
-        if (providerConnection.Scopes == null || !providerConnection.Scopes.Contains(scope))
-        {
-            throw new InvalidOperationException($"The existing connection does not have the required scope: {scope}");
-        }
+        //if (providerConnection.Scopes == null || !providerConnection.Scopes.Contains(scope))
+        //{
+        //    throw new InvalidOperationException($"The existing connection does not have the required scope: {scope}");
+        //}
 
-        if (providerConnection.ShouldRefreshToken())
-        {
-            var tokenResponse = await _spotifyOAuthClient.RefreshTokenAsync(provider.TokenUrl, providerConnection);
-            var updatedConnection = new UpdateProviderConnectionRequest
-            {
-                AccessToken = tokenResponse.AccessToken,
-                RefreshToken = tokenResponse.RefreshToken ?? providerConnection.RefreshToken,
-                AccessExpiresAt = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn)
-            };
+        //if (providerConnection.ShouldRefreshToken())
+        //{
+        //    var tokenResponse = await _spotifyOAuthClient.RefreshTokenAsync(provider.TokenUrl, providerConnection);
+        //    var updatedConnection = new UpdateProviderConnectionRequest
+        //    {
+        //        AccessToken = tokenResponse.AccessToken,
+        //        RefreshToken = tokenResponse.RefreshToken ?? providerConnection.RefreshToken,
+        //        AccessExpiresAt = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn)
+        //    };
 
-            providerConnection = await _providerConnectionService.UpdateProviderConnectionByProviderTypeAsync(OAuthProviderType.Spotify,
-                                                                                                              providerConnection.Id,
-                                                                                                              updatedConnection);
-        }
+        //    providerConnection = await _providerConnectionService.UpdateProviderConnectionByProviderTypeAsync(OAuthProviderType.Spotify,
+        //                                                                                                      providerConnection.Id,
+        //                                                                                                      updatedConnection);
+        //}
 
-        return providerConnection.AccessToken;
+        //return providerConnection.AccessToken;
+
+        throw new NotImplementedException("User-specific Spotify access token retrieval is not implemented yet.");
     }
 
     public async Task<string> GetLikedTracksAsync(string token, int numberOfTracks)
@@ -127,11 +121,13 @@ public class SpotifyService : ISpotifyService
         catch (JsonException jsonException)
         {
             _logger.LogError(jsonException, "Error parsing Spotify API response: {Message}", jsonException.Message);
+            
             return $"Error parsing Spotify API response.";
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Unexpected error processing Spotify API response: {Message}", exception.Message);
+            
             return "An unexpected error occurred while processing the response.";
         }
 

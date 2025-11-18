@@ -1,15 +1,12 @@
-﻿using GuruPR.Application.Features.ProviderConnections.Commands.CreateProviderConnection;
-using GuruPR.Application.Features.Providers.Dtos;
+﻿using GuruPR.Application.Features.Providers.Dtos;
 using GuruPR.Domain.Entities.Provider.Enums;
 
 using MediatR;
 
-namespace GuruPR.Application.Features.Providers.Commands.CreateProviderWithConnections;
+namespace GuruPR.Application.Features.Providers.Commands.CreateProvider;
 
-public record CreateProviderWithConnectionsCommand : IRequest<ProviderDto>
+public record CreateProviderCommand : IRequest<ProviderDto>
 {
-    public required string ProviderId { get; init; }
-
     public required string DisplayName { get; init; }
 
     public required OAuthProviderType ProviderType { get; init; }

@@ -1,78 +1,78 @@
 ﻿using Asp.Versioning;
 
-using AutoMapper;
-
-using GuruPR.Application.Common.Interfaces.Application;
-using GuruPR.Application.Dtos.OAuth.ProviderConnection;
+using GuruPR.Application.Features.ProviderConnections.Commands.CreateProviderConnection;
+using GuruPR.Application.Features.ProviderConnections.Commands.DeleteProviderConnection;
+using GuruPR.Application.Features.ProviderConnections.Commands.UpdateProviderConnection;
 using GuruPR.Application.Features.ProviderConnections.Dtos;
+using GuruPR.Application.Features.ProviderConnections.Queries.GetProviderConnectionById;
+using GuruPR.Application.Features.ProviderConnections.Queries.GetProviderConnections;
+
+using MediatR;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Controllers.v1;
 
-[Authorize]
+[Authorize(Roles = "Admin")]
 [ApiController]
 [ApiVersion(1.0)]
 [Route("api/v{version:apiVersion}/providers/{providerId}/provider-connections")]
 public class ProviderConnectionController : ControllerBase
 {
     private readonly ILogger<ProviderConnectionController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IProviderConnectionService _providerConnectionService;
+    private readonly IMediator _mediator;
 
     public ProviderConnectionController(ILogger<ProviderConnectionController> logger,
-                                        IMapper mapper,
-                                        IProviderConnectionService providerConnectionService)
+                                        IMediator mediator)
     {
         _logger = logger;
-        _mapper = mapper;
-        _providerConnectionService = providerConnectionService;
+        _mediator = mediator;
     }
 
 
     [HttpGet]
-    public async Task<IActionResult> GetConnectionsByProviderAsync(string providerId)
+    public async Task<ActionResult<List<ProviderConnectionDto>>> GetProviderConnectionsByProviderAsync(string providerId)
     {
-        var providerConnections = await _providerConnectionService.GetConnectionsByProviderIdAsync(providerId);
-        var providerConnectionsDtos = _mapper.Map<IEnumerable<ProviderConnectionDto>>(providerConnections);
+        var providerConnections = await _mediator.Send(new GetProviderConnectionsQuery(providerId));
 
-        return Ok(providerConnectionsDtos);
+        return Ok(providerConnections);
     }
 
     [HttpGet("{providerConnectionId}", Name = "GetProviderConnectionById")]
-    public async Task<IActionResult> GetProviderConnectionByIdAsync(string providerId, string providerConnectionId)
+    public async Task<ActionResult<ProviderConnectionDto>> GetProviderConnectionByIdAsync(string providerConnectionId)
     {
-        var providerConnection = await _providerConnectionService.GetProviderConnectionByIdAsync(providerId, providerConnectionId);
-        var providerConnectionDto = _mapper.Map<ProviderConnectionDto>(providerConnection);
+        var providerConnections = await _mediator.Send(new GetProviderConnectionByIdQuery(providerConnectionId));
 
-        return Ok(providerConnectionDto);
+        return Ok(providerConnections);
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddProviderConnectionToProviderAsync(string providerId, [FromBody] CreateProviderConnectionRequest createProviderConnectionRequest)
+    public async Task<IActionResult> AddProviderConnectionToProviderAsync(string providerId, [FromBody] CreateProviderConnectionCommand createProviderConnectionCommand)
     {
-        var providerConnection = await _providerConnectionService.AddProviderConnectionToProviderAsync(providerId, createProviderConnectionRequest);
-        var providerConnectionDto = _mapper.Map<ProviderConnectionDto>(providerConnection);
+        createProviderConnectionCommand.ProviderId = providerId;
+        var providerConnection = await _mediator.Send(createProviderConnectionCommand);
 
         return CreatedAtRoute("GetProviderConnectionById",
-                              new { providerId, providerConnectionId = providerConnectionDto.Id },
+                              new { providerId, providerConnectionId = providerConnection.Id },
                               providerConnection);
     }
 
     [HttpPut("{providerConnectionId}")]
-    public async Task<IActionResult> UpdateProviderConnectionAsync(string providerId, string providerConnectionId, [FromBody] UpdateProviderConnectionRequest updateProviderConnectionRequest)
+    public async Task<IActionResult> UpdateProviderConnectionAsync(string providerConnectionId, [FromBody] UpdateProviderConnectionCommand updateProviderConnectionCommand)
     {
-        // Note: Update functionality is not implemented in the service layer as per the current design.
-        // This endpoint is a placeholder for future implementation.
-        return StatusCode(501, "Update functionality is not implemented.");
+        updateProviderConnectionCommand.Id = providerConnectionId;
+
+        var providerConnection = await _mediator.Send(updateProviderConnectionCommand);
+
+        return Ok(providerConnection);
     }
 
     [HttpDelete("{providerConnectionId}")]
-    public async Task<IActionResult> DeleteProviderConnectionAsync(string providerId, string providerConnectionId)
+    public async Task<IActionResult> DeleteProviderConnectionAsync(string providerConnectionId)
     {
-        var result = await _providerConnectionService.DeleteProviderConnectionAsync(providerId, providerConnectionId);
+        await _mediator.Send(new DeleteProviderConnectionCommand(providerConnectionId));
 
-        return result ? NoContent() : NotFound();
+        return NoContent();
     }
 }
