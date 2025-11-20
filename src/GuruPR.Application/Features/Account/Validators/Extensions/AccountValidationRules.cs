@@ -29,9 +29,7 @@ public static class AccountValidationRules
     public static IRuleBuilderOptions<T, string> ValidPassword<T>(this IRuleBuilder<T, string> ruleBuilder)
     {
         return ruleBuilder.NotEmpty()
-                          .WithMessage("Password is required.")
-                          .MinimumLength(8)
-                          .WithMessage("Password must be at least 8 characters long.");
+                          .WithMessage("Password is required.");
     }
 
     public static IRuleBuilderOptions<T, string> ValidRefreshToken<T>(this IRuleBuilder<T, string> ruleBuilder)

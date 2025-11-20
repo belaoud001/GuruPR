@@ -22,9 +22,9 @@ public class UpdateProviderHandler : IRequestHandler<UpdateProviderCommand, Prov
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<UpdateProviderCommand> _validator;
 
-    public UpdateProviderHandler(ILogger<UpdateProviderHandler> logger, 
-                                 IMapper mapper, 
-                                 IUnitOfWork unitOfWork, 
+    public UpdateProviderHandler(ILogger<UpdateProviderHandler> logger,
+                                 IMapper mapper,
+                                 IUnitOfWork unitOfWork,
                                  IValidator<UpdateProviderCommand> validator)
     {
         _logger = logger;

@@ -1,13 +1,12 @@
 ﻿using Asp.Versioning;
 
+using GuruPR.Application.Common.Extensions;
 using GuruPR.Application.Common.Interfaces.Presentation;
-using GuruPR.Application.Common.Markers;
-using GuruPR.Application.Extensions;
-using GuruPR.Application.Settings;
-using GuruPR.Application.Settings.Authentication;
-using GuruPR.Application.Settings.Email;
-using GuruPR.Application.Settings.FrontEnd;
-using GuruPR.Application.Settings.Security;
+using GuruPR.Application.Common.Settings;
+using GuruPR.Application.Common.Settings.Authentication;
+using GuruPR.Application.Common.Settings.Email;
+using GuruPR.Application.Common.Settings.FrontEnd;
+using GuruPR.Application.Common.Settings.Security;
 using GuruPR.Infrastructure.Extensions;
 using GuruPR.Persistence.Extensions;
 using GuruPR.Services;
@@ -37,7 +36,6 @@ public static class ServiceCollectionExtensions
         );
 
         services.AddHttpContextAccessor();
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         services.ConfigureCors();
         services.ConfigureLogging();
@@ -67,9 +65,10 @@ public static class ServiceCollectionExtensions
         services.AddCors(
             options => options.AddPolicy(
                 "CorsPolicy",
-                builder => builder.AllowAnyOrigin()
+                builder => builder.WithOrigins("http://localhost:5173")
                                   .AllowAnyMethod()
-                                  .AllowAnyHeader())
+                                  .AllowAnyHeader()
+                                  .AllowCredentials())
         );
     }
 
@@ -82,6 +81,7 @@ public static class ServiceCollectionExtensions
         services.AddSettings<TokenHashingSettings>(configuration);
         services.AddSettings<EmailValidationSettings>(configuration);
         services.AddSettings<TokenEncryptionSettings>(configuration);
+        services.AddSettings<AllowedOriginsSettings>(configuration);
     }
 
     private static void AddSettings<T>(this IServiceCollection services, IConfiguration configuration) where T : class, ISettings

@@ -7,6 +7,8 @@ using GuruPR.Application.Features.Account.Commands.Login;
 using GuruPR.Application.Features.Account.Commands.Logout;
 using GuruPR.Application.Features.Account.Commands.RefreshToken;
 using GuruPR.Application.Features.Account.Commands.Register;
+using GuruPR.Application.Features.Users.Dtos;
+using GuruPR.Application.Features.Users.Queries.GetCurrentUser;
 
 using MediatR;
 
@@ -90,5 +92,13 @@ public class AccountController : ControllerBase
         await _mediator.Send(logoutCommand);
 
         return Ok("Logout has succeeded.");
+    }
+
+    [HttpGet("me")]
+    public async Task<ActionResult<UserDto>> GetCurrentUserAsync()
+    {
+        var userDto = await _mediator.Send(new GetCurrentUserQuery());
+
+        return Ok(userDto);
     }
 }

@@ -23,9 +23,9 @@ public class UpdateProviderConnectionHandler : IRequestHandler<UpdateProviderCon
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<UpdateProviderConnectionCommand> _validator;
 
-    public UpdateProviderConnectionHandler(ILogger<UpdateProviderConnectionHandler> logger, 
-                                           IMapper mapper, 
-                                           IUnitOfWork unitOfWork, 
+    public UpdateProviderConnectionHandler(ILogger<UpdateProviderConnectionHandler> logger,
+                                           IMapper mapper,
+                                           IUnitOfWork unitOfWork,
                                            IValidator<UpdateProviderConnectionCommand> validator)
     {
         _logger = logger;

@@ -49,6 +49,7 @@ public class ExceptionHandlingMiddleware
             EmailConfirmationException => (StatusCodes.Status400BadRequest, "Email Confirmation Failed"),
             RegistrationFailedException => (StatusCodes.Status400BadRequest, "User Registration Failed"),
             ArgumentNullException => (StatusCodes.Status400BadRequest, "A required argument was missing"),
+            ValidationExceptionBase => (StatusCodes.Status400BadRequest, "Validation Failed"),
 
             LoginFailedException => (StatusCodes.Status401Unauthorized, "Login Failed"),
             RefreshTokenException => (StatusCodes.Status401Unauthorized, "Invalid Refresh Token"),

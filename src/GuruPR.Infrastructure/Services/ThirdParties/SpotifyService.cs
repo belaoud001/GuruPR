@@ -2,7 +2,6 @@
 using System.Text.Json;
 
 using GuruPR.Application.Common.Interfaces.Infrastructure;
-using GuruPR.Domain.Entities.Provider.Enums;
 using GuruPR.Infrastructure.HttpClients.Spotify;
 
 using Microsoft.Extensions.Logging;
@@ -121,13 +120,13 @@ public class SpotifyService : ISpotifyService
         catch (JsonException jsonException)
         {
             _logger.LogError(jsonException, "Error parsing Spotify API response: {Message}", jsonException.Message);
-            
+
             return $"Error parsing Spotify API response.";
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Unexpected error processing Spotify API response: {Message}", exception.Message);
-            
+
             return "An unexpected error occurred while processing the response.";
         }
 

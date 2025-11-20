@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-using GuruPR.Application.Common.Markers;
+using GuruPR.Application.Common.Markers.Interfaces;
 using GuruPR.Application.Features.Agents.Dtos;
 using GuruPR.Domain.Entities.Agents.Configurations;
 using GuruPR.Domain.Entities.Agents.Enums;
@@ -29,5 +29,5 @@ public record CreateAgentCommand : IRequest<AgentDto>, IUserContextCommand
     public AgentStatus Status { get; set; } = AgentStatus.Inactive;
 
     [JsonIgnore]
-    public string UserId { get; set; } = null!; // Populated by MediatR pipeline behavior
+    public string? UserId { get; set; } = null!; // Populated by MediatR pipeline behavior
 }

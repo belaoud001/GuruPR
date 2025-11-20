@@ -8,12 +8,11 @@ using GuruPR.Application.Features.Agents.Queries.GetAgents;
 
 using MediatR;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Controllers.v1;
 
-[Authorize]
+//[Authorize]
 [ApiController]
 [ApiVersion(1.0)]
 [Route("api/v{version:apiVersion}/agents")]

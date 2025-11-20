@@ -1,5 +1,5 @@
 ﻿using GuruPR.Application.Common.Interfaces.Persistence;
-using GuruPR.Application.Settings.Database;
+using GuruPR.Application.Common.Settings.Database;
 using GuruPR.Domain.Entities;
 using GuruPR.Persistence.Contexts;
 using GuruPR.Persistence.Identity.IdentityValidators;
@@ -80,6 +80,8 @@ public static class ServiceExtensions
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IUserRepository, UserRepository>();
+
+        services.AddScoped(typeof(IOwnedGenericRepository<>), typeof(OwnedGenericRepository<>));
 
         services.AddScoped<IToolRepository, ToolRepository>();
         services.AddScoped<IAgentRepository, AgentRepository>();

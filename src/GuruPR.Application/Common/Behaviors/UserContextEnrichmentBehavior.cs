@@ -1,5 +1,5 @@
 using GuruPR.Application.Common.Interfaces.Presentation;
-using GuruPR.Application.Common.Markers;
+using GuruPR.Application.Common.Markers.Interfaces;
 
 using MediatR;
 

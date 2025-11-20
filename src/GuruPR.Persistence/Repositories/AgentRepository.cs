@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GuruPR.Persistence.Repositories;
 
-public class AgentRepository : GenericRepository<Agent>, IAgentRepository
+public class AgentRepository : OwnedGenericRepository<Agent>, IAgentRepository
 {
     public AgentRepository(GuruDbContext dbContext) : base(dbContext)
     {

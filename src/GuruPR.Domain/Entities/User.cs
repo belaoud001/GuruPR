@@ -23,7 +23,7 @@ public class User : IdentityUser<Guid>
             throw new ArgumentException("Token hash cannot be empty.", nameof(tokenHash));
         }
 
-        if (expiryTime <= DateTime.UtcNow)
+        if (RefreshTokenHash != null && expiryTime <= DateTime.UtcNow)
         {
             throw new ArgumentException("Expiry time must be in the future.", nameof(expiryTime));
         }

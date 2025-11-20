@@ -21,6 +21,7 @@
 
     <ItemGroup>
       <Folder Include="Common\Interfaces\Infrastructure\SemanticKernel\Models\" />
+      <Folder Include="Features\Account\Profiles\" />
     </ItemGroup>
 
 </Project>

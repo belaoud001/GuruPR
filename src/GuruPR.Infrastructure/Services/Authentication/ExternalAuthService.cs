@@ -96,7 +96,7 @@ public class ExternalAuthService : IExternalAuthService
         {
             _logger.LogError(ex, "Error handling Google login callback");
 
-            throw new InvalidOperationException("Failed to process Google login callback", ex);
+            throw;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-using GuruPR.Application.Common.Markers;
+using GuruPR.Application.Common.Markers.Interfaces;
 using GuruPR.Application.Features.Conversations.Dtos;
 using GuruPR.Domain.Entities.Conversation;
 

@@ -1,4 +1,4 @@
-﻿using GuruPR.Application.Settings.Security;
+﻿using GuruPR.Application.Common.Settings.Security;
 using GuruPR.Domain.Entities;
 
 using Microsoft.AspNetCore.Identity;

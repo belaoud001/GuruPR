@@ -19,7 +19,7 @@ public class DeleteProviderConnectionHandler : IRequestHandler<DeleteProviderCon
     private readonly IValidator<DeleteProviderConnectionCommand> _validator;
 
     public DeleteProviderConnectionHandler(ILogger<DeleteProviderConnectionHandler> logger,
-                                           IUnitOfWork unitOfWork, 
+                                           IUnitOfWork unitOfWork,
                                            IValidator<DeleteProviderConnectionCommand> validator)
     {
         _logger = logger;

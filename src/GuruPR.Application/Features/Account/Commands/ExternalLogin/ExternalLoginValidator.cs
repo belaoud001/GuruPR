@@ -19,17 +19,17 @@ public class ExternalLoginValidator<T> : AbstractValidator<ExternalLoginCommand<
                     urlValidator.ValidateReturnUrl(returnUrl);
                     return true;
                 }
-                catch (InvalidReturnUrlException)
+                catch (InvalidReturnUrlException exception)
                 {
-                    context.MessageFormatter.AppendArgument("Error", "Return URL format is invalid.");
+                    context.MessageFormatter.AppendArgument("Error", exception.Message);
                 }
-                catch (UntrustedReturnUrlException)
+                catch (UntrustedReturnUrlException exception)
                 {
-                    context.MessageFormatter.AppendArgument("Error", "Return URL is not from a trusted origin.");
+                    context.MessageFormatter.AppendArgument("Error", exception.Message);
                 }
-                catch (MissingAllowedOriginsException)
+                catch (MissingAllowedOriginsException exception)
                 {
-                    context.MessageFormatter.AppendArgument("Error", "Allowed origins are not configured.");
+                    context.MessageFormatter.AppendArgument("Error", exception.Message);
                 }
                 catch (Exception)
                 {

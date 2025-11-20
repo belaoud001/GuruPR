@@ -1,6 +1,6 @@
 ﻿using GuruPR.Application.Common.Interfaces.Application;
+using GuruPR.Application.Common.Settings.Security;
 using GuruPR.Application.Exceptions.Account;
-using GuruPR.Application.Settings.Security;
 
 using Microsoft.Extensions.Options;
 

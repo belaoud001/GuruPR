@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GuruPR.Application.Features.Conversations.Commands.DeleteConversation;
 
-public class DeleteConversationHandler : IRequestHandler<DeleteConversationCommand>
+public class DeleteConversationHandler : IRequestHandler<DeleteConversationCommand, Unit>
 {
     private readonly ILogger<DeleteConversationHandler> _logger;
     private readonly IUnitOfWork _unitOfWork;
@@ -18,7 +18,7 @@ public class DeleteConversationHandler : IRequestHandler<DeleteConversationComma
         _unitOfWork = unitOfWork;
     }
 
-    public async Task Handle(DeleteConversationCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(DeleteConversationCommand request, CancellationToken cancellationToken)
     {
         await _unitOfWork.BeginGuruTransactionAsync();
 
@@ -47,5 +47,6 @@ public class DeleteConversationHandler : IRequestHandler<DeleteConversationComma
             throw;
         }
 
+        return Unit.Value;
     }
 }

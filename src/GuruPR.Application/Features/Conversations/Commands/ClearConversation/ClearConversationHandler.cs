@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GuruPR.Application.Features.Conversations.Commands.ClearConversation;
 
-public class ClearConversationHandler : IRequestHandler<ClearConversationCommand>
+public class ClearConversationHandler : IRequestHandler<ClearConversationCommand, Unit>
 {
     private readonly ILogger<ClearConversationHandler> _logger;
     private readonly IUnitOfWork _unitOfWork;
@@ -17,7 +17,7 @@ public class ClearConversationHandler : IRequestHandler<ClearConversationCommand
         _unitOfWork = unitOfWork;
     }
 
-    public async Task Handle(ClearConversationCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(ClearConversationCommand request, CancellationToken cancellationToken)
     {
         await _unitOfWork.Messages.DeleteConversationMessagesAsync(request.Id, cancellationToken);
 
@@ -26,5 +26,7 @@ public class ClearConversationHandler : IRequestHandler<ClearConversationCommand
         {
             _logger.LogWarning("No messages were deleted for conversation {ConversationId}", request.Id);
         }
+
+        return Unit.Value;
     }
 }

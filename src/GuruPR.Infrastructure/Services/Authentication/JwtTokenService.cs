@@ -4,8 +4,8 @@ using System.Security.Cryptography;
 using System.Text;
 
 using GuruPR.Application.Common.Interfaces.Infrastructure;
+using GuruPR.Application.Common.Settings.Authentication;
 using GuruPR.Application.Dtos.Jwt;
-using GuruPR.Application.Settings.Authentication;
 using GuruPR.Domain.Entities;
 using GuruPR.Infrastructure.Exceptions;
 using GuruPR.Infrastructure.Identity.Constants;

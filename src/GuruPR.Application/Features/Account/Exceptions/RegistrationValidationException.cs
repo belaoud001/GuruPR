@@ -8,7 +8,7 @@ public class RegistrationValidationException : ValidationExceptionBase
     {
     }
 
-    public RegistrationValidationException(string message, IReadOnlyDictionary<string, List<string>> errors) : base(message)
+    public RegistrationValidationException(string message, IReadOnlyDictionary<string, List<string>> errors) : base(message, errors)
     {
     }
 }

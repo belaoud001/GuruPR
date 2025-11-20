@@ -1,4 +1,6 @@
-﻿using GuruPR.Application.Common.Exceptions;
+﻿using System.Collections.ObjectModel;
+
+using GuruPR.Application.Common.Exceptions;
 
 using Microsoft.AspNetCore.Identity;
 
@@ -13,9 +15,11 @@ public static class IdentityErrorsExtensions
                                     group => group.Key,
                                     group => group.Select(error => error.Description).ToList()
                                 );
-        var exception = Activator.CreateInstance(typeof(TException), message, errorGroups) as TException
+
+        var readonlyErrors = new ReadOnlyDictionary<string, List<string>>(errorGroups);
+        var exception = Activator.CreateInstance(typeof(TException), message, readonlyErrors) as TException
                         ?? throw new InvalidOperationException(
-                            $"Type {typeof(TException).Name} must have a constructor (string message, IDictionary<string, List<string>> errors)."
+                            $"Type {typeof(TException).Name} must have a constructor (string message, IReadOnlyDictionary<string, List<string>> errors)."
                         );
 
         throw exception;

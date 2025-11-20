@@ -18,7 +18,7 @@ public class DeleteProviderHandler : IRequestHandler<DeleteProviderCommand>
     private readonly IValidator<DeleteProviderCommand> _validator;
 
     public DeleteProviderHandler(ILogger<DeleteProviderHandler> logger,
-                                 IUnitOfWork unitOfWork, 
+                                 IUnitOfWork unitOfWork,
                                  IValidator<DeleteProviderCommand> validator)
     {
         _logger = logger;

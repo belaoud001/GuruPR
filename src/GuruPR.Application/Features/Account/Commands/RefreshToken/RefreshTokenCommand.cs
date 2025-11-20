@@ -1,4 +1,4 @@
-﻿using GuruPR.Application.Common.Markers;
+﻿using GuruPR.Application.Common.Markers.Interfaces;
 
 using MediatR;
 

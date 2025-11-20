@@ -50,7 +50,7 @@ public class ProviderController : ControllerBase
     {
         var provider = await _mediator.Send(createProviderCommand);
 
-        return CreatedAtRoute("GetProviderById", new { providerId = provider.Id}, provider);
+        return CreatedAtRoute("GetProviderById", new { providerId = provider.Id }, provider);
     }
 
     [HttpPut("{providerId}")]
