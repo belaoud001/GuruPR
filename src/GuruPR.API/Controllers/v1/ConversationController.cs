@@ -34,9 +34,9 @@ public class ConversationController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<ConversationDto>>> GetAllConversationsByUserIdAsync()
+    public async Task<ActionResult<PaginatedList<ConversationDto>>> GetAllConversationsByUserIdAsync([FromQuery] GetConversationsByUserIdQuery getConversationsByUserIdQuery)
     {
-        var conversations = await _mediator.Send(new GetConversationsByUserIdQuery());
+        var conversations = await _mediator.Send(getConversationsByUserIdQuery);
 
         return Ok(conversations);
     }
@@ -94,7 +94,7 @@ public class ConversationController : ControllerBase
     [HttpPost("{conversationId}/completions")]
     public async Task<ActionResult<MessageDto>> CreateCompletionAsync(string conversationId, [FromBody] CreateCompletionCommand createCompletionCommand)
     {
-        createCompletionCommand.ConversationId = conversationId;
+        createCompletionCommand.Id = conversationId;
 
         var message = await _mediator.Send(createCompletionCommand);
 

@@ -33,7 +33,7 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
 
     public async Task DeleteConversationMessagesAsync(string conversationId, CancellationToken cancellationToken = default)
     {
-        var messages = await _dbSet.Where(message => message.ConversationId == conversationId)
-                                   .ExecuteDeleteAsync(cancellationToken);
+        await _dbSet.Where(message => message.ConversationId == conversationId)
+                    .ForEachAsync(message => _dbSet.Remove(message), cancellationToken);
     }
 }

@@ -164,7 +164,7 @@ public class SemanticKernelChatProvider : IAIChatProvider
 
         chatHistory.AddSystemMessage(agent.Instructions);
 
-        if (!string.IsNullOrEmpty(conversation.Metadata.Summary))
+        if (conversation.Metadata != null && !string.IsNullOrEmpty(conversation.Metadata.Summary))
         {
             chatHistory.AddSystemMessage($"Previous conversation summary: {conversation.Metadata.Summary}");
         }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GuruPR.Persistence.Repositories;
 
-public class ConversationRepository : GenericRepository<Conversation>, IConversationRepository
+public class ConversationRepository : OwnedGenericRepository<Conversation>, IConversationRepository
 {
     public ConversationRepository(GuruDbContext dbContext) : base(dbContext)
     {

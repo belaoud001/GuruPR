@@ -17,7 +17,7 @@ public class Conversation : IOwnedEntity
 
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-    public ConversationMetadata Metadata { get; set; } = null!;
+    public ConversationMetadata? Metadata { get; set; } = new ConversationMetadata();
 
     public void Update(ConversationUpdateData conversationUpdateData)
     {

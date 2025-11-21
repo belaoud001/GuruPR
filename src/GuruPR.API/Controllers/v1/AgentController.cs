@@ -1,18 +1,21 @@
 ﻿using Asp.Versioning;
 
+using GuruPR.Application.Common.Models;
 using GuruPR.Application.Features.Agents.Commands.CreateAgent;
 using GuruPR.Application.Features.Agents.Commands.DeleteAgent;
 using GuruPR.Application.Features.Agents.Commands.UpdateAgent;
+using GuruPR.Application.Features.Agents.Dtos;
 using GuruPR.Application.Features.Agents.Queries.GetAgentById;
 using GuruPR.Application.Features.Agents.Queries.GetAgents;
 
 using MediatR;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuruPR.Controllers.v1;
 
-//[Authorize]
+[Authorize]
 [ApiController]
 [ApiVersion(1.0)]
 [Route("api/v{version:apiVersion}/agents")]
@@ -29,7 +32,7 @@ public class AgentController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllAgentsAsync([FromBody] GetAgentsQuery getAgentsQuery)
+    public async Task<ActionResult<PaginatedList<AgentDto>>> GetAllAgentsAsync([FromQuery] GetAgentsQuery getAgentsQuery)
     {
         var agents = await _mediator.Send(getAgentsQuery);
 
@@ -37,7 +40,7 @@ public class AgentController : ControllerBase
     }
 
     [HttpGet("{agentId}", Name = "GetAgentById")]
-    public async Task<IActionResult> GetAgentByIdAsync([FromRoute] string agentId)
+    public async Task<ActionResult<AgentDto>> GetAgentByIdAsync([FromRoute] string agentId)
     {
         var getAgentByIdQuery = new GetAgentByIdQuery(agentId);
         var agent = await _mediator.Send(getAgentByIdQuery);
@@ -54,7 +57,7 @@ public class AgentController : ControllerBase
     }
 
     [HttpPut("{agentId}")]
-    public async Task<IActionResult> UpdateAgentAsync([FromRoute] string agentId, [FromBody] UpdateAgentCommand updateAgentCommand)
+    public async Task<ActionResult<AgentDto>> UpdateAgentAsync([FromRoute] string agentId, [FromBody] UpdateAgentCommand updateAgentCommand)
     {
         updateAgentCommand.Id = agentId;
 

@@ -11,11 +11,9 @@ public class ProviderConnectionProfile : Profile
 {
     public ProviderConnectionProfile()
     {
-        CreateMap<ProviderConnection, ProviderConnectionDto>();
-        CreateMap<ProviderConnectionDto, ProviderConnection>();
+        CreateMap<ProviderConnection, ProviderConnectionDto>().ReverseMap();
 
-        CreateMap<ProviderConnection, CreateProviderConnectionCommand>();
-        CreateMap<CreateProviderConnectionCommand, ProviderConnection>();
+        CreateMap<ProviderConnection, CreateProviderConnectionCommand>().ReverseMap();
 
         CreateMap<ProviderConnection, UpdateProviderConnectionCommand>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));

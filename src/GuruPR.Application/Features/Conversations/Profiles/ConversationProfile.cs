@@ -12,13 +12,10 @@ public class ConversationProfile : Profile
 {
     public ConversationProfile()
     {
-        CreateMap<Conversation, ConversationDto>();
-        CreateMap<ConversationDto, Conversation>();
+        CreateMap<Conversation, ConversationDto>().ReverseMap();
 
-        CreateMap<Conversation, CreateConversationCommand>();
-        CreateMap<CreateConversationCommand, Conversation>();
+        CreateMap<Conversation, CreateConversationCommand>().ReverseMap();
 
-        CreateMap<UpdateConversationCommand, ConversationUpdateData>();
-        CreateMap<ConversationUpdateData, UpdateConversationCommand>();
+        CreateMap<UpdateConversationCommand, ConversationUpdateData>().ReverseMap();
     }
 }

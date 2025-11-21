@@ -25,13 +25,11 @@ public class PaginatedList<T>
                                                            int pageSize,
                                                            CancellationToken cancellationToken = default)
     {
-        var countTask = source.CountAsync(cancellationToken);
-        var itemsTask = source.Skip((pageIndex - 1) * pageSize)
-                              .Take(pageSize)
-                              .ToListAsync(cancellationToken);
+        var count = await source.CountAsync(cancellationToken);
+        var items = await source.Skip((pageIndex - 1) * pageSize)
+                                .Take(pageSize)
+                                .ToListAsync(cancellationToken);
 
-        await Task.WhenAll(countTask, itemsTask);
-
-        return new PaginatedList<T>(await itemsTask, await countTask, pageIndex, pageSize);
+        return new PaginatedList<T>(items, count, pageIndex, pageSize);
     }
 }

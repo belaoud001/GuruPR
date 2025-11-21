@@ -10,12 +10,11 @@ namespace GuruPR.Application.Features.Conversations.Commands.CreateCompletion;
 
 public class CreateCompletionCommand : IRequest<MessageDto>, IOwnedEntityRequest<Conversation>
 {
-    public string Id { get; set; } = null!;
+    [JsonIgnore]
+    public string? Id { get; set; } = null!;
 
     [JsonIgnore]
-    public string UserId { get; set; } = null!;
-
-    public string ConversationId { get; set; } = null!;
+    public string? UserId { get; set; } = null!;
 
     public string Message { get; set; } = null!;
 

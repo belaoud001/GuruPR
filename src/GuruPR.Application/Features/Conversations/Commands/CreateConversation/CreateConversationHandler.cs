@@ -31,6 +31,7 @@ public class CreateConversationHandler : IRequestHandler<CreateConversationComma
                                              (message, errors) => new ConversationValidationException(message, errors));
 
         var conversation = _mapper.Map<Conversation>(request);
+
         var createdConversation = await _unitOfWork.Conversations.AddAsync(conversation);
 
         await _unitOfWork.SaveGuruChangesAsync();

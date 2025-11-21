@@ -12,10 +12,11 @@ namespace GuruPR.Application.Features.Agents.Commands.UpdateAgent;
 
 public record UpdateAgentCommand : IRequest<AgentDto>, IOwnedEntityRequest<Agent>
 {
-    public string Id { get; set; } = null!;
+    [JsonIgnore]
+    public string? Id { get; set; } = null!;
 
     [JsonIgnore]
-    public string UserId { get; set; } = null!;
+    public string? UserId { get; set; } = null!;
 
     public string Name { get; set; } = null!;
     public string AvatarUrl { get; set; } = null!;

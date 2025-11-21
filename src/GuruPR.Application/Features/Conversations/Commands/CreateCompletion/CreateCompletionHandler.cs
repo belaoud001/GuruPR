@@ -36,12 +36,12 @@ public class CreateCompletionHandler : IRequestHandler<CreateCompletionCommand, 
 
     public async Task<MessageDto> Handle(CreateCompletionCommand request, CancellationToken cancellationToken)
     {
-        var conversation = await _unitOfWork.Conversations.GetByIdOrThrowAsync(request.ConversationId, cancellationToken);
+        var conversation = await _unitOfWork.Conversations.GetByIdOrThrowAsync(request.Id, cancellationToken);
         var agent = await _unitOfWork.Agents.GetByIdOrThrowAsync(conversation.AgentId, cancellationToken);
 
         ValidateAgentIsActive(agent);
 
-        var messages = await _unitOfWork.Messages.GetMessagesAsync(request.ConversationId,
+        var messages = await _unitOfWork.Messages.GetMessagesAsync(request.Id,
                                                                    agent.MemoryConfiguration.MaxContextMessages,
                                                                    cancellationToken);
 
@@ -89,17 +89,14 @@ public class CreateCompletionHandler : IRequestHandler<CreateCompletionCommand, 
                                            AgentExecutionResult agentExecutionResult,
                                            CancellationToken cancellationToken)
     {
-        await _unitOfWork.BeginGuruTransactionAsync(cancellationToken);
-
         try
         {
+            // ToDo : Consider moving transaction management to a higher level if multiple operations need to be atomic.
             await SaveMessagesAsync(userMessage, agentMessage, cancellationToken);
-
             UpdateConversation(conversation, agentExecutionResult);
-
             await HandleSummaryAsync(agent, conversation, cancellationToken);
 
-            await _unitOfWork.CommitGuruTransactionAsync(cancellationToken);
+            await _unitOfWork.SaveGuruChangesAsync(cancellationToken);
         }
         catch (Exception ex)
         {

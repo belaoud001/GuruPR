@@ -15,13 +15,10 @@ public class ProviderProfile : Profile
         CreateMap<Provider, Provider>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
-        CreateMap<Provider, ProviderDto>();
-        CreateMap<ProviderDto, Provider>();
+        CreateMap<Provider, ProviderDto>().ReverseMap();
 
-        CreateMap<Provider, CreateAgentCommand>();
-        CreateMap<CreateAgentCommand, Provider>();
+        CreateMap<Provider, CreateAgentCommand>().ReverseMap();
 
-        CreateMap<ProviderUpdateData, UpdateProviderCommand>();
-        CreateMap<UpdateProviderCommand, ProviderUpdateData>();
+        CreateMap<ProviderUpdateData, UpdateProviderCommand>().ReverseMap();
     }
 }

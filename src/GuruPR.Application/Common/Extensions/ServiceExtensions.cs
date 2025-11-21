@@ -44,15 +44,16 @@ public static class ServiceExtensions
 {
     public static void AddApplicationServices(this IServiceCollection services)
     {
-        services.AddAutoMapper(config =>
+        services.AddAutoMapper(configuration =>
         {
-            config.AllowNullCollections = true;
+            configuration.AllowNullCollections = true;
 
-            config.AddProfile<ProviderProfile>();
-            config.AddProfile<ProviderConnectionProfile>();
-            config.AddProfile<AgentProfile>();
-            config.AddProfile<ConversationProfile>();
-            config.AddProfile<UserProfile>();
+            configuration.AddProfile<UserProfile>();
+            configuration.AddProfile<AgentProfile>();
+            configuration.AddProfile<MessageProfile>();
+            configuration.AddProfile<ProviderProfile>();
+            configuration.AddProfile<ConversationProfile>();
+            configuration.AddProfile<ProviderConnectionProfile>();
         });
 
         services.AddMediatR(configuration =>
