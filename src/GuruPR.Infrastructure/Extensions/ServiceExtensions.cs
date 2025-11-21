@@ -1,13 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 
-using GuruPR.Application.Interfaces.Application;
-using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Plugins;
-using GuruPR.Application.Services.Account;
-using GuruPR.Application.Settings.Authentication;
-using GuruPR.Application.Settings.ModelConfiguration.AzureOpenAI;
-using GuruPR.Application.Settings.ModelConfiguration.HuggingFace;
-using GuruPR.Application.Settings.Security;
+using GuruPR.Application.Common.Interfaces.Infrastructure;
+using GuruPR.Application.Common.Interfaces.Infrastructure.SemanticKernel.Plugins;
+using GuruPR.Application.Common.Settings.Authentication;
+using GuruPR.Application.Common.Settings.ModelConfiguration.AzureOpenAI;
+using GuruPR.Application.Common.Settings.ModelConfiguration.HuggingFace;
+using GuruPR.Application.Common.Settings.Security;
 using GuruPR.Infrastructure.HttpClients.Spotify;
 using GuruPR.Infrastructure.Identity.Constants;
 using GuruPR.Infrastructure.SemanticKernel.Filters;
@@ -127,7 +125,6 @@ public static class ServiceExtensions
                 );
 
         services.AddScoped<ITokenService, JwtTokenService>();
-        services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IExternalAuthService, ExternalAuthService>();
     }
 

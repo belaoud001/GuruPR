@@ -12,9 +12,16 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="15.0.1" />
+      <PackageReference Include="FluentValidation" Version="12.1.0" />
       <PackageReference Include="JetBrains.Annotations" Version="2025.1.0-eap1" />
+      <PackageReference Include="MediatR" Version="13.1.0" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.10" />
       <PackageReference Include="Microsoft.SemanticKernel" Version="1.66.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Common\Interfaces\Infrastructure\SemanticKernel\Models\" />
+      <Folder Include="Features\Account\Profiles\" />
     </ItemGroup>
 
 </Project>

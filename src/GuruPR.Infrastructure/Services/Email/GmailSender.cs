@@ -1,4 +1,4 @@
-﻿using GuruPR.Application.Settings.Email;
+﻿using GuruPR.Application.Common.Settings.Email;
 
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 
 namespace GuruPR.Infrastructure.Services.Email;
+
 public class GmailSender : IEmailSender
 {
     private GmailingAppSettings _gmailingSettings;

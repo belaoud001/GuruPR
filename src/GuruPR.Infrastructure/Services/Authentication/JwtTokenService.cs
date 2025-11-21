@@ -3,14 +3,16 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
+using GuruPR.Application.Common.Interfaces.Infrastructure;
+using GuruPR.Application.Common.Settings.Authentication;
 using GuruPR.Application.Dtos.Jwt;
-using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Application.Settings.Security;
 using GuruPR.Domain.Entities;
+using GuruPR.Infrastructure.Exceptions;
 using GuruPR.Infrastructure.Identity.Constants;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,79 +20,181 @@ namespace GuruPR.Infrastructure.Services.Authentication;
 
 public class JwtTokenService : ITokenService
 {
+    private readonly ILogger<JwtTokenService> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IHasher _hasher;
     private readonly UserManager<User> _userManager;
     private readonly JwtSettings _jwtSettings;
+    private readonly RefreshTokenSettings _refreshTokenSettings;
 
-    public JwtTokenService(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IOptions<JwtSettings> jwtSettings)
+    public JwtTokenService(ILogger<JwtTokenService> logger,
+                           IHttpContextAccessor httpContextAccessor,
+                           IHasher hasher,
+                           UserManager<User> userManager,
+                           IOptions<JwtSettings> jwtSettings,
+                           IOptions<RefreshTokenSettings> refreshTokenSettings)
     {
+        _logger = logger;
         _httpContextAccessor = httpContextAccessor;
+        _hasher = hasher;
         _userManager = userManager;
         _jwtSettings = jwtSettings.Value;
+        _refreshTokenSettings = refreshTokenSettings.Value;
     }
 
-    public async Task<JwtTokenResult> GenerateTokenAsync(User user)
+    #region Public Methods
+
+    public async Task IssueNewTokenPairAsync(User user)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+
+        var jwtTokenResult = await GenerateAccessTokenAsync(user);
+        var refreshToken = GenerateRefreshToken();
+        var refreshTokenExpiry = DateTime.UtcNow.AddDays(_refreshTokenSettings.ExpirationTimeInDays);
+
+        user.UpdateRefreshToken(_hasher.Hash(refreshToken), refreshTokenExpiry);
+
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+            _logger.LogError("Failed to update refresh token for user {UserId}. Errors: {Errors}", user.Id, errors);
+
+            throw new TokenUpdateFailedException("Failed to update refresh token for the user.");
+        }
+
+        WriteAccessTokenCookie(jwtTokenResult.Token, jwtTokenResult.ExpiresAtUtc);
+        WriteRefreshTokenCookie(refreshToken, refreshTokenExpiry);
+    }
+
+    public async Task RenewAccessTokenAsync(User user)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+
+        var jwtTokenResult = await GenerateAccessTokenAsync(user);
+
+        WriteAccessTokenCookie(jwtTokenResult.Token, jwtTokenResult.ExpiresAtUtc);
+    }
+
+    public async Task RevokeTokensAsync(User user)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+
+        user.ClearRefreshToken();
+
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            var errors = string.Join(", ", updateResult.Errors.Select(error => error.Description));
+            _logger.LogError("Failed to revoke tokens for user {UserId}. Errors: {Errors}", user.Id, errors);
+
+            throw new TokenUpdateFailedException("Failed to revoke tokens for the user.");
+        }
+
+        ClearAuthenticationCookies();
+    }
+
+    #endregion
+
+    #region Private Methods - Token Generation
+
+    private async Task<JwtTokenResult> GenerateAccessTokenAsync(User user)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
-        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
-        var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-        var claims = new List<Claim>
-        {
-            new Claim(JwtClaimTypes.Subject, user.Id.ToString()),
-            new Claim(JwtClaimTypes.JwtId,   Guid.NewGuid().ToString()),
-            new Claim(JwtClaimTypes.Email,   user.Email ?? string.Empty),
-
-            new Claim(JwtClaimTypes.Name, user.ToString())
-        };
-        claims.AddRange(userRoles.Select(role => new Claim(JwtClaimTypes.Role, role)));
-
-        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
-
-        var expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationTimeInMinutes);
+        var claims = BuildClaims(user, userRoles);
+        var signingCredentials = CreateSigningCredentials();
+        var expiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationTimeInMinutes);
         var token = new JwtSecurityToken(issuer: _jwtSettings.Issuer,
                                          audience: _jwtSettings.Audience,
                                          claims: claims,
                                          notBefore: DateTime.UtcNow,
-                                         expires: expires,
+                                         expires: expiresAt,
                                          signingCredentials: signingCredentials);
         var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-        var jwtTokenResult = new JwtTokenResult
+
+        return new JwtTokenResult
         {
             Token = jwtToken,
-            ExpiresAtUtc = expires
+            ExpiresAtUtc = expiresAt
         };
-
-        return jwtTokenResult;
     }
 
-    public string GenerateRefreshToken()
+    private List<Claim> BuildClaims(User user, IList<string> roles)
     {
-        var randomNumber = new byte[64];
-        using var randomNumberGenerator = RandomNumberGenerator.Create();
+        var claims = new List<Claim>
+                     {
+                         new(JwtClaimTypes.Subject, user.Id.ToString()),
+                         new(JwtClaimTypes.JwtId, Guid.NewGuid().ToString()),
+                         new(JwtClaimTypes.Email, user.Email ?? string.Empty),
+                         new(JwtClaimTypes.Name, user.ToString())
+                     };
 
-        randomNumberGenerator.GetBytes(randomNumber);
+        claims.AddRange(roles.Select(role => new Claim(JwtClaimTypes.Role, role)));
 
-        return Convert.ToBase64String(randomNumber);
+        return claims;
     }
 
-    public void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token, DateTime expiration)
+    private SigningCredentials CreateSigningCredentials()
     {
-        var httpContext = _httpContextAccessor.HttpContext;
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
 
-        if (httpContext == null)
-        {
+        return new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+    }
+
+    private static string GenerateRefreshToken()
+    {
+        var randomBytes = RandomNumberGenerator.GetBytes(64);
+
+        return Convert.ToBase64String(randomBytes);
+    }
+
+    #endregion
+
+    #region Private Methods - Cookie Management
+
+    private void WriteAccessTokenCookie(string token, DateTime expiration)
+    {
+        var httpContext = GetHttpContext();
+        var cookieOptions = CreateSecureCookieOptions(expiration);
+
+        httpContext.Response.Cookies.Append("AccessToken", token, cookieOptions);
+    }
+
+    private void WriteRefreshTokenCookie(string token, DateTime expiration)
+    {
+        var httpContext = GetHttpContext();
+        var cookieOptions = CreateSecureCookieOptions(expiration);
+
+        httpContext.Response.Cookies.Append("RefreshToken", token, cookieOptions);
+    }
+
+    private void ClearAuthenticationCookies()
+    {
+        var httpContext = GetHttpContext();
+
+        httpContext.Response.Cookies.Delete("AccessToken");
+        httpContext.Response.Cookies.Delete("RefreshToken");
+    }
+
+    private HttpContext GetHttpContext()
+    {
+        return _httpContextAccessor.HttpContext ??
             throw new InvalidOperationException("HttpContext is not available. This method must be called within an HTTP request context.");
-        }
-
-        var cookieOptions = new CookieOptions
-        {
-            Secure = true,
-            HttpOnly = true,
-            Expires = expiration,
-            IsEssential = true,
-            SameSite = SameSiteMode.None
-        };
-        httpContext.Response.Cookies.Append(cookieName, token, cookieOptions);
     }
+
+    private CookieOptions CreateSecureCookieOptions(DateTime expiration)
+    {
+        return new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict, // Use Strict for better security, change to None only if needed for CORS
+            IsEssential = true,
+            Expires = expiration,
+            // Path = "/"
+            // Domain = _jwtSettings.CookieDomain // Configure in production
+        };
+    }
+
+    #endregion
 }

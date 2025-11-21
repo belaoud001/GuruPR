@@ -1,12 +1,15 @@
 ﻿using Asp.Versioning;
 
-using GuruPR.Application.Extensions;
-using GuruPR.Application.Settings;
-using GuruPR.Application.Settings.Email;
-using GuruPR.Application.Settings.FrontEnd;
-using GuruPR.Application.Settings.Security;
+using GuruPR.Application.Common.Extensions;
+using GuruPR.Application.Common.Interfaces.Presentation;
+using GuruPR.Application.Common.Settings;
+using GuruPR.Application.Common.Settings.Authentication;
+using GuruPR.Application.Common.Settings.Email;
+using GuruPR.Application.Common.Settings.FrontEnd;
+using GuruPR.Application.Common.Settings.Security;
 using GuruPR.Infrastructure.Extensions;
 using GuruPR.Persistence.Extensions;
+using GuruPR.Services;
 
 namespace GuruPR.Extensions;
 
@@ -32,11 +35,14 @@ public static class ServiceCollectionExtensions
             }
         );
 
+        services.AddHttpContextAccessor();
+
         services.ConfigureCors();
         services.ConfigureLogging();
         services.ConfigureSignalR();
 
         services.ConfigureSettings(configuration);
+        services.ConfigurePresentationServices();
         services.ConfigureApplicationServices();
         services.ConfigurePersistence(configuration);
         services.ConfigureInfrastructure(configuration);
@@ -59,9 +65,10 @@ public static class ServiceCollectionExtensions
         services.AddCors(
             options => options.AddPolicy(
                 "CorsPolicy",
-                builder => builder.AllowAnyOrigin()
+                builder => builder.WithOrigins("http://localhost:5173")
                                   .AllowAnyMethod()
-                                  .AllowAnyHeader())
+                                  .AllowAnyHeader()
+                                  .AllowCredentials())
         );
     }
 
@@ -70,9 +77,11 @@ public static class ServiceCollectionExtensions
         services.AddSettings<JwtSettings>(configuration);
         services.AddSettings<FrontEndSettings>(configuration);
         services.AddSettings<GmailingAppSettings>(configuration);
+        services.AddSettings<RefreshTokenSettings>(configuration);
         services.AddSettings<TokenHashingSettings>(configuration);
         services.AddSettings<EmailValidationSettings>(configuration);
         services.AddSettings<TokenEncryptionSettings>(configuration);
+        services.AddSettings<AllowedOriginsSettings>(configuration);
     }
 
     private static void AddSettings<T>(this IServiceCollection services, IConfiguration configuration) where T : class, ISettings
@@ -88,6 +97,11 @@ public static class ServiceCollectionExtensions
     private static void ConfigureSignalR(this IServiceCollection services)
     {
         services.AddSignalR();
+    }
+
+    private static void ConfigurePresentationServices(this IServiceCollection services)
+    {
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
     }
 
     private static void ConfigureApplicationServices(this IServiceCollection services)

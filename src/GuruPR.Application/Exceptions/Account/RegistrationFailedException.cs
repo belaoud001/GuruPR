@@ -1,18 +1,14 @@
-﻿using GuruPR.Application.Exceptions.Interfaces;
+﻿using GuruPR.Application.Common.Exceptions;
 
 namespace GuruPR.Application.Exceptions.Account;
 
-public class RegistrationFailedException : AccountException, IValidationException
+public class RegistrationFailedException : ValidationExceptionBase
 {
-    public IReadOnlyDictionary<string, List<string>> Errors { get; }
-
     public RegistrationFailedException(string message) : base(message)
     {
-        Errors = new Dictionary<string, List<string>>();
     }
 
-    public RegistrationFailedException(string message, IReadOnlyDictionary<string, List<string>> errors) : base(message)
+    public RegistrationFailedException(string message, IReadOnlyDictionary<string, List<string>> errors) : base(message, errors)
     {
-        Errors = errors;
     }
 }

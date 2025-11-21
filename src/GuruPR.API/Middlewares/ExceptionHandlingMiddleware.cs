@@ -1,6 +1,7 @@
-﻿using GuruPR.Application.Exceptions;
+﻿using GuruPR.Application.Common.Exceptions;
+using GuruPR.Application.Common.Exceptions.Interfaces;
 using GuruPR.Application.Exceptions.Account;
-using GuruPR.Application.Exceptions.Interfaces;
+using GuruPR.Application.Features.Account.Exceptions;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,10 +44,12 @@ public class ExceptionHandlingMiddleware
         var (statusCode, title) = exception switch
         {
             // Client Errors
-            ArgumentNullException => (StatusCodes.Status400BadRequest, "A required argument was missing"),
             InvalidReturnUrlException => (StatusCodes.Status400BadRequest, "Invalid Return URL"),
-            RegistrationFailedException => (StatusCodes.Status400BadRequest, "User Registration Failed"),
             UntrustedReturnUrlException => (StatusCodes.Status400BadRequest, "Untrusted Return URL"),
+            EmailConfirmationException => (StatusCodes.Status400BadRequest, "Email Confirmation Failed"),
+            RegistrationFailedException => (StatusCodes.Status400BadRequest, "User Registration Failed"),
+            ArgumentNullException => (StatusCodes.Status400BadRequest, "A required argument was missing"),
+            ValidationExceptionBase => (StatusCodes.Status400BadRequest, "Validation Failed"),
 
             LoginFailedException => (StatusCodes.Status401Unauthorized, "Login Failed"),
             RefreshTokenException => (StatusCodes.Status401Unauthorized, "Invalid Refresh Token"),
@@ -57,6 +60,7 @@ public class ExceptionHandlingMiddleware
             UserAlreadyExistsException => (StatusCodes.Status409Conflict, "User Already Exists"),
 
             // Server Errors
+            InvalidOperationException => (StatusCodes.Status500InternalServerError, "Invalid Operation"),
             MissingAllowedOriginsException => (StatusCodes.Status500InternalServerError, "Missing Allowed Origins Configuration"),
             UserRoleOperationFailedException => (StatusCodes.Status500InternalServerError, "User Role Operation Failed"),
             OperationFailedException => (StatusCodes.Status500InternalServerError, "Operation Failed"),

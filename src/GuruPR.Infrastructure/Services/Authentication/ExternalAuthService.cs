@@ -1,5 +1,5 @@
-﻿using GuruPR.Application.Interfaces.Application;
-using GuruPR.Application.Interfaces.Infrastructure;
+﻿using GuruPR.Application.Common.Interfaces.Application;
+using GuruPR.Application.Common.Interfaces.Infrastructure;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Enums;
 using GuruPR.Domain.Extensions.Authentication;
@@ -17,29 +17,29 @@ namespace GuruPR.Infrastructure.Services.Authentication;
 public class ExternalAuthService : IExternalAuthService
 {
     private readonly ILogger<ExternalAuthService> _logger;
-    private readonly IAccountService _accountService;
-    private readonly IUrlValidator _urlValidator;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IExternalUserProvisioningService _externalUserProvisioningService;
     private readonly LinkGenerator _linkGenerator;
     private readonly SignInManager<User> _signInManager;
 
     public ExternalAuthService(ILogger<ExternalAuthService> logger,
-                               IAccountService accountService,
-                               IUrlValidator urlValidator,
+                               IHttpContextAccessor httpContextAccessor,
+                               IExternalUserProvisioningService externalUserProvisioningService,
                                LinkGenerator linkGenerator,
                                SignInManager<User> signInManager)
     {
         _logger = logger;
-        _accountService = accountService;
-        _urlValidator = urlValidator;
+        _httpContextAccessor = httpContextAccessor;
+        _externalUserProvisioningService = externalUserProvisioningService;
         _linkGenerator = linkGenerator;
         _signInManager = signInManager;
     }
 
-    public Task<ChallengeResult> InitiateGoogleLoginAsync(string? returnUrl, HttpContext httpContext)
+    public Task<ChallengeResult> InitiateGoogleLoginAsync(string? returnUrl)
     {
         try
         {
-            _urlValidator.ValidateReturnUrl(returnUrl);
+            var httpContext = _httpContextAccessor.HttpContext ?? throw new InvalidOperationException("Http context is missing.");
 
             var callbackUrl = _linkGenerator.GetUriByName(httpContext, "GoogleLoginCallback", new { returnUrl });
             if (string.IsNullOrEmpty(callbackUrl))
@@ -62,11 +62,11 @@ public class ExternalAuthService : IExternalAuthService
         }
     }
 
-    public async Task<string> HandleGoogleCallbackAsync(string returnUrl, HttpContext httpContext)
+    public async Task<string> HandleGoogleCallbackAsync(string returnUrl)
     {
         try
         {
-            _urlValidator.ValidateReturnUrl(returnUrl);
+            var httpContext = _httpContextAccessor.HttpContext ?? throw new InvalidOperationException("Http context is missing.");
 
             var authResult = await httpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
             if (!authResult.Succeeded)
@@ -84,7 +84,7 @@ public class ExternalAuthService : IExternalAuthService
             }
 
             var provider = ExternalProvider.Google.ToName();
-            await _accountService.LoginWithExternalProviderAsync(authResult.Principal, provider);
+            await _externalUserProvisioningService.LoginWithExternalProviderAsync(authResult.Principal, provider);
 
             return returnUrl;
         }
@@ -96,7 +96,7 @@ public class ExternalAuthService : IExternalAuthService
         {
             _logger.LogError(ex, "Error handling Google login callback");
 
-            throw new InvalidOperationException("Failed to process Google login callback", ex);
+            throw;
         }
     }
 }

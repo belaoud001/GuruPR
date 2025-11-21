@@ -1,8 +1,8 @@
-﻿using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Domain.Entities;
+﻿using GuruPR.Application.Common.Interfaces.Infrastructure;
+using GuruPR.Domain.Entities.Agents;
 using GuruPR.Domain.Entities.Conversation;
 using GuruPR.Domain.Entities.Message;
-using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Domain.Entities.Provider;
 using GuruPR.Domain.Entities.Tool;
 using GuruPR.Persistence.Extensions.ContextConfiguration;
 
@@ -43,6 +43,7 @@ public class GuruDbContext : DbContext
         modelBuilder.ApplyConfiguration(new AgentConfiguration());
         modelBuilder.ApplyConfiguration(new MessageConfiguration());
         modelBuilder.ApplyConfiguration(new ConversationConfiguration());
-        modelBuilder.ApplyConfiguration(new ProviderConfiguration(_tokenEncryptionService));
+        modelBuilder.ApplyConfiguration(new ProviderConfiguration());
+        modelBuilder.ApplyConfiguration(new ProviderConnectionConfiguration(_tokenEncryptionService));
     }
 }

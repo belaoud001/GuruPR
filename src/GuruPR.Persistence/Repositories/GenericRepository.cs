@@ -1,4 +1,6 @@
-﻿using GuruPR.Application.Interfaces.Persistence;
+﻿using System.Linq.Expressions;
+
+using GuruPR.Application.Common.Interfaces.Persistence;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -15,19 +17,32 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         _dbSet = _context.Set<T>();
     }
 
-    public async Task<List<T>> GetAllAsync()
+    public IQueryable<T> AsQueryable()
     {
-        return await _dbSet.ToListAsync();
+        return _dbSet.AsQueryable();
     }
 
-    public async Task<T?> GetByIdAsync(string id)
+    public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FindAsync(id);
+        var query = _dbSet.AsNoTracking()
+                          .AsQueryable();
+
+        if (predicate != null)
+        {
+            query = query.Where(predicate);
+        }
+
+        return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task<T> AddAsync(T entity)
+    public async Task<T?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        var result = await _dbSet.AddAsync(entity);
+        return await _dbSet.FindAsync([id], cancellationToken); ;
+    }
+
+    public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
+    {
+        var result = await _dbSet.AddAsync(entity, cancellationToken);
 
         return result.Entity;
     }

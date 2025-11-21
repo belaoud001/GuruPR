@@ -1,6 +1,9 @@
-﻿namespace GuruPR.Domain.Entities.Conversation;
+﻿using GuruPR.Domain.Entities.Conversation.Operations;
+using GuruPR.Domain.Interfaces.Markers;
 
-public class Conversation
+namespace GuruPR.Domain.Entities.Conversation;
+
+public class Conversation : IOwnedEntity
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
@@ -10,11 +13,17 @@ public class Conversation
 
     public string Title { get; set; } = null!;
 
-    public Dictionary<string, object> State { get; set; } = null!;
-
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-    public ConversationMetadata Metadata { get; set; } = null!;
+    public ConversationMetadata? Metadata { get; set; } = new ConversationMetadata();
+
+    public void Update(ConversationUpdateData conversationUpdateData)
+    {
+        Title = conversationUpdateData.Title;
+        AgentId = conversationUpdateData.AgentId;
+
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

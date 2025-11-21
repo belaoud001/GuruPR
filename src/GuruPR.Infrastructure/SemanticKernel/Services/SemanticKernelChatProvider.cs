@@ -1,7 +1,8 @@
-﻿using GuruPR.Application.Interfaces.Infrastructure;
-using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Models;
-using GuruPR.Application.Interfaces.Infrastructure.SemanticKernel.Plugins;
-using GuruPR.Domain.Entities.Configurations;
+﻿using GuruPR.Application.Common.Interfaces.Infrastructure;
+using GuruPR.Application.Common.Interfaces.Infrastructure.SemanticKernel.Plugins;
+using GuruPR.Application.Features.Conversations.Models.CreateCompletion;
+using GuruPR.Application.Features.Conversations.Models.ToolCalls;
+using GuruPR.Domain.Entities.Agents.Configurations;
 using GuruPR.Domain.Entities.Conversation;
 using GuruPR.Domain.Entities.Message;
 using GuruPR.Domain.Entities.Tool;
@@ -14,7 +15,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 
-using Agent = GuruPR.Domain.Entities.Agent;
+using Agent = GuruPR.Domain.Entities.Agents.Agent;
 
 namespace GuruPR.Infrastructure.SemanticKernel.Services;
 
@@ -31,7 +32,7 @@ public class SemanticKernelChatProvider : IAIChatProvider
 
     #region Public Methods
 
-    public async Task<AgentExecutionResult> ExecuteAsync(Agent agent, Conversation conversation, IList<Message> messages, string userMessage)
+    public async Task<AgentExecutionResult> ExecuteAsync(Agent agent, Conversation conversation, IList<Message> messages, string userMessage, CancellationToken cancellationToken = default)
     {
         var startTime = DateTime.UtcNow;
 
@@ -74,7 +75,7 @@ public class SemanticKernelChatProvider : IAIChatProvider
         };
     }
 
-    public async Task<string?> GenerateSummaryAsync(IList<Message> messages, string? existingSummary)
+    public async Task<string?> GenerateSummaryAsync(IList<Message> messages, string? existingSummary, CancellationToken cancellationToken)
     {
         string summaryPrompt;
 
@@ -161,9 +162,9 @@ public class SemanticKernelChatProvider : IAIChatProvider
         var chatHistory = new ChatHistory();
         var memoryConfiguration = agent.MemoryConfiguration;
 
-        chatHistory.AddSystemMessage(agent.Instrunctions);
+        chatHistory.AddSystemMessage(agent.Instructions);
 
-        if (!string.IsNullOrEmpty(conversation.Metadata.Summary))
+        if (conversation.Metadata != null && !string.IsNullOrEmpty(conversation.Metadata.Summary))
         {
             chatHistory.AddSystemMessage($"Previous conversation summary: {conversation.Metadata.Summary}");
         }
@@ -204,7 +205,7 @@ public class SemanticKernelChatProvider : IAIChatProvider
         {
             Kernel = kernel,
             Name = safeAgentName,
-            Instructions = agent.Instrunctions,
+            Instructions = agent.Instructions,
             Arguments = new KernelArguments(executionSettings)
         };
         var agentResponse = chatCompletionAgent.InvokeAsync(chatHistory);

@@ -1,6 +1,6 @@
-﻿using GuruPR.Application.Exceptions;
+﻿using GuruPR.Application.Common.Exceptions;
+using GuruPR.Application.Common.Settings.Database;
 using GuruPR.Application.Exceptions.Account;
-using GuruPR.Application.Settings.Database;
 using GuruPR.Domain.Entities;
 using GuruPR.Domain.Enums;
 using GuruPR.Domain.Extensions.User;

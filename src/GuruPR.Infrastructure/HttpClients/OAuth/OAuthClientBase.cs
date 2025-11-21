@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 
-using GuruPR.Domain.Entities.OAuth;
+using GuruPR.Domain.Entities.ProviderConnection;
 
 namespace GuruPR.Infrastructure.HttpClients.OAuth;
 

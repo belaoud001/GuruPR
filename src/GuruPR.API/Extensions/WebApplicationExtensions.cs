@@ -13,6 +13,8 @@ public static class WebApplicationExtensions
 
         app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+        app.UseCors("CorsPolicy");
+
         app.UseRouting();
 
         app.UseAuthentication();

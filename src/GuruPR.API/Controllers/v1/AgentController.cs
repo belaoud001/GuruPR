@@ -1,11 +1,14 @@
 ﻿using Asp.Versioning;
 
-using AutoMapper;
+using GuruPR.Application.Common.Models;
+using GuruPR.Application.Features.Agents.Commands.CreateAgent;
+using GuruPR.Application.Features.Agents.Commands.DeleteAgent;
+using GuruPR.Application.Features.Agents.Commands.UpdateAgent;
+using GuruPR.Application.Features.Agents.Dtos;
+using GuruPR.Application.Features.Agents.Queries.GetAgentById;
+using GuruPR.Application.Features.Agents.Queries.GetAgents;
 
-using GuruPR.Application.Dtos.Agent;
-using GuruPR.Application.Interfaces.Application;
-using GuruPR.Extensions;
-using GuruPR.Infrastructure.Identity.Constants;
+using MediatR;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,64 +22,57 @@ namespace GuruPR.Controllers.v1;
 public class AgentController : ControllerBase
 {
     private readonly ILogger<AgentController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IAgentService _agentService;
+    private readonly IMediator _mediator;
 
     public AgentController(ILogger<AgentController> logger,
-                           IMapper mapper,
-                           IAgentService agentService)
+                           IMediator mediator)
     {
         _logger = logger;
-        _mapper = mapper;
-        _agentService = agentService;
+        _mediator = mediator;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllAgentsAsync()
+    public async Task<ActionResult<PaginatedList<AgentDto>>> GetAllAgentsAsync([FromQuery] GetAgentsQuery getAgentsQuery)
     {
-        var agents = await _agentService.GetAllAgentsAsync();
-        var agentDtos = _mapper.Map<IEnumerable<AgentDto>>(agents);
+        var agents = await _mediator.Send(getAgentsQuery);
 
-        return Ok(agentDtos);
+        return Ok(agents);
     }
 
     [HttpGet("{agentId}", Name = "GetAgentById")]
-    public async Task<IActionResult> GetAgentByIdAsync(string agentId)
+    public async Task<ActionResult<AgentDto>> GetAgentByIdAsync([FromRoute] string agentId)
     {
-        var agent = await _agentService.GetAgentByIdAsync(agentId);
+        var getAgentByIdQuery = new GetAgentByIdQuery(agentId);
+        var agent = await _mediator.Send(getAgentByIdQuery);
 
         return Ok(agent);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAgentAsync([FromBody] CreateAgentRequest createAgentRequest)
+    public async Task<IActionResult> CreateAgentAsync([FromBody] CreateAgentCommand createAgentCommand)
     {
-        var userId = User.GetClaimValue(JwtClaimTypes.Name);
-        if (userId == null)
-        {
-            return Unauthorized("Invalid token or missing subject claim.");
-        }
+        var agent = await _mediator.Send(createAgentCommand);
 
-        var agent = await _agentService.CreateAgentAsync(createAgentRequest, userId);
-        var agentDto = _mapper.Map<AgentDto>(agent);
-
-        return CreatedAtRoute("GetAgentById", new { agentId = agent.Id }, agentDto);
+        return CreatedAtRoute("GetAgentById", new { agentId = agent.Id }, agent);
     }
 
     [HttpPut("{agentId}")]
-    public async Task<IActionResult> UpdateAgentAsync([FromBody] UpdateAgentRequest updateAgentRequest, string agentId)
+    public async Task<ActionResult<AgentDto>> UpdateAgentAsync([FromRoute] string agentId, [FromBody] UpdateAgentCommand updateAgentCommand)
     {
-        var agent = await _agentService.UpdateAgentAsync(agentId, updateAgentRequest);
-        var agentDto = _mapper.Map<AgentDto>(agent);
+        updateAgentCommand.Id = agentId;
 
-        return Ok(agentDto);
+        var agent = await _mediator.Send(updateAgentCommand);
+
+        return Ok(agent);
     }
 
     [HttpDelete("{agentId}")]
-    public async Task<IActionResult> DeleteAgentAsync(string agentId)
+    public async Task<IActionResult> DeleteAgentAsync([FromRoute] string agentId)
     {
-        var result = await _agentService.DeleteAgentAsync(agentId);
+        var deleteAgentCommand = new DeleteAgentCommand(agentId);
 
-        return result ? NoContent() : NotFound();
+        await _mediator.Send(deleteAgentCommand);
+
+        return NoContent();
     }
 }
